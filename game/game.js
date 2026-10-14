@@ -77,6 +77,7 @@ dirLight.shadow.camera.near = 1;
 dirLight.shadow.camera.far = 180;
 dirLight.shadow.bias = -0.0004;
 scene.add(dirLight);
+scene.add(dirLight.target);
 
 // Obstacle Colliders Array
 const colliders = [];
@@ -314,7 +315,7 @@ function buildLobby() {
   buildCutawayRoomShell(cx, cz, 0xE5E0D8, 0xD4C5B9, 0xC8B9AD, 0x8C7A6B);
 
   // Courtyard Tile Grid
-  const grid = new THREE.GridHelper(18, 9, 0xC4B5A5, 0xD9CFC4);
+  const grid = new THREE.GridHelper(22, 11, 0xC4B5A5, 0xD9CFC4);
   grid.position.set(cx, 0.02, cz);
   scene.add(grid);
 
@@ -368,42 +369,42 @@ function buildLobby() {
     new THREE.BoxGeometry(signWidth, signHeight, 0.25),
     new THREE.MeshLambertMaterial({ color: 0x1E3A8A })
   );
-  signMesh.position.set(cx, 2.75, cz - 9.85);
+  signMesh.position.set(cx, 2.75, cz - 10.85);
   scene.add(signMesh);
 
   // Front Decal Plaque with CanvasTexture
   const plaqueMat = new THREE.MeshBasicMaterial({ map: signTex, transparent: true });
   const plaque = new THREE.Mesh(new THREE.PlaneGeometry(signWidth - 0.2, signHeight - 0.1), plaqueMat);
-  plaque.position.set(cx, 2.75, cz - 9.71);
+  plaque.position.set(cx, 2.75, cz - 10.71);
   scene.add(plaque);
 
   // Golden architectural trims on signboard
   const topGoldTrim = new THREE.Mesh(new THREE.BoxGeometry(signWidth + 0.4, 0.14, 0.3), goldBorderMat);
-  topGoldTrim.position.set(cx, 3.45, cz - 9.85);
+  topGoldTrim.position.set(cx, 3.45, cz - 10.85);
   scene.add(topGoldTrim);
 
   const bottomGoldTrim = new THREE.Mesh(new THREE.BoxGeometry(signWidth + 0.4, 0.1, 0.3), goldBorderMat);
-  bottomGoldTrim.position.set(cx, 2.05, cz - 9.85);
+  bottomGoldTrim.position.set(cx, 2.05, cz - 10.85);
   scene.add(bottomGoldTrim);
 
   // Brick Support Pillars for School Arch
   [-5.8, 5.8].forEach(px => {
     const colMat = new THREE.MeshLambertMaterial({ color: 0xB45309 });
     const col = new THREE.Mesh(new THREE.BoxGeometry(0.85, 3.8, 0.85), colMat);
-    col.position.set(cx + px, 1.9, cz - 9.6);
+    col.position.set(cx + px, 1.9, cz - 10.6);
     col.castShadow = true;
     scene.add(col);
 
     const cap = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.2, 1.05), goldBorderMat);
-    cap.position.set(cx + px, 3.85, cz - 9.6);
+    cap.position.set(cx + px, 3.85, cz - 10.6);
     scene.add(cap);
 
-    colliders.push({ minX: cx + px - 0.5, maxX: cx + px + 0.5, minZ: cz - 10.1, maxZ: cz - 9.1 });
+    colliders.push({ minX: cx + px - 0.5, maxX: cx + px + 0.5, minZ: cz - 11.0, maxZ: cz - 10.1 });
   });
 
   // 3. Wooden Glass Noticeboard (Papan Kenyataan) on West Wall (-X)
   const nbGroup = new THREE.Group();
-  nbGroup.position.set(cx - 9.75, 2.1, cz);
+  nbGroup.position.set(cx - 12.85, 2.1, cz);
 
   // Frame & Corkboard
   const nbFrame = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.3, 5.6), new THREE.MeshLambertMaterial({ color: 0x78350F }));
@@ -460,7 +461,7 @@ function buildLobby() {
   });
 
   scene.add(nbGroup);
-  colliders.push({ minX: cx - 10.0, maxX: cx - 9.3, minZ: cz - 3.0, maxZ: cz + 3.0 });
+  colliders.push({ minX: cx - 13.0, maxX: cx - 12.5, minZ: cz - 3.0, maxZ: cz + 3.0 });
 
   // 4. Tropical Flower Beds along North and West Wall Bases
   function createFlowerBed(bx, bz, bWidth, bDepth) {
@@ -522,12 +523,12 @@ function buildLobby() {
   }
 
   // Add Flower Beds along North wall (-Z)
-  createFlowerBed(-2.8, -9.25, 4.8, 0.9);
-  createFlowerBed(2.8, -9.25, 4.8, 0.9);
+  createFlowerBed(-2.8, -10.35, 4.8, 0.9);
+  createFlowerBed(2.8, -10.35, 4.8, 0.9);
 
   // Add Flower Beds along West wall (-X) flanking noticeboard
-  createFlowerBed(-9.25, -6.5, 0.9, 4.6);
-  createFlowerBed(-9.25, 6.2, 0.9, 4.6);
+  createFlowerBed(-12.35, -6.5, 0.9, 4.6);
+  createFlowerBed(-12.35, 6.2, 0.9, 4.6);
 
   // 5. Flagpole on tiered pedestal
   const base1 = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.8, 0.25, 16), new THREE.MeshLambertMaterial({ color: 0xCBD5E1 }));
@@ -739,7 +740,7 @@ function buildRoom1() {
   // Warm Wooden Classroom Floor & Pastel Cream Walls
   buildCutawayRoomShell(cx, cz, 0x9E6938, 0xFFF7D6, 0xFFFBEB, 0xB45309);
 
-  const grid = new THREE.GridHelper(18, 9, 0x78350F, 0xB45309);
+  const grid = new THREE.GridHelper(22, 11, 0x78350F, 0xB45309);
   grid.position.set(cx, 0.02, cz);
   scene.add(grid);
 
@@ -748,7 +749,7 @@ function buildRoom1() {
     new THREE.BoxGeometry(9.0, 3.2, 0.15),
     new THREE.MeshLambertMaterial({ color: 0x78350F })
   );
-  boardFrame.position.set(cx, 2.1, cz - 9.85);
+  boardFrame.position.set(cx, 2.1, cz - 10.85);
   scene.add(boardFrame);
 
   // Chalkboard Surface with CanvasTexture
@@ -766,12 +767,12 @@ function buildRoom1() {
     new THREE.PlaneGeometry(8.6, 2.8),
     new THREE.MeshBasicMaterial({ map: chalkTex })
   );
-  boardSurface.position.set(cx, 2.1, cz - 9.76);
+  boardSurface.position.set(cx, 2.1, cz - 10.76);
   scene.add(boardSurface);
 
   // Chalk Ledge & Chalk sticks
   const ledge = new THREE.Mesh(new THREE.BoxGeometry(8.8, 0.1, 0.35), new THREE.MeshLambertMaterial({ color: 0x9A3412 }));
-  ledge.position.set(cx, 0.5, cz - 9.75);
+  ledge.position.set(cx, 0.5, cz - 10.75);
   scene.add(ledge);
 
   // Little chalk sticks on ledge (white, yellow)
@@ -781,13 +782,13 @@ function buildRoom1() {
       new THREE.MeshLambertMaterial({ color: (idx % 2 === 0) ? 0xFFFFFF : 0xFDE047 })
     );
     chalkStick.rotation.z = Math.PI / 2;
-    chalkStick.position.set(cx + cxOffset, 0.58, cz - 9.72);
+    chalkStick.position.set(cx + cxOffset, 0.58, cz - 10.72);
     scene.add(chalkStick);
   });
 
   // 2. Round Wall Clock above Chalkboard
   const clockGroup = new THREE.Group();
-  clockGroup.position.set(cx, 3.82, cz - 9.75);
+  clockGroup.position.set(cx, 3.82, cz - 10.75);
 
   const clockRim = new THREE.Mesh(
     new THREE.CylinderGeometry(0.52, 0.52, 0.06, 24),
@@ -830,7 +831,7 @@ function buildRoom1() {
     new THREE.PlaneGeometry(2.4, 2.0),
     new THREE.MeshBasicMaterial({ map: chart1Tex })
   );
-  chart1.position.set(cx + 6.2, 2.2, cz - 9.8);
+  chart1.position.set(cx + 6.2, 2.2, cz - 10.85);
   scene.add(chart1);
 
   // Chart 2 on West Wall (front)
@@ -840,7 +841,7 @@ function buildRoom1() {
     new THREE.MeshBasicMaterial({ map: chart2Tex })
   );
   chart2.rotation.y = Math.PI / 2;
-  chart2.position.set(cx - 9.8, 2.2, cz - 6.5);
+  chart2.position.set(cx - 12.85, 2.2, cz - 6.5);
   scene.add(chart2);
 
   // Chart 3 on West Wall (middle)
@@ -850,28 +851,28 @@ function buildRoom1() {
     new THREE.MeshBasicMaterial({ map: chart3Tex })
   );
   chart3.rotation.y = Math.PI / 2;
-  chart3.position.set(cx - 9.8, 2.2, cz - 1.5);
+  chart3.position.set(cx - 12.85, 2.2, cz - 1.5);
   scene.add(chart3);
 
   // 4. Classroom Windows on West Wall (-X)
   for (let i = 0; i <= 1; i++) {
     const wz = cz + 3.0 + i * 4.0;
     const winFrame = new THREE.Mesh(new THREE.BoxGeometry(0.15, 2.0, 2.6), new THREE.MeshLambertMaterial({ color: 0xCBD5E1 }));
-    winFrame.position.set(cx - 9.85, 2.3, wz);
+    winFrame.position.set(cx - 12.85, 2.3, wz);
     scene.add(winFrame);
 
     const winGlass = new THREE.Mesh(new THREE.BoxGeometry(0.16, 1.8, 2.4), new THREE.MeshLambertMaterial({ color: 0xBAE6FD, transparent: true, opacity: 0.85 }));
-    winGlass.position.set(cx - 9.84, 2.3, wz);
+    winGlass.position.set(cx - 12.84, 2.3, wz);
     scene.add(winGlass);
   }
 
   // 5. Green Noticeboard at Back Corner (West Wall)
   const cNotice = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.8, 2.6), new THREE.MeshLambertMaterial({ color: 0x78350F }));
-  cNotice.position.set(cx - 9.78, 2.2, cz + 7.5);
+  cNotice.position.set(cx - 12.85, 2.2, cz + 7.5);
   scene.add(cNotice);
 
   const cFelt = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.6, 2.4), new THREE.MeshLambertMaterial({ color: 0x15803D }));
-  cFelt.position.set(cx - 9.77, 2.2, cz + 7.5);
+  cFelt.position.set(cx - 12.84, 2.2, cz + 7.5);
   scene.add(cFelt);
 
   // 6. Teacher's Desk (Meja Guru - Assembly Station)
@@ -997,7 +998,7 @@ function buildRoom1() {
 
   // 8. Classroom Bookshelf on West Wall
   const shelf = new THREE.Mesh(new THREE.BoxGeometry(1.2, 3.2, 3.8), new THREE.MeshLambertMaterial({ color: 0x78350F }));
-  shelf.position.set(cx - 9.0, 1.6, cz + 3.5);
+  shelf.position.set(cx - 11.8, 1.6, cz + 3.5);
   shelf.castShadow = true;
   scene.add(shelf);
 
@@ -1009,27 +1010,27 @@ function buildRoom1() {
         new THREE.BoxGeometry(0.9, 0.55, 0.28),
         new THREE.MeshLambertMaterial({ color: shelfColors[(sRow * 3 + sBook) % shelfColors.length] })
       );
-      bMesh.position.set(cx - 8.9, 0.8 + sRow * 0.9, cz + 2.3 + sBook * 0.55);
+      bMesh.position.set(cx - 11.7, 0.8 + sRow * 0.9, cz + 2.3 + sBook * 0.55);
       scene.add(bMesh);
     }
   }
-  colliders.push({ minX: cx - 9.8, maxX: cx - 8.2, minZ: cz + 1.5, maxZ: cz + 5.5 });
+  colliders.push({ minX: cx - 12.6, maxX: cx - 11.0, minZ: cz + 1.5, maxZ: cz + 5.5 });
 
   // 9. Dustbin & Broom in Front-Left Corner
   const bin = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.22, 0.65, 12), new THREE.MeshLambertMaterial({ color: 0x0284C7 }));
-  bin.position.set(cx - 8.8, 0.325, cz - 8.8);
+  bin.position.set(cx - 11.8, 0.325, cz - 9.8);
   scene.add(bin);
 
   const broomHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.5, 6), new THREE.MeshLambertMaterial({ color: 0x78350F }));
   broomHandle.rotation.z = 0.25;
-  broomHandle.position.set(cx - 9.1, 0.8, cz - 8.5);
+  broomHandle.position.set(cx - 12.1, 0.8, cz - 9.5);
   scene.add(broomHandle);
 
   const broomHead = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.3, 0.4), new THREE.MeshLambertMaterial({ color: 0xFCD34D }));
-  broomHead.position.set(cx - 9.3, 0.2, cz - 8.5);
+  broomHead.position.set(cx - 12.3, 0.2, cz - 9.5);
   scene.add(broomHead);
 
-  colliders.push({ minX: cx - 9.5, maxX: cx - 8.2, minZ: cz - 9.2, maxZ: cz - 8.0 });
+  colliders.push({ minX: cx - 12.6, maxX: cx - 11.2, minZ: cz - 10.2, maxZ: cz - 9.0 });
 }
 
 // ==========================================
@@ -1045,7 +1046,7 @@ function buildRoom2() {
   // 1. Soft Royal Blue Library Carpet & Cutaway Walls
   buildCutawayRoomShell(cx, cz, 0x1E3A8A, 0xF1F5F9, 0xE2E8F0, 0x1E40AF);
 
-  const grid = new THREE.GridHelper(18, 9, 0x1D4ED8, 0x3B82F6);
+  const grid = new THREE.GridHelper(22, 11, 0x1D4ED8, 0x3B82F6);
   grid.position.set(cx, 0.02, cz);
   scene.add(grid);
 
@@ -1054,7 +1055,7 @@ function buildRoom2() {
     new THREE.BoxGeometry(7.6, 1.5, 0.16),
     new THREE.MeshLambertMaterial({ color: 0x78350F })
   );
-  signBack.position.set(cx - 0.5, 3.2, cz - 9.85);
+  signBack.position.set(cx - 0.5, 3.2, cz - 10.85);
   scene.add(signBack);
 
   const signTex = createTextCanvasTexture(
@@ -1070,7 +1071,7 @@ function buildRoom2() {
     new THREE.PlaneGeometry(7.4, 1.3),
     new THREE.MeshBasicMaterial({ map: signTex })
   );
-  signFace.position.set(cx - 0.5, 3.2, cz - 9.76);
+  signFace.position.set(cx - 0.5, 3.2, cz - 10.76);
   scene.add(signFace);
 
   // 3. Wall Posters on West Wall (-X): 'KEMPEN NILAM' & Reading Posters
@@ -1085,12 +1086,12 @@ function buildRoom2() {
     'MEMBACA JAMBATAN ILMU • 1 HARI 1 BUKU'
   );
   const p1Frame = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.9, 2.3), new THREE.MeshLambertMaterial({ color: 0x78350F }));
-  p1Frame.position.set(cx - 9.82, 2.35, cz + 2.5);
+  p1Frame.position.set(cx - 12.85, 2.35, cz + 2.5);
   scene.add(p1Frame);
 
   const p1Surface = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.8), new THREE.MeshBasicMaterial({ map: nilamTex }));
   p1Surface.rotation.y = Math.PI / 2;
-  p1Surface.position.set(cx - 9.75, 2.35, cz + 2.5);
+  p1Surface.position.set(cx - 12.78, 2.35, cz + 2.5);
   scene.add(p1Surface);
 
   // Poster 2: DEKAD MEMBACA
@@ -1104,12 +1105,12 @@ function buildRoom2() {
     'BANGSA MEMBACA BANGSA BERJAYA'
   );
   const p2Frame = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.9, 2.3), new THREE.MeshLambertMaterial({ color: 0x78350F }));
-  p2Frame.position.set(cx - 9.82, 2.35, cz + 5.5);
+  p2Frame.position.set(cx - 12.85, 2.35, cz + 5.5);
   scene.add(p2Frame);
 
   const p2Surface = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.8), new THREE.MeshBasicMaterial({ map: dekadTex }));
   p2Surface.rotation.y = Math.PI / 2;
-  p2Surface.position.set(cx - 9.75, 2.35, cz + 5.5);
+  p2Surface.position.set(cx - 12.78, 2.35, cz + 5.5);
   scene.add(p2Surface);
 
   // Poster 3: ETIKA PERPUSTAKAAN (North-West corner)
@@ -1123,12 +1124,12 @@ function buildRoom2() {
     '1. SENYAP • 2. SUSUN BUKU • 3. CATAT NILAM'
   );
   const p3Frame = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.8, 2.1), new THREE.MeshLambertMaterial({ color: 0x78350F }));
-  p3Frame.position.set(cx - 9.82, 2.35, cz - 6.5);
+  p3Frame.position.set(cx - 12.85, 2.35, cz - 6.5);
   scene.add(p3Frame);
 
   const p3Surface = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 1.7), new THREE.MeshBasicMaterial({ map: etikaTex }));
   p3Surface.rotation.y = Math.PI / 2;
-  p3Surface.position.set(cx - 9.75, 2.35, cz - 6.5);
+  p3Surface.position.set(cx - 12.78, 2.35, cz - 6.5);
   scene.add(p3Surface);
 
   // 4. Tall Bookshelves along North (-Z) and West (-X) walls
@@ -1156,11 +1157,13 @@ function buildRoom2() {
     }
 
     scene.add(group);
-    colliders.push({ minX: bx - bWidth / 2 - 0.2, maxX: bx + bWidth / 2 + 0.2, minZ: bz - bDepth / 2 - 0.2, maxZ: bz + bDepth / 2 + 0.2 });
+    const halfDimX = rotY !== 0 ? bDepth / 2 : bWidth / 2;
+    const halfDimZ = rotY !== 0 ? bWidth / 2 : bDepth / 2;
+    colliders.push({ minX: bx - halfDimX - 0.2, maxX: bx + halfDimX + 0.2, minZ: bz - halfDimZ - 0.2, maxZ: bz + halfDimZ + 0.2 });
   }
 
-  makeTallBookshelf(cx - 4.5, cz - 9.0, 7.5, 1.2, 0);
-  makeTallBookshelf(cx - 9.0, cz - 2.8, 6.5, 1.2, Math.PI / 2);
+  makeTallBookshelf(cx - 4.5, cz - 10.2, 7.5, 1.2, 0);
+  makeTallBookshelf(cx - 11.8, cz - 2.8, 6.5, 1.2, Math.PI / 2);
 
   // 5. Reading Corner (Sudut Nilam) at (cx - 5.5, cz + 4.5)
   const nilamGroup = new THREE.Group();
@@ -1560,7 +1563,7 @@ function buildRoom3() {
   buildCutawayRoomShell(cx, cz, 0x15803D, 0xF8FAFC, 0xEDE9FE, 0x166534);
 
   // White Football Pitch Markings
-  const pitchLines = new THREE.GridHelper(18, 6, 0xFFFFFF, 0x22C55E);
+  const pitchLines = new THREE.GridHelper(22, 11, 0xFFFFFF, 0x22C55E);
   pitchLines.position.set(cx, 0.02, cz);
   scene.add(pitchLines);
 
@@ -1594,7 +1597,7 @@ function buildRoom3() {
 
   // 3. Detailed Canteen Stall (Gerai Kantin Sekolah) on North Wall (-Z)
   const cGroup = new THREE.Group();
-  cGroup.position.set(cx + 2.0, 0, cz - 8.0);
+  cGroup.position.set(cx + 2.0, 0, cz - 9.0);
 
   // Menu Signboard on North Wall (-Z)
   const menuFrame = new THREE.Mesh(
@@ -1743,14 +1746,14 @@ function buildRoom3() {
   cGroup.add(till);
 
   scene.add(cGroup);
-  colliders.push({ minX: cx - 1.8, maxX: cx + 5.8, minZ: cz - 9.1, maxZ: cz - 7.0 });
+  colliders.push({ minX: cx - 1.8, maxX: cx + 5.8, minZ: cz - 10.1, maxZ: cz - 8.0 });
 
   // 4. Tiled Patio Area & 2 Canteen Picnic Tables with Benches
   const patio = new THREE.Mesh(
     new THREE.BoxGeometry(9.6, 0.03, 3.8),
     new THREE.MeshLambertMaterial({ color: 0xE2E8F0 })
   );
-  patio.position.set(cx + 1.8, 0.02, cz - 4.8);
+  patio.position.set(cx + 1.8, 0.02, cz - 5.8);
   scene.add(patio);
 
   function makePicnicTable(tx, tz, tableColor) {
@@ -1795,13 +1798,13 @@ function buildRoom3() {
   }
 
   // Picnic Table 1 (Blue)
-  makePicnicTable(cx - 0.8, cz - 4.8, 0x0284C7);
+  makePicnicTable(cx - 0.8, cz - 5.8, 0x0284C7);
   // Picnic Table 2 (Emerald)
-  makePicnicTable(cx + 4.4, cz - 4.8, 0x10B981);
+  makePicnicTable(cx + 4.4, cz - 5.8, 0x10B981);
 
   // 5. Football Pitch Goalpost on West Wall (-X)
   const goalGroup = new THREE.Group();
-  goalGroup.position.set(cx - 8.5, 0, cz);
+  goalGroup.position.set(cx - 11.8, 0, cz);
 
   const barMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.25 });
   const post1 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2.4, 8), barMat);
@@ -1824,11 +1827,11 @@ function buildRoom3() {
   goalGroup.add(netMesh);
 
   scene.add(goalGroup);
-  colliders.push({ minX: cx - 9.5, maxX: cx - 7.7, minZ: cz - 2.8, maxZ: cz + 2.8 });
+  colliders.push({ minX: cx - 12.8, maxX: cx - 11.0, minZ: cz - 2.8, maxZ: cz + 2.8 });
 
   // 6. 3D Black-and-White Football Resting on Grass near Goalpost
   const ballGroup = new THREE.Group();
-  ballGroup.position.set(cx - 7.4, 0.22, cz + 1.2);
+  ballGroup.position.set(cx - 10.4, 0.22, cz + 1.2);
 
   // White Ball Sphere
   const ballSphere = new THREE.Mesh(
@@ -1888,14 +1891,14 @@ function buildRoom3() {
     scene.add(fGroup);
   }
 
-  makeCornerFlag(cx - 8.5, cz - 7.2);
-  makeCornerFlag(cx - 8.5, cz + 6.8);
-  makeCornerFlag(cx + 8.5, cz - 7.2);
-  makeCornerFlag(cx + 8.5, cz + 6.8);
+  makeCornerFlag(cx - 11.2, cz - 8.8);
+  makeCornerFlag(cx - 11.2, cz + 7.2);
+  makeCornerFlag(cx + 11.2, cz - 8.8);
+  makeCornerFlag(cx + 11.2, cz + 7.2);
 
   // 8. Tiered Spectator Bench (Astaka / Bangku Penonton) along West Wall (-X)
   const astakaGroup = new THREE.Group();
-  astakaGroup.position.set(cx - 8.8, 0, cz + 4.8);
+  astakaGroup.position.set(cx - 11.8, 0, cz + 4.8);
 
   // Tier 1 Bench (Lower Step)
   const tier1 = new THREE.Mesh(
@@ -1938,7 +1941,7 @@ function buildRoom3() {
   astakaGroup.add(astakaPlaque);
 
   scene.add(astakaGroup);
-  colliders.push({ minX: cx - 9.8, maxX: cx - 7.8, minZ: cz + 2.4, maxZ: cz + 7.2 });
+  colliders.push({ minX: cx - 12.8, maxX: cx - 10.8, minZ: cz + 2.4, maxZ: cz + 7.2 });
 
   // 9. Trophy Podium in Center (Pentas Cabaran 1-2-3 - Assembly Station)
   const podGroup = new THREE.Group();
@@ -2293,38 +2296,229 @@ setupCollectiblesList(COLLECTIBLES_R2, 'book');
 setupCollectiblesList(COLLECTIBLES_R3, 'orb');
 
 // ==========================================
-// 10. 3D PLAYER AVATAR SETUP
+// 10. 3D PLAYER AVATAR SETUP (ANIMATED MALAYSIAN PRIMARY SCHOOL STUDENT)
 // ==========================================
 const playerGroup = new THREE.Group();
 playerGroup.position.set(0, 0, 4.5);
 scene.add(playerGroup);
 
-const bodyMat = new THREE.MeshLambertMaterial({ color: 0xFF6B6B });
-const playerBody = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.0, 0.8), bodyMat);
-playerBody.position.y = 0.7;
-playerBody.castShadow = true;
+// Limb Pivot References for Natural Movement Animation
+let leftArmPivot, rightArmPivot;
+let leftLegPivot, rightLegPivot;
+
+// Upper Body & Torso Group (bobs slightly when moving)
+const playerBody = new THREE.Group();
+playerBody.position.y = 0.65;
 playerGroup.add(playerBody);
 
-const hatMat = new THREE.MeshLambertMaterial({ color: 0x4ECDC4 });
-const playerHat = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.35, 0.9), hatMat);
-playerHat.position.y = 1.35;
-playerHat.castShadow = true;
-playerGroup.add(playerHat);
+// Materials for Malaysian School Uniform
+const shirtMat = new THREE.MeshLambertMaterial({ color: 0xFFFFFF }); // White short-sleeve school shirt
+const pantsMat = new THREE.MeshLambertMaterial({ color: 0x1E3A8A }); // Navy blue primary school pants (0x1E3A8A)
+const skinMat = new THREE.MeshLambertMaterial({ color: 0xFDE68A }); // Warm skin tone
+const tieMat = new THREE.MeshLambertMaterial({ color: 0xDC2626 }); // Red school tie
+const darkMat = new THREE.MeshBasicMaterial({ color: 0x0F172A }); // Eyes & school shoes
+const hairMat = new THREE.MeshLambertMaterial({ color: 0x1E293B }); // Dark hair
+const backpackMat = new THREE.MeshLambertMaterial({ color: 0x2563EB }); // Royal blue school backpack (beg sekolah)
+const bagPocketMat = new THREE.MeshLambertMaterial({ color: 0xF59E0B }); // Amber pocket accent
 
-const eyeMat = new THREE.MeshBasicMaterial({ color: 0x2B2D42 });
-const leftEye = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.06), eyeMat);
-leftEye.position.set(-0.22, 0.8, -0.42);
-playerGroup.add(leftEye);
+// 1. Torso / White Short-Sleeve School Shirt
+const shirtMesh = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.52, 0.42), shirtMat);
+shirtMesh.position.y = 0.26;
+shirtMesh.castShadow = true;
+shirtMesh.receiveShadow = true;
+playerBody.add(shirtMesh);
 
-const rightEye = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.06), eyeMat);
-rightEye.position.set(0.22, 0.8, -0.42);
-playerGroup.add(rightEye);
+// Navy Blue Belt / Waistband
+const beltMesh = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.08, 0.44), pantsMat);
+beltMesh.position.y = 0.02;
+playerBody.add(beltMesh);
 
-const pShadowMat = new THREE.MeshBasicMaterial({ color: 0x8D99AE, transparent: true, opacity: 0.35 });
-const playerShadow = new THREE.Mesh(new THREE.CircleGeometry(0.65, 16), pShadowMat);
+// Red School Tie on Front (-Z)
+const tieKnot = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.08, 0.05), tieMat);
+tieKnot.position.set(0, 0.46, -0.23);
+playerBody.add(tieKnot);
+
+const tieBody = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.3, 0.04), tieMat);
+tieBody.position.set(0, 0.3, -0.23);
+playerBody.add(tieBody);
+
+// School Badge on Left Chest
+const badge = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.09, 0.02), bagPocketMat);
+badge.position.set(-0.18, 0.38, -0.22);
+playerBody.add(badge);
+
+// 2. 3D School Backpack (Beg Sekolah) on their back (z = +0.32)
+const backpack = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.48, 0.26), backpackMat);
+backpack.position.set(0, 0.26, 0.32);
+backpack.castShadow = true;
+playerBody.add(backpack);
+
+// Front Pocket on Backpack
+const bagPocket = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.24, 0.1), bagPocketMat);
+bagPocket.position.set(0, 0.18, 0.47);
+playerBody.add(bagPocket);
+
+// Backpack Shoulder Straps
+[-0.2, 0.2].forEach((sx) => {
+  const strap = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.5, 0.04), backpackMat);
+  strap.position.set(sx, 0.28, -0.21);
+  playerBody.add(strap);
+});
+
+// 3. Cute Head with Cap & Hair
+const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 0.12, 8), skinMat);
+neck.position.set(0, 0.56, 0);
+playerBody.add(neck);
+
+const headGroup = new THREE.Group();
+headGroup.position.set(0, 0.82, 0);
+playerBody.add(headGroup);
+
+const headMesh = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.44, 0.44), skinMat);
+headMesh.castShadow = true;
+headGroup.add(headMesh);
+
+// Cute Eyes on Front (-Z)
+const eyeGeo = new THREE.BoxGeometry(0.08, 0.12, 0.04);
+const leftEye = new THREE.Mesh(eyeGeo, darkMat);
+leftEye.position.set(-0.12, 0.02, -0.23);
+headGroup.add(leftEye);
+
+const rightEye = new THREE.Mesh(eyeGeo, darkMat);
+rightEye.position.set(0.12, 0.02, -0.23);
+headGroup.add(rightEye);
+
+// Cute Blush Cheeks
+const blushGeo = new THREE.BoxGeometry(0.08, 0.04, 0.02);
+const blushMat = new THREE.MeshBasicMaterial({ color: 0xF472B6 });
+const leftBlush = new THREE.Mesh(blushGeo, blushMat);
+leftBlush.position.set(-0.16, -0.06, -0.23);
+headGroup.add(leftBlush);
+
+const rightBlush = new THREE.Mesh(blushGeo, blushMat);
+rightBlush.position.set(0.16, -0.06, -0.23);
+headGroup.add(rightBlush);
+
+// Cute Smile
+const smile = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.03, 0.02), new THREE.MeshBasicMaterial({ color: 0xE11D48 }));
+smile.position.set(0, -0.1, -0.23);
+headGroup.add(smile);
+
+// Dark Student Hair & Cap
+const hairTop = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.16, 0.52), hairMat);
+hairTop.position.set(0, 0.2, 0);
+headGroup.add(hairTop);
+
+const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.3, 0.16), hairMat);
+hairBack.position.set(0, 0.05, 0.18);
+headGroup.add(hairBack);
+
+const hairBangs = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.12, 0.08), hairMat);
+hairBangs.position.set(0, 0.16, -0.22);
+headGroup.add(hairBangs);
+
+// Cute School Cap Visor (Navy Blue)
+const capVisor = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.04, 0.18), pantsMat);
+capVisor.position.set(0, 0.22, -0.26);
+headGroup.add(capVisor);
+
+// 4. Separate Left & Right Arms (Shoulder Pivots)
+function makeStudentArm(isLeft) {
+  const armPivot = new THREE.Group();
+  const armX = isLeft ? -0.42 : 0.42;
+  armPivot.position.set(armX, 0.44, 0);
+
+  // Short White Sleeve
+  const sleeve = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.2, 0.2), shirtMat);
+  sleeve.position.set(0, -0.08, 0);
+  sleeve.castShadow = true;
+  armPivot.add(sleeve);
+
+  // Bare Forearm & Hand (Skin)
+  const forearm = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.28, 0.15), skinMat);
+  forearm.position.set(0, -0.28, 0);
+  armPivot.add(forearm);
+
+  playerBody.add(armPivot);
+  return armPivot;
+}
+
+leftArmPivot = makeStudentArm(true);
+rightArmPivot = makeStudentArm(false);
+
+// 5. Separate Left & Right Legs (Hip Pivots attached directly to playerGroup)
+function makeStudentLeg(isLeft) {
+  const legPivot = new THREE.Group();
+  const legX = isLeft ? -0.16 : 0.16;
+  legPivot.position.set(legX, 0.62, 0);
+
+  // Navy Blue School Pants (0x1E3A8A)
+  const pants = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.38, 0.24), pantsMat);
+  pants.position.set(0, -0.19, 0);
+  pants.castShadow = true;
+  legPivot.add(pants);
+
+  // White School Socks
+  const sock = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.12, 0.22), shirtMat);
+  sock.position.set(0, -0.42, 0);
+  legPivot.add(sock);
+
+  // Black School Shoes
+  const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.12, 0.3), darkMat);
+  shoe.position.set(0, -0.52, -0.04);
+  shoe.castShadow = true;
+  legPivot.add(shoe);
+
+  playerGroup.add(legPivot);
+  return legPivot;
+}
+
+leftLegPivot = makeStudentLeg(true);
+rightLegPivot = makeStudentLeg(false);
+
+// Ground Shadow Disc
+const pShadowMat = new THREE.MeshBasicMaterial({ color: 0x475569, transparent: true, opacity: 0.35 });
+const playerShadow = new THREE.Mesh(new THREE.CircleGeometry(0.6, 16), pShadowMat);
 playerShadow.rotation.x = -Math.PI / 2;
 playerShadow.position.y = 0.03;
 playerGroup.add(playerShadow);
+
+// ==========================================
+// 10.5 DYNAMIC 3D FLOOR GUIDE ARROW (ANAK PANAH PANDUAN)
+// ==========================================
+const guideArrowGroup = new THREE.Group();
+guideArrowGroup.position.set(0, 0.25, 4.5);
+scene.add(guideArrowGroup);
+
+// Glowing Gold 3D Arrow Mesh (ConeGeometry + BoxGeometry shaft) hovering at y = 0.25
+const arrowMat = new THREE.MeshStandardMaterial({
+  color: 0xF59E0B,
+  emissive: 0xFBBF24,
+  emissiveIntensity: 0.95,
+  metalness: 0.5,
+  roughness: 0.2
+});
+
+const arrowMeshContainer = new THREE.Group();
+arrowMeshContainer.position.set(0, 0, -1.35); // Hovering 1.35m just in front of player
+
+// Arrow Shaft (BoxGeometry)
+const arrowShaft = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.08, 0.42), arrowMat);
+arrowShaft.position.set(0, 0, 0.22);
+arrowMeshContainer.add(arrowShaft);
+
+// Arrow Head Cone (ConeGeometry pointing forward toward -Z)
+const arrowHead = new THREE.Mesh(new THREE.ConeGeometry(0.26, 0.5, 16), arrowMat);
+arrowHead.rotation.x = -Math.PI / 2;
+arrowHead.position.set(0, 0, -0.22);
+arrowMeshContainer.add(arrowHead);
+
+// Soft Gold Glow PointLight
+const arrowGlowLight = new THREE.PointLight(0xF59E0B, 1.2, 3.5);
+arrowGlowLight.position.set(0, 0.2, 0);
+arrowMeshContainer.add(arrowGlowLight);
+
+guideArrowGroup.add(arrowMeshContainer);
 
 // ==========================================
 // 11. TELEPORTATION SYSTEM
@@ -2338,6 +2532,9 @@ export function teleportTo(roomId) {
 
   const { x: sx, z: sz } = targetRoom.spawn;
   playerGroup.position.set(sx, 0, sz);
+  if (guideArrowGroup) {
+    guideArrowGroup.position.set(sx, 0.25, sz);
+  }
 
   playerGroup.rotation.y = 0; // Face forward towards room interior (-Z)
   // Instantly snap Roblox 3rd-person camera close behind player
@@ -2536,9 +2733,108 @@ function animate() {
       while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
       playerGroup.rotation.y += angleDiff * 0.25;
 
-      playerBody.position.y = 0.7 + Math.abs(Math.sin(time * 12)) * 0.1;
+      // Natural Limb Swing Animation (Math.sin(time * 12) * 0.45)
+      const swing = Math.sin(time * 12) * 0.45;
+      if (leftLegPivot && rightLegPivot) {
+        leftLegPivot.rotation.x = swing;
+        rightLegPivot.rotation.x = -swing;
+      }
+      if (leftArmPivot && rightArmPivot) {
+        leftArmPivot.rotation.x = -swing;
+        rightArmPivot.rotation.x = swing;
+      }
+      playerBody.position.y = 0.65 + Math.abs(Math.sin(time * 12)) * 0.08;
     } else {
-      playerBody.position.y = 0.7 + Math.sin(time * 2.5) * 0.02;
+      // Idle Breathing & Smooth Limb Reset
+      if (leftLegPivot && rightLegPivot) {
+        leftLegPivot.rotation.x *= 0.8;
+        rightLegPivot.rotation.x *= 0.8;
+      }
+      if (leftArmPivot && rightArmPivot) {
+        leftArmPivot.rotation.x = Math.sin(time * 2.2) * 0.06;
+        rightArmPivot.rotation.x = -Math.sin(time * 2.2) * 0.06;
+      }
+      playerBody.position.y = 0.65 + Math.sin(time * 2.5) * 0.02;
+    }
+  }
+
+  // Dynamic 3D Floor Guide Arrow (Anak Panah Panduan)
+  if (guideArrowGroup) {
+    guideArrowGroup.position.set(playerGroup.position.x, 0.25, playerGroup.position.z);
+    arrowMeshContainer.position.y = Math.sin(time * 4.0) * 0.04;
+
+    let arrowTarget = null;
+
+    if (gameState.currentRoom === 'lobby') {
+      arrowTarget = portals.portalR1.group.position;
+    } else if (gameState.currentRoom === 'room1') {
+      const uncollected = COLLECTIBLES_R1.filter(item => !item.collected);
+      if (uncollected.length > 0) {
+        let nearest = uncollected[0];
+        let minDist = Infinity;
+        uncollected.forEach(item => {
+          const d = Math.hypot(playerGroup.position.x - item.pos.x, playerGroup.position.z - item.pos.z);
+          if (d < minDist) {
+            minDist = d;
+            nearest = item;
+          }
+        });
+        arrowTarget = nearest.pos;
+      } else if (!gameState.room1Completed) {
+        arrowTarget = r1AssemblyStation.group.position;
+      } else {
+        arrowTarget = portals.portalR2.group.position;
+      }
+    } else if (gameState.currentRoom === 'room2') {
+      const uncollected = COLLECTIBLES_R2.filter(item => !item.collected);
+      if (uncollected.length > 0) {
+        let nearest = uncollected[0];
+        let minDist = Infinity;
+        uncollected.forEach(item => {
+          const d = Math.hypot(playerGroup.position.x - item.pos.x, playerGroup.position.z - item.pos.z);
+          if (d < minDist) {
+            minDist = d;
+            nearest = item;
+          }
+        });
+        arrowTarget = nearest.pos;
+      } else if (!gameState.room2Completed) {
+        arrowTarget = r2AssemblyStation.group.position;
+      } else {
+        arrowTarget = portals.portalR3.group.position;
+      }
+    } else if (gameState.currentRoom === 'room3') {
+      const uncollected = COLLECTIBLES_R3.filter(item => !item.collected);
+      if (uncollected.length > 0) {
+        let nearest = uncollected[0];
+        let minDist = Infinity;
+        uncollected.forEach(item => {
+          const d = Math.hypot(playerGroup.position.x - item.pos.x, playerGroup.position.z - item.pos.z);
+          if (d < minDist) {
+            minDist = d;
+            nearest = item;
+          }
+        });
+        arrowTarget = nearest.pos;
+      } else if (!gameState.room3Completed) {
+        arrowTarget = r3AssemblyStation.group.position;
+      } else {
+        arrowTarget = portals.returnLobby.group.position;
+      }
+    }
+
+    if (arrowTarget) {
+      guideArrowGroup.visible = true;
+      const dx = arrowTarget.x - playerGroup.position.x;
+      const dz = arrowTarget.z - playerGroup.position.z;
+      const targetAngle = Math.atan2(dx, dz) + Math.PI;
+
+      let angleDiff = targetAngle - guideArrowGroup.rotation.y;
+      while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+      while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+      guideArrowGroup.rotation.y += angleDiff * 0.15;
+    } else {
+      guideArrowGroup.visible = false;
     }
   }
 
@@ -2593,7 +2889,7 @@ function animate() {
 
   // Sunlight and Close-Up Roblox 3rd-Person Camera Follow
   dirLight.position.set(playerGroup.position.x + 16, 32, playerGroup.position.z + 20);
-  dirLight.target = playerGroup;
+  dirLight.target.position.copy(playerGroup.position);
 
   const targetCamX = playerGroup.position.x;
   const targetCamY = playerGroup.position.y + 4.2;
