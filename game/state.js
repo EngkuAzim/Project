@@ -171,6 +171,8 @@ export const COLLECTIBLES_R3 = [
     id: 'orb1',
     label: 'Senario 1',
     topic: 'Kecenderungan Membaca',
+    proverb: 'ULAT BUKU',
+    note: 'Nota Pintar #1: ULAT BUKU bermaksud orang yang sangat rajin dan gemar membaca buku.',
     char: '⚽ 1',
     color: 0x10B981,
     pos: { x: 293.0, y: 1.2, z: 300.0 }, // By football goalpost
@@ -181,6 +183,8 @@ export const COLLECTIBLES_R3 = [
     id: 'orb2',
     label: 'Senario 2',
     topic: 'Aktiviti Sukan Bola',
+    proverb: 'KAKI BANGKU',
+    note: 'Nota Pintar #2: KAKI BANGKU bermaksud orang yang tidak pandai bermain bola sepak.',
     char: '⚽ 2',
     color: 0xF59E0B,
     pos: { x: 300.0, y: 1.4, z: 294.0 }, // In front of canteen
@@ -191,6 +195,8 @@ export const COLLECTIBLES_R3 = [
     id: 'orb3',
     label: 'Senario 3',
     topic: 'Semangat Kesukanan',
+    proverb: 'MANDI PELUH',
+    note: 'Nota Pintar #3: MANDI PELUH bermaksud bekerja atau bersukan dengan bersungguh-sungguh.',
     char: '⚽ 3',
     color: 0x6366F1,
     pos: { x: 306.5, y: 1.2, z: 304.0 }, // Near spectators bench

@@ -11,7 +11,8 @@ import {
   QUIZ_R3_CORRECT,
   COLLECTIBLES_R1,
   COLLECTIBLES_R2,
-  COLLECTIBLES_R3
+  COLLECTIBLES_R3,
+  keys
 } from './state.js';
 
 // DOM Element References
@@ -92,9 +93,49 @@ export function playErrorBuzzer() {
 }
 
 // ==========================================
+// 1.5 BAHASA MELAYU VOICEOVER (SpeechSynthesis)
+// ==========================================
+let isVoiceMuted = false;
+
+export function toggleVoiceover() {
+  isVoiceMuted = !isVoiceMuted;
+  if (isVoiceMuted && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+  const btn = document.getElementById('voice-toggle-btn');
+  if (btn) {
+    btn.classList.toggle('muted', isVoiceMuted);
+    btn.innerHTML = isVoiceMuted ? '🔇 <span id="voice-toggle-label">Suara: Senyap</span>' : '🔊 <span id="voice-toggle-label">Suara: Hidup</span>';
+  }
+  showItemToast(isVoiceMuted ? '🔇' : '🔊', isVoiceMuted ? 'Suara latar dipadamkan.' : 'Suara latar Bahasa Melayu diaktifkan!');
+}
+
+export function speakBM(text) {
+  if (isVoiceMuted) return;
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+
+  try {
+    window.speechSynthesis.cancel();
+    const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/[-•—_]/g, ' ');
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'ms-MY';
+    utterance.rate = 0.95;
+    utterance.pitch = 1.05;
+
+    const voices = window.speechSynthesis.getVoices();
+    const msVoice = voices.find(v => v.lang === 'ms-MY' || v.lang === 'ms' || v.lang.startsWith('id'));
+    if (msVoice) utterance.voice = msVoice;
+
+    window.speechSynthesis.speak(utterance);
+  } catch (e) {
+    console.warn('Speech error', e);
+  }
+}
+
+// ==========================================
 // 2. HUD & TOAST NOTIFICATIONS
 // ==========================================
-export function showItemToast(char, text) {
+export function showItemToast(char, text, duration = 2800) {
   if (!toastEl || !toastJawiEl || !toastMsgEl) return;
   toastJawiEl.textContent = char;
   toastMsgEl.textContent = text;
@@ -102,7 +143,7 @@ export function showItemToast(char, text) {
   clearTimeout(toastTimeout);
   toastTimeout = setTimeout(() => {
     toastEl.classList.remove('show');
-  }, 2800);
+  }, duration);
 }
 
 export function updateLocationBadge(text, isSpecial = false) {
@@ -219,6 +260,7 @@ export function collectItem(item, currentRoom) {
 
   if (currentRoom === 'room1') {
     showItemToast(item.char, `Hebat! Anda menemui huruf: ${item.name} (${item.char})`);
+    speakBM(`Huruf Jawi: ${item.name}. Padanan Rumi: ${item.rumi}`);
     const count = COLLECTIBLES_R1.filter(c => c.collected).length;
     if (count === 4) {
       updateMissionText('Tahniah! Semua 4 huruf ditemui. Pergi ke Meja Guru untuk menyusun huruf Jawi!');
@@ -227,6 +269,7 @@ export function collectItem(item, currentRoom) {
     }
   } else if (currentRoom === 'room2') {
     showItemToast('📖', `Tahniah! Anda menjumpai buku: ${item.text}`);
+    speakBM(`Keratan frasa: ${item.text}`);
     const count = COLLECTIBLES_R2.filter(c => c.collected).length;
     if (count === 3) {
       updateMissionText('Tahniah! Semua 3 buku ditemui. Pergi ke Meja Bacaan untuk membina ayat!');
@@ -234,7 +277,14 @@ export function collectItem(item, currentRoom) {
       updateMissionText(`Misi: Cari ${3 - count} lagi buku frasa di Pusat Sumber.`);
     }
   } else if (currentRoom === 'room3') {
-    showItemToast('⚽', `Bagus! Anda meneroka: ${item.label} (${item.topic})`);
+    const proverbNotes = {
+      orb1: 'Nota Pintar #1: ULAT BUKU bermaksud orang yang sangat rajin dan gemar membaca buku.',
+      orb2: 'Nota Pintar #2: KAKI BANGKU bermaksud orang yang tidak pandai bermain bola sepak.',
+      orb3: 'Nota Pintar #3: MANDI PELUH bermaksud bekerja atau bersukan dengan bersungguh-sungguh.'
+    };
+    const noteText = proverbNotes[item.id] || item.note || `Bagus! Anda meneroka: ${item.label} (${item.topic})`;
+    showItemToast('💡', noteText, 4800);
+    speakBM(noteText);
     const count = COLLECTIBLES_R3.filter(c => c.collected).length;
     if (count === 3) {
       updateMissionText('Tahniah! Semua 3 senario diteroka. Pergi ke Pentas Cabaran untuk kuiz peribahasa!');
@@ -554,6 +604,7 @@ export function checkPuzzleR1() {
   if (isCorrect) {
     gameState.room1Completed = true;
     playSuccessFanfare();
+    speakBM('Tahniah! Cantuman huruf Jawi guna berjaya dibina dengan tepat. Portal ke Bilik 2 kini dibuka.');
 
     const puzzleView = document.getElementById('r1-puzzle-view');
     const successView = document.getElementById('r1-success-view');
@@ -570,6 +621,7 @@ export function checkPuzzleR1() {
     gameScores.room1 = Math.max(10, 40 - (gameScores.attemptsR1 * 5));
     updateR1ScoreDisplay();
     playErrorBuzzer();
+    speakBM('Susunan huruf Jawi belum tepat. Ejaan guna bermula dari huruf Ga di sebelah kanan. Sila cuba lagi.');
 
     if (feedbackEl) {
       feedbackEl.className = 'feedback-banner error';
@@ -767,6 +819,7 @@ export function checkPuzzleR2() {
   if (isCorrect) {
     gameState.room2Completed = true;
     playSuccessFanfare();
+    speakBM('Tahniah! Ayat tunggal berjaya dibina dengan susunan subjek, kata kerja, dan keterangan yang gramatis. Portal ke Bilik 3 kini dibuka.');
 
     const puzzleView = document.getElementById('r2-puzzle-view');
     const successView = document.getElementById('r2-success-view');
@@ -783,6 +836,7 @@ export function checkPuzzleR2() {
     gameScores.room2 = Math.max(10, 30 - (gameScores.attemptsR2 * 5));
     updateR2ScoreDisplay();
     playErrorBuzzer();
+    speakBM('Susunan ayat belum tepat. Susun mengikut subjek, kata kerja, dan objek atau keterangan.');
 
     if (feedbackEl) {
       feedbackEl.className = 'feedback-banner error';
@@ -805,7 +859,15 @@ export function proceedToRoom3() {
 // ==========================================
 // 10. ROOM 3 MODAL: PERIBAHASA (30 Marks)
 // ==========================================
+export function updateR3ScoreDisplay() {
+  const scoreEl = document.getElementById('r3-live-score');
+  const attemptsEl = document.getElementById('r3-attempts');
+  if (scoreEl) scoreEl.textContent = `${gameScores.room3} / 30`;
+  if (attemptsEl) attemptsEl.textContent = gameScores.attemptsR3;
+}
+
 export function openRoom3Modal() {
+  updateR3ScoreDisplay();
   const feedback = document.getElementById('r3-feedback');
   if (feedback) feedback.style.display = 'none';
   renderR3Options();
@@ -839,22 +901,68 @@ export function submitQuizR3() {
     playErrorBuzzer();
     if (feedbackEl) {
       feedbackEl.className = 'feedback-banner error';
-      feedbackEl.innerHTML = '⚠️ Sila pilih jawapan bagi kedua-dua soalan simpulan bahasa!';
+      feedbackEl.innerHTML = '⚠️ Sila pilih jawapan bagi kedua-dua soalan simpulan bahasa sebelum menghantar!';
       feedbackEl.style.display = 'block';
     }
+    speakBM('Sila pilih jawapan bagi kedua-dua soalan simpulan bahasa sebelum menghantar.');
     return;
   }
 
-  const scoreQ1 = (gameState.quizR3Answers.q1 === QUIZ_R3_CORRECT.q1) ? 15 : 0;
-  const scoreQ2 = (gameState.quizR3Answers.q2 === QUIZ_R3_CORRECT.q2) ? 15 : 0;
-  gameScores.room3 = scoreQ1 + scoreQ2;
-  gameState.room3Completed = true;
+  const isQ1Correct = (gameState.quizR3Answers.q1 === QUIZ_R3_CORRECT.q1);
+  const isQ2Correct = (gameState.quizR3Answers.q2 === QUIZ_R3_CORRECT.q2);
 
-  playSuccessFanfare();
-  closeModal('room3-modal');
+  if (isQ1Correct && isQ2Correct) {
+    // Both correct! Proceed to final PBD report
+    gameState.room3Completed = true;
+    playSuccessFanfare();
+    speakBM('Tahniah! Anda berjaya menjawab kedua-dua soalan simpulan bahasa dengan tepat!');
+    closeModal('room3-modal');
 
-  // Trigger Final PBD Report Card!
-  showFinalPBDReport();
+    // Trigger Final PBD Report Card!
+    showFinalPBDReport();
+  } else {
+    // Trialogical Reflection & Retry:
+    // Do NOT immediately close Room 3. Deduct 5 marks per attempt (minimum 10 marks), increment attemptsR3, play buzzer, display reflection hint.
+    gameScores.attemptsR3 += 1;
+    gameScores.room3 = Math.max(10, 30 - (gameScores.attemptsR3 * 5));
+    updateR3ScoreDisplay();
+    playErrorBuzzer();
+
+    let hintHtml = '';
+    let voiceHint = '';
+
+    if (!isQ1Correct && !isQ2Correct) {
+      hintHtml = `
+        <strong>Refleksi Trialogikal:</strong> Kedua-dua jawapan anda belum tepat!<br>
+        • <em>Soalan 1:</em> Fikirkan simpulan bahasa bagi orang yang sangat rajin membaca buku di perpustakaan.<br>
+        • <em>Soalan 2:</em> Fikirkan simpulan bahasa bagi orang yang tidak pandai bermain bola sepak.<br>
+        <span style="color: #DC2626; font-size: 11px; font-weight: 700;">(-5 Markah Penalti • Percubaan Ke-${gameScores.attemptsR3})</span>
+      `;
+      voiceHint = 'Refleksi: Kedua-dua soalan belum tepat. Sila rujuk nota pintar ulat buku dan kaki bangku.';
+    } else if (!isQ1Correct) {
+      hintHtml = `
+        <strong>Refleksi Trialogikal:</strong> Soalan 1 belum tepat! (Soalan 2 anda betul: <em>Kaki Bangku</em>).<br>
+        Ingat kembali Nota Pintar #1: Apakah simpulan bahasa untuk murid yang sangat gemar membaca buku cerita di perpustakaan?<br>
+        <span style="color: #DC2626; font-size: 11px; font-weight: 700;">(-5 Markah Penalti • Percubaan Ke-${gameScores.attemptsR3})</span>
+      `;
+      voiceHint = 'Refleksi: Soalan 1 belum tepat. Fikirkan simpulan bahasa untuk orang yang suka membaca buku.';
+    } else {
+      hintHtml = `
+        <strong>Refleksi Trialogikal:</strong> Soalan 2 belum tepat! (Soalan 1 anda betul: <em>Ulat Buku</em>).<br>
+        Ingat kembali Nota Pintar #2: Apakah simpulan bahasa untuk murid yang tidak mahir bermain bola sepak di padang?<br>
+        <span style="color: #DC2626; font-size: 11px; font-weight: 700;">(-5 Markah Penalti • Percubaan Ke-${gameScores.attemptsR3})</span>
+      `;
+      voiceHint = 'Refleksi: Soalan 2 belum tepat. Fikirkan simpulan bahasa untuk orang yang tidak pandai menendang bola.';
+    }
+
+    if (feedbackEl) {
+      feedbackEl.className = 'feedback-banner error';
+      feedbackEl.innerHTML = hintHtml;
+      feedbackEl.style.display = 'block';
+    }
+
+    speakBM(voiceHint);
+  }
 }
 
 // ==========================================
@@ -900,7 +1008,7 @@ export function showFinalPBDReport() {
   if (classEl) classEl.textContent = studentProfile.class;
   if (scoreR1El) scoreR1El.textContent = `${gameScores.room1} / 40 (Percubaan salah: ${gameScores.attemptsR1})`;
   if (scoreR2El) scoreR2El.textContent = `${gameScores.room2} / 30 (Percubaan salah: ${gameScores.attemptsR2})`;
-  if (scoreR3El) scoreR3El.textContent = `${gameScores.room3} / 30`;
+  if (scoreR3El) scoreR3El.textContent = `${gameScores.room3} / 30 (Percubaan salah: ${gameScores.attemptsR3})`;
   if (totalScoreEl) totalScoreEl.textContent = `${totalScore} / 100`;
 
   if (tpBadgeEl) {
@@ -913,6 +1021,8 @@ export function showFinalPBDReport() {
   }
 
   openModal('report-modal');
+
+  speakBM(`Tahniah ${studentProfile.name}! Anda berjaya menamatkan kembara bahasa dengan markah keseluruhan ${totalScore} peratus dan mencapai ${tpLevel}.`);
 }
 
 // ==========================================
@@ -970,6 +1080,76 @@ export function allowDrop(event) {
   }
 }
 
+// ==========================================
+// 14. ON-SCREEN D-PAD & TOUCH CONTROLS
+// ==========================================
+export function initTouchControls() {
+  const dpadUp = document.getElementById('dpad-up');
+  const dpadDown = document.getElementById('dpad-down');
+  const dpadLeft = document.getElementById('dpad-left');
+  const dpadRight = document.getElementById('dpad-right');
+  const actionBtn = document.getElementById('touch-action-btn');
+
+  function bindDirectionBtn(btn, keyName1, keyName2) {
+    if (!btn) return;
+
+    const press = (e) => {
+      if (e && e.cancelable) e.preventDefault();
+      keys[keyName1] = true;
+      if (keyName2) keys[keyName2] = true;
+      btn.classList.add('active');
+    };
+
+    const release = (e) => {
+      if (e && e.cancelable && e.type !== 'mouseleave') e.preventDefault();
+      keys[keyName1] = false;
+      if (keyName2) keys[keyName2] = false;
+      btn.classList.remove('active');
+    };
+
+    btn.addEventListener('mousedown', press);
+    btn.addEventListener('mouseup', release);
+    btn.addEventListener('mouseleave', release);
+
+    btn.addEventListener('touchstart', press, { passive: false });
+    btn.addEventListener('touchend', release, { passive: false });
+    btn.addEventListener('touchcancel', release, { passive: false });
+  }
+
+  bindDirectionBtn(dpadUp, 'w', 'ArrowUp');
+  bindDirectionBtn(dpadDown, 's', 'ArrowDown');
+  bindDirectionBtn(dpadLeft, 'a', 'ArrowLeft');
+  bindDirectionBtn(dpadRight, 'd', 'ArrowRight');
+
+  if (actionBtn) {
+    const triggerAction = (e) => {
+      if (e && e.cancelable) e.preventDefault();
+      actionBtn.classList.add('active');
+      handleCurrentInteraction();
+      setTimeout(() => actionBtn.classList.remove('active'), 180);
+    };
+
+    actionBtn.addEventListener('click', triggerAction);
+    actionBtn.addEventListener('touchstart', triggerAction, { passive: false });
+  }
+
+  // Clear keys on window blur
+  window.addEventListener('blur', () => {
+    keys.w = false; keys.s = false; keys.a = false; keys.d = false;
+    keys.ArrowUp = false; keys.ArrowDown = false; keys.ArrowLeft = false; keys.ArrowRight = false;
+    document.querySelectorAll('.dpad-btn').forEach(b => b.classList.remove('active'));
+  });
+}
+
+// Auto-initialize touch controls on DOM ready
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTouchControls);
+  } else {
+    initTouchControls();
+  }
+}
+
 // Bind methods to window so inline HTML onclick/ondrag handlers continue working seamlessly
 window.handleCurrentInteraction = handleCurrentInteraction;
 window.openModal = openModal;
@@ -977,6 +1157,8 @@ window.closeModal = closeModal;
 window.handleOverlayClick = handleOverlayClick;
 window.openProfileModal = openProfileModal;
 window.saveProfile = saveProfile;
+window.toggleVoiceover = toggleVoiceover;
+window.speakBM = speakBM;
 
 window.resetPuzzleR1 = resetPuzzleR1;
 window.checkPuzzleR1 = checkPuzzleR1;
@@ -994,7 +1176,9 @@ window.handleDropToTrayR2 = handleDropToTrayR2;
 
 window.selectQuizOption = selectQuizOption;
 window.submitQuizR3 = submitQuizR3;
+window.updateR3ScoreDisplay = updateR3ScoreDisplay;
 
 window.showFinalPBDReport = showFinalPBDReport;
 window.restartGame = restartGame;
 window.allowDrop = allowDrop;
+window.initTouchControls = initTouchControls;

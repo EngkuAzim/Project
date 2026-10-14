@@ -43,6 +43,11 @@
         <span style="font-size: 11px; color: #94A3B8; margin-left: 4px;">✎ Ubah</span>
       </div>
 
+      <!-- Voiceover Sound Toggle Button -->
+      <button id="voice-toggle-btn" class="voice-toggle-pill" onclick="toggleVoiceover()" title="Buka / Tutup Suara Bahasa Melayu">
+        🔊 <span id="voice-toggle-label">Suara: Hidup</span>
+      </button>
+
       <!-- Dynamic Inventory HUD Card -->
       <div class="inventory-card">
         <div class="inventory-title">
@@ -68,7 +73,24 @@
 
     <!-- Bottom Controls & Mission Helper -->
     <div class="bottom-bar">
-      <div class="controls-pill">
+      <!-- Touch / Mouse Virtual D-Pad & Action Button -->
+      <div id="touch-controls-wrapper">
+        <div class="dpad-cluster">
+          <button id="dpad-up" class="dpad-btn dpad-up" aria-label="Gerak Atas">▲</button>
+          <div class="dpad-middle-row">
+            <button id="dpad-left" class="dpad-btn dpad-left" aria-label="Gerak Kiri">◀</button>
+            <div class="dpad-center"></div>
+            <button id="dpad-right" class="dpad-btn dpad-right" aria-label="Gerak Kanan">▶</button>
+          </div>
+          <button id="dpad-down" class="dpad-btn dpad-down" aria-label="Gerak Bawah">▼</button>
+        </div>
+        <button id="touch-action-btn" class="touch-action-btn" aria-label="Interaksi (E)">
+          <span class="action-key-circle">E</span>
+          <span class="action-label">Interaksi</span>
+        </button>
+      </div>
+
+      <div class="controls-pill desktop-only">
         <div class="ctrl-key">
           <span class="key-badge">W</span>
           <span class="key-badge">A</span>
@@ -343,6 +365,11 @@
 
       <div class="target-word-badge" style="background: #FEF3C7; color: #B45309;">
         Cabaran Simpulan Bahasa • 30 Markah (15 x 2)
+      </div>
+
+      <div style="font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px;">
+        Markah Semasa: <span id="r3-live-score" class="score-badge-live">30 / 30</span>
+        <span style="font-size: 11px; color: #94A3B8; margin-left: 6px;">(Percubaan Salah: <span id="r3-attempts">0</span>)</span>
       </div>
 
       <p class="puzzle-instructions">
