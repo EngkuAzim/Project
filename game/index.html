@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kembara Bahasa Sekolah Bestari - Inovasi Digital PdP Bahasa Melayu</title>
+  
+  <!-- Google Fonts: Fredoka, Plus Jakarta Sans & Amiri for authentic Jawi typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Amiri:wght@700&display=swap" rel="stylesheet">
+
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="./style.css">
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <!-- Three.js Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- HUD Overlay Layer -->
+  <div id="hud-layer">
+    <div class="top-bar">
+      <!-- Brand & Room Status -->
+      <div class="brand-card">
+        <div class="brand-icon">🏫</div>
+        <div class="brand-text">
+          <h1>Kembara Bahasa Sekolah Bestari</h1>
+          <p><span id="location-badge" class="badge-area">Dataran Sekolah</span> PdP Bahasa Melayu</p>
+        </div>
+      </div>
+
+      <!-- Student Profile Pill (Clickable) -->
+      <div class="profile-pill" onclick="openProfileModal()" title="Klik untuk kemaskini profil murid">
+        <div class="profile-avatar">🎓</div>
+        <div class="profile-info">
+          <strong id="hud-student-name">Penjelajah Bestari</strong>
+          <span id="hud-student-class">3 Inovatif</span>
+        </div>
+        <span style="font-size: 11px; color: #94A3B8; margin-left: 4px;">✎ Ubah</span>
+      </div>
+
+      <!-- Dynamic Inventory HUD Card -->
+      <div class="inventory-card">
+        <div class="inventory-title">
+          <span id="inventory-title-text">Koleksi Huruf Jawi</span> <span id="inventory-count">0 / 4</span>
+        </div>
+        <div class="inventory-slots" id="inventory-slots-container">
+          <!-- Dynamically populated by ui.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- On-screen Proximity Prompt -->
+    <div id="interact-prompt" onclick="handleCurrentInteraction()">
+      <span class="key-tag">E</span>
+      <span id="prompt-label">Tekan E untuk Berinteraksi</span>
+    </div>
+
+    <!-- Floating Item Toast -->
+    <div id="item-toast">
+      <span class="toast-jawi" id="toast-jawi-char">✨</span>
+      <span id="toast-message">Tahniah! Huruf ditemui!</span>
+    </div>
+
+    <!-- Bottom Controls & Mission Helper -->
+    <div class="bottom-bar">
+      <div class="controls-pill">
+        <div class="ctrl-key">
+          <span class="key-badge">W</span>
+          <span class="key-badge">A</span>
+          <span class="key-badge">S</span>
+          <span class="key-badge">D</span>
+          <span>/</span>
+          <span class="key-badge">&uarr;&larr;&darr;&rarr;</span>
+          <span>Gerak</span>
+        </div>
+        <div class="ctrl-key">
+          <span class="key-badge">E</span>
+          <span>Interaksi</span>
+        </div>
+      </div>
+
+      <div class="mission-pill">
+        <span class="bullet"></span>
+        <span id="mission-text">Misi: Terokai dataran & dekati portal bercahaya untuk ke Bilik 1.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 1: STUDENT PROFILE (Nama Murid & Kelas)
+       ========================================== -->
+  <div id="profile-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'profile-modal')">
+    <div class="modal-card" style="max-width: 440px;">
+      <button class="modal-close-btn" onclick="closeModal('profile-modal')">&times;</button>
+      <div class="modal-hero-icon" style="background: linear-gradient(135deg, #4361EE, #3A0CA3);">🎓</div>
+      <h2>Profil Murid Bestari</h2>
+      <div class="trialogic-tag">✦ Maklumat Pentaksiran Bilik Darjah (PBD)</div>
+      
+      <p style="font-size: 13px; color: #64748B; margin-bottom: 16px;">
+        Sila masukkan nama dan kelas anda untuk dipaparkan pada Kad Laporan Pentaksiran Bilik Darjah.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label" for="input-student-name">Nama Murid:</label>
+        <input type="text" id="input-student-name" class="form-input" placeholder="Penjelajah Bestari" maxlength="35">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-student-class">Kelas / Tahun:</label>
+        <input type="text" id="input-student-class" class="form-input" placeholder="3 Inovatif" maxlength="25">
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 18px;">
+        <button class="btn-secondary" style="flex: 1;" onclick="closeModal('profile-modal')">Batal</button>
+        <button class="btn-primary" style="flex: 2;" onclick="saveProfile()">Simpan & Mula Kembara</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 2: ROOM 1 - EJAAN JAWI 'GUNA' (40 Marks)
+       ========================================== -->
+  <div id="room1-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'room1-modal')">
+    <div class="modal-card" style="max-width: 560px;">
+      <button class="modal-close-btn" onclick="closeModal('room1-modal')">&times;</button>
+
+      <!-- Puzzle View -->
+      <div id="r1-puzzle-view">
+        <div class="modal-hero-icon" style="background: linear-gradient(135deg, #48BFE3, #5E60CE);">✍️</div>
+        <h2>Bilik 1: Bilik Darjah Bestari</h2>
+        <div class="trialogic-tag">
+          ✦ Fasa 1: Merangka & Membina Artifak (Trialogical Drafting)
+        </div>
+
+        <div class="target-word-badge">
+          Sasaran Kata: "GUNA" (ݢونا) • 40 Markah
+        </div>
+
+        <div style="font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px;">
+          Markah Semasa: <span id="r1-live-score" class="score-badge-live">40 / 40</span> 
+          <span style="font-size: 11px; color: #94A3B8; margin-left: 6px;">(Percubaan: <span id="r1-attempts">0</span>)</span>
+        </div>
+
+        <p class="puzzle-instructions">
+          Tarik atau klik huruf-huruf koleksi anda ke dalam petak mengikut turutan ejaan Jawi yang betul (dari kanan ke kiri).
+        </p>
+
+        <!-- Drop Zones Container (Right-to-Left) -->
+        <div class="puzzle-board-container">
+          <div class="jawi-direction-guide">
+            <span>Arah Tulisan Jawi (Kanan ke Kiri)</span>
+            <span>&larr;</span>
+          </div>
+
+          <div class="drop-zones-row">
+            <!-- Slot 0: Kanan Sekali (Ga) -->
+            <div class="drop-zone" data-slot="0" ondragover="allowDrop(event)" ondrop="handleDropR1(event, 0)" onclick="handleZoneClickR1(0)">
+              <span class="zone-idx">1 (Kanan)</span>
+            </div>
+            <!-- Slot 1: Wau -->
+            <div class="drop-zone" data-slot="1" ondragover="allowDrop(event)" ondrop="handleDropR1(event, 1)" onclick="handleZoneClickR1(1)">
+              <span class="zone-idx">2</span>
+            </div>
+            <!-- Slot 2: Nun -->
+            <div class="drop-zone" data-slot="2" ondragover="allowDrop(event)" ondrop="handleDropR1(event, 2)" onclick="handleZoneClickR1(2)">
+              <span class="zone-idx">3</span>
+            </div>
+            <!-- Slot 3: Kiri Sekali (Alif) -->
+            <div class="drop-zone" data-slot="3" ondragover="allowDrop(event)" ondrop="handleDropR1(event, 3)" onclick="handleZoneClickR1(3)">
+              <span class="zone-idx">4 (Kiri)</span>
+            </div>
+          </div>
+
+          <!-- Live Assembled Word Preview -->
+          <div class="word-preview-box">
+            <span class="word-preview-label">Pratonton Artifak:</span>
+            <span id="r1-assembled-preview" class="word-preview-text">ـ ـ ـ ـ</span>
+          </div>
+
+          <!-- Available Collected Letters Tray -->
+          <div class="tray-title">Dulang Huruf Koleksi Anda (Klik / Tarik):</div>
+          <div id="r1-letters-tray" class="letters-tray" ondragover="allowDrop(event)" ondrop="handleDropToTrayR1(event)">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Feedback Alert Banner -->
+        <div id="r1-feedback" class="feedback-banner"></div>
+
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-secondary" style="flex: 1;" onclick="resetPuzzleR1()">
+            Susun Semula
+          </button>
+          <button class="btn-primary" style="flex: 2;" onclick="checkPuzzleR1()">
+            Semak Semula (Cantumkan)
+          </button>
+        </div>
+      </div>
+
+      <!-- Success / Transition View -->
+      <div id="r1-success-view" style="display: none;">
+        <div class="modal-hero-icon" style="background: linear-gradient(135deg, #10B981, #059669);">🎉</div>
+        <h2>Tahniah! Ejaan Jawi Tepat</h2>
+        <div class="trialogic-tag">✦ Artifak Bilik 1 Berjaya Dibina</div>
+
+        <div class="report-card" style="margin: 16px 0;">
+          <div class="report-artifact-box">
+            <div class="artifact-title">Perkataan Jawi Terbina</div>
+            <div class="artifact-word-showcase">ݢونا</div>
+            <div class="artifact-meaning">G-U-N-A (Guna)</div>
+          </div>
+          <p style="font-size: 13px; color: #166534; margin-top: 10px; text-align: center;">
+            Markah Diperoleh: <strong id="r1-success-score" style="font-size: 15px;">40 / 40</strong>
+          </p>
+        </div>
+
+        <button class="btn-primary" style="width: 100%;" onclick="proceedToRoom2()">
+          Teruskan ke Bilik 2 (Pusat Sumber) &rarr;
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 3: ROOM 2 - SINTAKSIS BINA AYAT (30 Marks)
+       ========================================== -->
+  <div id="room2-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'room2-modal')">
+    <div class="modal-card" style="max-width: 580px;">
+      <button class="modal-close-btn" onclick="closeModal('room2-modal')">&times;</button>
+
+      <!-- Puzzle View -->
+      <div id="r2-puzzle-view">
+        <div class="modal-hero-icon" style="background: linear-gradient(135deg, #3B82F6, #1D4ED8);">📚</div>
+        <h2>Bilik 2: Pusat Sumber (Perpustakaan)</h2>
+        <div class="trialogic-tag">
+          ✦ Fasa 2: Menilai & Menyusun Struktur Bahasa (Examining & Reflecting)
+        </div>
+
+        <div class="target-word-badge" style="background: #DBEAFE; color: #1E40AF;">
+          Sintaksis Ayat Tunggal • 30 Markah
+        </div>
+
+        <div style="font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px;">
+          Markah Semasa: <span id="r2-live-score" class="score-badge-live">30 / 30</span>
+          <span style="font-size: 11px; color: #94A3B8; margin-left: 6px;">(Percubaan: <span id="r2-attempts">0</span>)</span>
+        </div>
+
+        <p class="puzzle-instructions">
+          Susun 3 keratan buku yang anda temui mengikut tatabahasa Bahasa Melayu yang betul (Subjek ➔ Kata Kerja ➔ Objek/Keterangan).
+        </p>
+
+        <!-- Drop Zones Container (Left-to-Right) -->
+        <div class="puzzle-board-container">
+          <div class="sentence-drop-row">
+            <!-- Slot 0: Subjek -->
+            <div class="sentence-slot" data-slot="0" ondragover="allowDrop(event)" ondrop="handleDropR2(event, 0)" onclick="handleZoneClickR2(0)">
+              <span class="sentence-slot-label">1. Subjek / Frasa Nama</span>
+              <span class="sentence-slot-content">[Letak keratan di sini]</span>
+            </div>
+            <!-- Slot 1: Kata Kerja -->
+            <div class="sentence-slot" data-slot="1" ondragover="allowDrop(event)" ondrop="handleDropR2(event, 1)" onclick="handleZoneClickR2(1)">
+              <span class="sentence-slot-label">2. Kata Kerja</span>
+              <span class="sentence-slot-content">[Letak keratan di sini]</span>
+            </div>
+            <!-- Slot 2: Objek / Keterangan -->
+            <div class="sentence-slot" data-slot="2" ondragover="allowDrop(event)" ondrop="handleDropR2(event, 2)" onclick="handleZoneClickR2(2)">
+              <span class="sentence-slot-label">3. Objek / Keterangan</span>
+              <span class="sentence-slot-content">[Letak keratan di sini]</span>
+            </div>
+          </div>
+
+          <!-- Sentence Live Preview -->
+          <div class="word-preview-box">
+            <span class="word-preview-label">Pratonton Ayat:</span>
+            <span id="r2-sentence-preview" class="word-preview-text" style="font-size: 13px;">"......."</span>
+          </div>
+
+          <!-- Available Book Fragments Tray -->
+          <div class="tray-title">Dulang Buku Koleksi Perpustakaan (Klik / Tarik):</div>
+          <div id="r2-frags-tray" class="letters-tray" ondragover="allowDrop(event)" ondrop="handleDropToTrayR2(event)">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Feedback Alert Banner -->
+        <div id="r2-feedback" class="feedback-banner"></div>
+
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-secondary" style="flex: 1;" onclick="resetPuzzleR2()">
+            Susun Semula
+          </button>
+          <button class="btn-primary" style="flex: 2;" onclick="checkPuzzleR2()">
+            Semak Susunan Ayat
+          </button>
+        </div>
+      </div>
+
+      <!-- Success / Transition View -->
+      <div id="r2-success-view" style="display: none;">
+        <div class="modal-hero-icon" style="background: linear-gradient(135deg, #10B981, #059669);">🎉</div>
+        <h2>Tahniah! Ayat Gramatis Terbina</h2>
+        <div class="trialogic-tag">✦ Artifak Bilik 2 Berjaya Dibina</div>
+
+        <div class="report-card" style="margin: 16px 0;">
+          <div class="report-artifact-box">
+            <div class="artifact-title">Ayat Lengkap Terhasil</div>
+            <div style="font-size: 16px; font-weight: 700; color: #1E3A8A; padding: 12px; line-height: 1.4;">
+              "Murid-murid itu sedang membaca buku cerita di perpustakaan."
+            </div>
+            <div class="artifact-meaning">Subjek + Kata Kerja + Objek & Keterangan Tempat</div>
+          </div>
+          <p style="font-size: 13px; color: #166534; margin-top: 10px; text-align: center;">
+            Markah Diperoleh: <strong id="r2-success-score" style="font-size: 15px;">30 / 30</strong>
+          </p>
+        </div>
+
+        <button class="btn-primary" style="width: 100%;" onclick="proceedToRoom3()">
+          Teruskan ke Bilik 3 (Padang Sekolah) &rarr;
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 4: ROOM 3 - PERIBAHASA & PENTAS CABARAN (30 Marks)
+       ========================================== -->
+  <div id="room3-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'room3-modal')">
+    <div class="modal-card" style="max-width: 580px;">
+      <button class="modal-close-btn" onclick="closeModal('room3-modal')">&times;</button>
+
+      <div class="modal-hero-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">🏆</div>
+      <h2>Bilik 3: Pentas Cabaran Peribahasa</h2>
+      <div class="trialogic-tag">
+        ✦ Fasa 3: Peneguhan & Aplikasi Konteks Makna (Consolidating & Reusing)
+      </div>
+
+      <div class="target-word-badge" style="background: #FEF3C7; color: #B45309;">
+        Cabaran Simpulan Bahasa • 30 Markah (15 x 2)
+      </div>
+
+      <p class="puzzle-instructions">
+        Pilih simpulan bahasa yang paling tepat untuk situasi di bawah berdasarkan penerokaan anda di padang dan kantin sekolah.
+      </p>
+
+      <!-- Question 1 -->
+      <div class="quiz-question-box">
+        <div style="font-weight: 700; font-size: 12px; color: #475569; margin-bottom: 4px;">Soalan 1 (15 Markah):</div>
+        <div class="quiz-scenario-text">
+          Ahmad gemar menghabiskan waktu lapang di perpustakaan dengan membaca pelbagai bahan ilmiah dan buku cerita sehingga digelar oleh rakan-rakannya sebagai...
+        </div>
+        <div class="quiz-options-grid">
+          <button class="quiz-option-btn" data-quiz-q="q1" data-quiz-val="ulat_buku" onclick="selectQuizOption('q1', 'ulat_buku')">
+            🐛 Ulat Buku
+          </button>
+          <button class="quiz-option-btn" data-quiz-q="q1" data-quiz-val="kaki_bangku" onclick="selectQuizOption('q1', 'kaki_bangku')">
+            🪑 Kaki Bangku
+          </button>
+          <button class="quiz-option-btn" data-quiz-q="q1" data-quiz-val="ringan_tulang" onclick="selectQuizOption('q1', 'ringan_tulang')">
+            💪 Ringan Tulang
+          </button>
+          <button class="quiz-option-btn" data-quiz-q="q1" data-quiz-val="hati_batu" onclick="selectQuizOption('q1', 'hati_batu')">
+            🪨 Hati Batu
+          </button>
+        </div>
+      </div>
+
+      <!-- Question 2 -->
+      <div class="quiz-question-box">
+        <div style="font-weight: 700; font-size: 12px; color: #475569; margin-bottom: 4px;">Soalan 2 (15 Markah):</div>
+        <div class="quiz-scenario-text">
+          Daniel berasa malu untuk menyertai pertandingan bola sepak kelas kerana dia tidak pandai menendang bola dan tendangannya selalu tersasar. Daniel digelar...
+        </div>
+        <div class="quiz-options-grid">
+          <button class="quiz-option-btn" data-quiz-q="q2" data-quiz-val="kaki_ayam" onclick="selectQuizOption('q2', 'kaki_ayam')">
+            🦶 Kaki Ayam
+          </button>
+          <button class="quiz-option-btn" data-quiz-q="q2" data-quiz-val="kaki_bangku" onclick="selectQuizOption('q2', 'kaki_bangku')">
+            🪑 Kaki Bangku
+          </button>
+          <button class="quiz-option-btn" data-quiz-q="q2" data-quiz-val="ulat_buku" onclick="selectQuizOption('q2', 'ulat_buku')">
+            🐛 Ulat Buku
+          </button>
+          <button class="quiz-option-btn" data-quiz-q="q2" data-quiz-val="panjang_tangan" onclick="selectQuizOption('q2', 'panjang_tangan')">
+            🖐️ Panjang Tangan
+          </button>
+        </div>
+      </div>
+
+      <!-- Feedback Banner -->
+      <div id="r3-feedback" class="feedback-banner"></div>
+
+      <button class="btn-primary" style="width: 100%;" onclick="submitQuizR3()">
+        Hantar Jawapan Pentas &rarr;
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 5: FINAL PBD ASSESSMENT REPORT CARD (Kad Laporan PBD)
+       ========================================== -->
+  <div id="report-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'report-modal')">
+    <div class="modal-card" style="max-width: 620px;">
+      <button class="modal-close-btn" onclick="closeModal('report-modal')">&times;</button>
+
+      <div class="modal-hero-icon" style="background: linear-gradient(135deg, #10B981, #059669);">🎓</div>
+      <h2>Kad Laporan Pentaksiran Bilik Darjah (PBD)</h2>
+      <div class="trialogic-tag">
+        ✦ Pembelajaran Berasaskan Artifak Digital (Trialogical Learning)
+      </div>
+
+      <!-- Certificate Card -->
+      <div class="report-card">
+        <div class="report-header">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="report-emblem">🏫</div>
+            <div class="report-header-text">
+              <h3>Kembara Bahasa Sekolah Bestari</h3>
+              <p>Kementerian Pendidikan Malaysia • Inovasi PdP BM</p>
+            </div>
+          </div>
+          <div id="report-tp-badge" class="tp-badge-large tp6">
+            TP 6
+          </div>
+        </div>
+
+        <!-- Student Meta Grid -->
+        <div class="report-meta-grid">
+          <div class="meta-box">
+            <div class="meta-label">Nama Murid</div>
+            <div class="meta-val" id="report-student-name">Penjelajah Bestari</div>
+          </div>
+          <div class="meta-box">
+            <div class="meta-label">Kelas / Tahun</div>
+            <div class="meta-val" id="report-student-class">3 Inovatif</div>
+          </div>
+          <div class="meta-box">
+            <div class="meta-label">Pedagogi</div>
+            <div class="meta-val">Model Pembelajaran Trialogikal</div>
+          </div>
+          <div class="meta-box">
+            <div class="meta-label">Status Kembara</div>
+            <div class="meta-val" style="color: #059669; font-weight: 800;">4 / 4 Bilik Selesai ✓</div>
+          </div>
+        </div>
+
+        <!-- Detailed Mark Breakdown Table -->
+        <table class="score-breakdown-table">
+          <thead>
+            <tr>
+              <th>Stesen Pembelajaran</th>
+              <th>Fokus Kemahiran</th>
+              <th style="text-align: right;">Markah</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Bilik 1: Bilik Darjah</strong></td>
+              <td>Ejaan Jawi: 'GUNA' (ݢونا)</td>
+              <td style="text-align: right;" id="report-score-r1">40 / 40</td>
+            </tr>
+            <tr>
+              <td><strong>Bilik 2: Perpustakaan</strong></td>
+              <td>Sintaksis: Bina Ayat Tunggal</td>
+              <td style="text-align: right;" id="report-score-r2">30 / 30</td>
+            </tr>
+            <tr>
+              <td><strong>Bilik 3: Padang & Kantin</strong></td>
+              <td>Simpulan Bahasa: Ulat Buku & Kaki Bangku</td>
+              <td style="text-align: right;" id="report-score-r3">30 / 30</td>
+            </tr>
+            <tr class="total-row">
+              <td colspan="2">Jumlah Keseluruhan Markah:</td>
+              <td style="text-align: right; color: #059669;" id="report-score-total">100 / 100</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Rubric Statement Description -->
+        <div class="rubric-text" id="report-rubric-desc">
+          Tahap Penguasaan 6 (Cemerlang / Berdikari): Murid mempamerkan penguasaan menyeluruh dan cemerlang dalam sistem ejaan Jawi, sintaksis pembinaan ayat tunggal, serta pemahaman simpulan bahasa secara kontekstual melalui model pembelajaran Trialogikal berteraskan artifak digital.
+        </div>
+
+        <!-- Explanation of Scoring -->
+        <div style="font-size: 11px; color: #64748B; line-height: 1.4; border-top: 1px dashed #CBD5E1; padding-top: 8px;">
+          <em>* Kaedah Pengiraan Markah: Markah dinilai berdasarkan ketepatan semakan pertama. Bilik 1 (40 markah, tolak 5 markah setiap semakan salah, min 10). Bilik 2 (30 markah, tolak 5 markah setiap semakan salah, min 10). Bilik 3 (30 markah, 15 markah bagi setiap jawapan simpulan bahasa yang tepat).</em>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-secondary" style="flex: 1;" onclick="restartGame()">
+          🔄 Main Semula
+        </button>
+        <button class="btn-primary" style="flex: 2;" onclick="window.print()">
+          🖨️ Cetak / Simpan Laporan (PDF)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main ES6 Module Game Script -->
+  <script type="module" src="./game.js"></script>
+</body>
+</html>
