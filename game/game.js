@@ -11,7 +11,7 @@ import {
   COLLECTIBLES_R1,
   COLLECTIBLES_R2,
   COLLECTIBLES_R3
-} from './state.js';
+} from './state.js?v=4.4.2';
 
 import {
   registerTeleportHandlers,
@@ -24,7 +24,7 @@ import {
   updateInventoryHUD,
   handleCurrentInteraction,
   closeModal
-} from './ui.js';
+} from './ui.js?v=4.4.2';
 
 // ==========================================
 // 1. THREE.JS SCENE & ROBLOX 3RD-PERSON SETUP

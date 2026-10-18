@@ -12,7 +12,7 @@ import {
   COLLECTIBLES_R2,
   COLLECTIBLES_R3,
   keys
-} from './state.js';
+} from './state.js?v=4.4.2';
 
 // DOM Element References
 const locationBadge = document.getElementById('location-badge');
