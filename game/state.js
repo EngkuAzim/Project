@@ -27,15 +27,15 @@ export const ROOM_CONFIG = {
   room2: {
     id: 'room2',
     name: 'Pusat Sumber (Perpustakaan)',
-    badge: 'Bilik 2: Bina Ayat',
+    badge: 'Bilik 2: Simpulan Bahasa Jawi',
     center: { x: 200, z: 200 },
     bounds: { minX: 187, maxX: 213, minZ: 189, maxZ: 211 },
     spawn: { x: 200, z: 205.5 }
   },
   room3: {
     id: 'room3',
-    name: 'Padang Sekolah & Kantin',
-    badge: 'Bilik 3: Peribahasa',
+    name: 'Bilik Seni Visual & Studio Khat',
+    badge: 'Bilik 3: Seni Khat',
     center: { x: 300, z: 300 },
     bounds: { minX: 287, maxX: 313, minZ: 289, maxZ: 311 },
     spawn: { x: 300, z: 305.5 }
@@ -78,16 +78,20 @@ export const gameState = {
   room3Completed: false,
   // Puzzle slot states
   puzzleR1Placed: [null, null, null, null],      // 'ga', 'wau', 'nun', 'alif'
-  puzzleR2Placed: [null, null, null],            // 'frag1', 'frag2', 'frag3'
-  quizR3Answers: { q1: null, q2: null }
+  puzzleR2Placed: [null, null],                  // 'frag1' (اولت), 'frag2' (بوکو)
+  // Room 3 Art Studio Calligraphy Customization State (SP 4.4.2)
+  artworkR3: {
+    bg: 'batik',       // 'batik' | 'songket' | 'vellum'
+    textColor: 'gold',  // 'black' | 'gold' | 'indigo'
+    frame: 'wood'      // 'wood' | 'gold' | 'minimal'
+  }
 };
 
 // Correct answer configurations
 export const PUZZLE_R1_CORRECT = ['ga', 'wau', 'nun', 'alif'];
-export const PUZZLE_R2_CORRECT = ['frag1', 'frag2', 'frag3'];
-export const QUIZ_R3_CORRECT = { q1: 'ulat_buku', q2: 'kaki_bangku' };
+export const PUZZLE_R2_CORRECT = ['frag1', 'frag2']; // RTL: Slot 0 (Kanan) = frag1 (اولت), Slot 1 (Kiri) = frag2 (بوکو)
 
-// Collectibles for Room 1 (Bilik Darjah - Jawi)
+// Collectibles for Room 1 (Bilik Darjah - Jawi 'GUNA')
 export const COLLECTIBLES_R1 = [
   {
     id: 'ga',
@@ -131,75 +135,67 @@ export const COLLECTIBLES_R1 = [
   }
 ];
 
-// Collectibles for Room 2 (Pusat Sumber - Frasa & Ayat)
+// Collectibles for Room 2 (Pusat Sumber - Kad Simpulan Bahasa Jawi)
 export const COLLECTIBLES_R2 = [
   {
     id: 'frag1',
-    role: 'Subjek / Frasa Nama',
-    text: 'Murid-murid itu',
-    char: '📖 1',
+    char: 'اولت',
+    name: 'Ulat',
+    rumi: 'Ulat',
+    role: 'Perkataan Pertama',
     color: 0x3B82F6,
-    pos: { x: 194.0, y: 1.5, z: 194.2 }, // Accessible library aisle
+    pos: { x: 194.0, y: 1.5, z: 194.5 }, // Library aisle near bookshelf
     mesh: null, gemMesh: null, ringMesh: null,
     isPopping: false, popScale: 1.0, collected: false
   },
   {
     id: 'frag2',
-    role: 'Kata Kerja',
-    text: 'sedang membaca',
-    char: '📖 2',
+    char: 'بوکو',
+    name: 'Buku',
+    rumi: 'Buku',
+    role: 'Perkataan Kedua',
     color: 0x8B5CF6,
-    pos: { x: 204.6, y: 1.5, z: 195.2 }, // Front edge of Librarian counter
-    mesh: null, gemMesh: null, ringMesh: null,
-    isPopping: false, popScale: 1.0, collected: false
-  },
-  {
-    id: 'frag3',
-    role: 'Objek / Keterangan',
-    text: 'buku cerita di perpustakaan.',
-    char: '📖 3',
-    color: 0xEC4899,
-    pos: { x: 194.0, y: 1.4, z: 203.2 }, // Reading nook
+    pos: { x: 204.6, y: 1.5, z: 196.0 }, // Near reading nook & counter
     mesh: null, gemMesh: null, ringMesh: null,
     isPopping: false, popScale: 1.0, collected: false
   }
 ];
 
-// Collectibles for Room 3 (Padang & Kantin - Senario Peribahasa)
+// Collectibles for Room 3 (Bilik Seni Visual - Alatan Seni Khat Jawi)
 export const COLLECTIBLES_R3 = [
   {
     id: 'orb1',
-    label: 'Senario 1',
-    topic: 'Kecenderungan Membaca',
-    proverb: 'ULAT BUKU',
-    note: 'Nota Pintar #1: ULAT BUKU bermaksud orang yang sangat rajin dan gemar membaca buku.',
-    char: '⚽ 1',
-    color: 0x10B981,
-    pos: { x: 293.0, y: 1.2, z: 300.0 }, // By football goalpost
+    label: 'Berus Khat',
+    name: 'Berus Khat',
+    topic: 'Alatan Seni Khat',
+    desc: 'Berus buluh kaligrafi bermutu tinggi untuk melukis aksara Jawi yang gemalai.',
+    char: '🖌️',
+    color: 0xD97706,
+    pos: { x: 294.0, y: 1.3, z: 295.0 }, // Near wooden easel
     mesh: null, gemMesh: null, ringMesh: null,
     isPopping: false, popScale: 1.0, collected: false
   },
   {
     id: 'orb2',
-    label: 'Senario 2',
-    topic: 'Aktiviti Sukan Bola',
-    proverb: 'KAKI BANGKU',
-    note: 'Nota Pintar #2: KAKI BANGKU bermaksud orang yang tidak pandai bermain bola sepak.',
-    char: '⚽ 2',
-    color: 0xF59E0B,
-    pos: { x: 300.0, y: 1.4, z: 294.0 }, // In front of canteen
+    label: 'Palet Warna',
+    name: 'Palet Warna',
+    topic: 'Alatan Seni Khat',
+    desc: 'Palet pembancuh cat air dan pigmen emas untuk seni hiasan kaligrafi.',
+    char: '🎨',
+    color: 0xEC4899,
+    pos: { x: 305.5, y: 1.3, z: 296.0 }, // By art studio supply table
     mesh: null, gemMesh: null, ringMesh: null,
     isPopping: false, popScale: 1.0, collected: false
   },
   {
     id: 'orb3',
-    label: 'Senario 3',
-    topic: 'Semangat Kesukanan',
-    proverb: 'MANDI PELUH',
-    note: 'Nota Pintar #3: MANDI PELUH bermaksud bekerja atau bersukan dengan bersungguh-sungguh.',
-    char: '⚽ 3',
-    color: 0x6366F1,
-    pos: { x: 306.5, y: 1.2, z: 304.0 }, // Near spectators bench
+    label: 'Kanvas Lukisan',
+    name: 'Kanvas Lukisan',
+    topic: 'Alatan Seni Khat',
+    desc: 'Kanvas dan kertas kraf bertekstur untuk karya seni tulisan Jawi terpuji.',
+    char: '📜',
+    color: 0x3B82F6,
+    pos: { x: 295.0, y: 1.3, z: 304.0 }, // Near studio exhibition area
     mesh: null, gemMesh: null, ringMesh: null,
     isPopping: false, popScale: 1.0, collected: false
   }

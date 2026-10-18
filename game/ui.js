@@ -214,17 +214,17 @@ export function updateInventoryHUD() {
 
   if (room === 'room2') {
     const collected = COLLECTIBLES_R2.filter(c => c.collected).length;
-    if (invTitleTextEl) invTitleTextEl.textContent = 'Keratan Buku Cerita';
-    if (invCountEl) invCountEl.textContent = `${collected} / 3`;
+    if (invTitleTextEl) invTitleTextEl.textContent = 'Kad Simpulan Bahasa Jawi';
+    if (invCountEl) invCountEl.textContent = `${collected} / 2`;
 
     COLLECTIBLES_R2.forEach(item => {
       const slot = document.createElement('div');
-      slot.className = `slot-item ${item.collected ? 'unlocked' : ''}`;
+      slot.className = `slot-item jawi-char ${item.collected ? 'unlocked' : ''}`;
       slot.id = `inv-${item.id}`;
-      slot.title = `${item.role}: ${item.text}`;
+      slot.title = `Kad Jawi: ${item.name} (${item.char})`;
       slot.innerHTML = `
-        <span class="slot-char">${item.collected ? '📖' : '?'}</span>
-        <span class="slot-label">${item.id.replace('frag', 'Bahagian ')}</span>
+        <span class="slot-char">${item.collected ? item.char : '?'}</span>
+        <span class="slot-label">${item.name}</span>
       `;
       invSlotsContainer.appendChild(slot);
     });
@@ -233,16 +233,16 @@ export function updateInventoryHUD() {
 
   if (room === 'room3') {
     const collected = COLLECTIBLES_R3.filter(c => c.collected).length;
-    if (invTitleTextEl) invTitleTextEl.textContent = 'Senario Sukan & Kantin';
+    if (invTitleTextEl) invTitleTextEl.textContent = 'Alatan Seni Khat';
     if (invCountEl) invCountEl.textContent = `${collected} / 3`;
 
     COLLECTIBLES_R3.forEach(item => {
       const slot = document.createElement('div');
       slot.className = `slot-item ${item.collected ? 'unlocked' : ''}`;
       slot.id = `inv-${item.id}`;
-      slot.title = `${item.label}: ${item.topic}`;
+      slot.title = `${item.label}: ${item.desc}`;
       slot.innerHTML = `
-        <span class="slot-char">${item.collected ? '⚽' : '?'}</span>
+        <span class="slot-char">${item.collected ? item.char : '?'}</span>
         <span class="slot-label">${item.label}</span>
       `;
       invSlotsContainer.appendChild(slot);
@@ -268,28 +268,22 @@ export function collectItem(item, currentRoom) {
       updateMissionText(`Misi: Cari ${4 - count} lagi kristal Jawi di bilik darjah.`);
     }
   } else if (currentRoom === 'room2') {
-    showItemToast('📖', `Tahniah! Anda menjumpai buku: ${item.text}`);
-    speakBM(`Keratan frasa: ${item.text}`);
+    showItemToast(item.char, `Tahniah! Anda menjumpai kad Jawi: ${item.name} (${item.char})`);
+    speakBM(`Kad perkataan Jawi: ${item.name}. ${item.char}`);
     const count = COLLECTIBLES_R2.filter(c => c.collected).length;
-    if (count === 3) {
-      updateMissionText('Tahniah! Semua 3 buku ditemui. Pergi ke Meja Bacaan untuk membina ayat!');
+    if (count === 2) {
+      updateMissionText('Tahniah! Kedua-dua kad Jawi ditemui. Pergi ke Meja Bacaan untuk membina simpulan bahasa Jawi!');
     } else {
-      updateMissionText(`Misi: Cari ${3 - count} lagi buku frasa di Pusat Sumber.`);
+      updateMissionText(`Misi: Cari 1 lagi kad Jawi di Pusat Sumber.`);
     }
   } else if (currentRoom === 'room3') {
-    const proverbNotes = {
-      orb1: 'Nota Pintar #1: ULAT BUKU bermaksud orang yang sangat rajin dan gemar membaca buku.',
-      orb2: 'Nota Pintar #2: KAKI BANGKU bermaksud orang yang tidak pandai bermain bola sepak.',
-      orb3: 'Nota Pintar #3: MANDI PELUH bermaksud bekerja atau bersukan dengan bersungguh-sungguh.'
-    };
-    const noteText = proverbNotes[item.id] || item.note || `Bagus! Anda meneroka: ${item.label} (${item.topic})`;
-    showItemToast('💡', noteText, 4800);
-    speakBM(noteText);
+    showItemToast(item.char, `${item.name}: ${item.desc}`, 4500);
+    speakBM(`Alatan seni khat ditemui: ${item.name}. ${item.desc}`);
     const count = COLLECTIBLES_R3.filter(c => c.collected).length;
     if (count === 3) {
-      updateMissionText('Tahniah! Semua 3 senario diteroka. Pergi ke Pentas Cabaran untuk kuiz peribahasa!');
+      updateMissionText('Tahniah! Semua alatan seni khat ditemui. Pergi ke Kanvas Pameran Utama untuk menghasilkan karya seni Jawi!');
     } else {
-      updateMissionText(`Misi: Terokai ${3 - count} lagi senario sukan di padang/kantin.`);
+      updateMissionText(`Misi: Cari ${3 - count} lagi alatan seni khat di studio seni.`);
     }
   }
 
@@ -384,7 +378,7 @@ export function handleCurrentInteraction() {
   if (target === 'portalR3') {
     if (!gameState.room2Completed) {
       playErrorBuzzer();
-      showItemToast('⚠️', 'Sila selesaikan tugasan bina ayat di Meja Bacaan terlebih dahulu!');
+      showItemToast('⚠️', 'Sila selesaikan susunan simpulan bahasa Jawi di Meja Bacaan terlebih dahulu!');
       return;
     }
     if (teleportCallbacks.toRoom3) {
@@ -409,9 +403,9 @@ export function handleCurrentInteraction() {
 
   if (target === 'tableR2') {
     const countR2 = COLLECTIBLES_R2.filter(c => c.collected).length;
-    if (countR2 < 3) {
+    if (countR2 < 2) {
       playErrorBuzzer();
-      showItemToast('📚', `Kumpulkan kesemua 3 keratan buku di Pusat Sumber dahulu! (${countR2} / 3)`);
+      showItemToast('📖', `Kumpulkan kedua-dua kad Jawi di Pusat Sumber dahulu! (${countR2} / 2)`);
       return;
     }
     openRoom2Modal();
@@ -422,7 +416,7 @@ export function handleCurrentInteraction() {
     const countR3 = COLLECTIBLES_R3.filter(c => c.collected).length;
     if (countR3 < 3) {
       playErrorBuzzer();
-      showItemToast('⚽', `Terokai kesemua 3 senario di padang & kantin dahulu! (${countR3} / 3)`);
+      showItemToast('🎨', `Kumpulkan kesemua 3 alatan seni di studio seni dahulu! (${countR3} / 3)`);
       return;
     }
     openRoom3Modal();
@@ -642,7 +636,7 @@ export function proceedToRoom2() {
 }
 
 // ==========================================
-// 9. ROOM 2 PUZZLE: SINTAKSIS BINA AYAT (30 Marks)
+// 9. ROOM 2 PUZZLE: MEMBINA SIMPULAN BAHASA JAWI (30 Marks)
 // ==========================================
 export function openRoom2Modal() {
   setupR2Tray();
@@ -675,7 +669,7 @@ export function setupR2Tray() {
 
   const collectedFrags = COLLECTIBLES_R2.filter(c => c.collected);
   if (collectedFrags.length === 0) {
-    trayEl.innerHTML = '<div style="color: #64748B; font-size: 12px; padding: 10px;">Peti anda kosong. Terokai Pusat Sumber untuk mencari buku dahulu!</div>';
+    trayEl.innerHTML = '<div style="color: #64748B; font-size: 12px; padding: 10px;">Peti anda kosong. Terokai Pusat Sumber untuk mencari kad Jawi dahulu!</div>';
     return;
   }
 
@@ -689,11 +683,14 @@ export function setupR2Tray() {
 
 export function createR2FragTile(item) {
   const tile = document.createElement('div');
-  tile.className = 'frag-tile';
+  tile.className = 'jawi-idiom-tile';
   tile.draggable = true;
   tile.id = `frag-${item.id}`;
   tile.dataset.itemId = item.id;
-  tile.innerHTML = `<strong>${item.text}</strong> <span style="font-size: 11px; opacity: 0.7;">(${item.role})</span>`;
+  tile.innerHTML = `
+    <span class="tile-jawi">${item.char}</span>
+    <span class="tile-rumi">${item.name} (${item.role})</span>
+  `;
 
   tile.addEventListener('dragstart', (e) => {
     e.dataTransfer.setData('text/plain', item.id);
@@ -710,8 +707,8 @@ export function createR2FragTile(item) {
 }
 
 export function renderR2DropZones() {
-  const zones = document.querySelectorAll('#room2-modal .sentence-slot');
-  const labels = ['1. Subjek / Frasa Nama', '2. Kata Kerja', '3. Objek / Keterangan'];
+  const zones = document.querySelectorAll('#room2-modal .jawi-idiom-zone');
+  const labels = ['1. Perkataan Pertama (Kanan)', '2. Perkataan Kedua (Kiri)'];
 
   zones.forEach((zone, index) => {
     const itemId = gameState.puzzleR2Placed[index];
@@ -721,15 +718,17 @@ export function renderR2DropZones() {
       const item = COLLECTIBLES_R2.find(c => c.id === itemId);
       zone.classList.add('filled');
       zone.innerHTML = `
-        <span class="sentence-slot-label">${defaultLabel}:</span>
-        <span class="sentence-slot-content">${item ? item.text : ''}</span>
-        <button style="border:none; background:transparent; cursor:pointer; font-size:14px; color:#EF4444;" onclick="handleZoneClickR2(${index})">&times;</button>
+        <span class="zone-idx">${defaultLabel}</span>
+        <div class="jawi-idiom-tile" style="margin: 4px 0; border-color: #10B981; cursor: pointer;" onclick="handleZoneClickR2(${index})" title="Klik untuk pulangkan ke dulang">
+          <span class="tile-jawi">${item ? item.char : ''}</span>
+          <span class="tile-rumi">${item ? item.name : ''}</span>
+        </div>
       `;
     } else {
       zone.classList.remove('filled');
       zone.innerHTML = `
-        <span class="sentence-slot-label">${defaultLabel}</span>
-        <span class="sentence-slot-content" style="color: #94A3B8; font-style: italic;">[Letak keratan buku di sini]</span>
+        <span class="zone-idx">${defaultLabel}</span>
+        <span class="zone-placeholder" style="font-size: 11px; color: #94A3B8;">[Letak kad Jawi di sini]</span>
       `;
     }
   });
@@ -781,7 +780,7 @@ export function handleDropToTrayR2(event) {
 }
 
 export function resetPuzzleR2() {
-  gameState.puzzleR2Placed = [null, null, null];
+  gameState.puzzleR2Placed = [null, null];
   renderR2DropZones();
   setupR2Tray();
   updateR2Preview();
@@ -794,11 +793,12 @@ export function updateR2Preview() {
   if (!previewEl) return;
 
   const parts = gameState.puzzleR2Placed.map(id => {
-    if (!id) return '_______';
+    if (!id) return 'ـ';
     const item = COLLECTIBLES_R2.find(c => c.id === id);
-    return item ? item.text : '_______';
+    return item ? item.char : 'ـ';
   });
-  previewEl.textContent = `"${parts.join(' ')}"`;
+  // Right-to-Left: Slot 0 (Kanan) first, followed by Slot 1 (Kiri)
+  previewEl.textContent = parts.join(' ');
 }
 
 export function checkPuzzleR2() {
@@ -808,18 +808,21 @@ export function checkPuzzleR2() {
     playErrorBuzzer();
     if (feedbackEl) {
       feedbackEl.className = 'feedback-banner error';
-      feedbackEl.innerHTML = '⚠️ Sila isikan ketiga-tiga komponen ayat sebelum menyemak!';
+      feedbackEl.innerHTML = '⚠️ Sila isikan kedua-dua petak simpulan bahasa Jawi sebelum menyemak!';
       feedbackEl.style.display = 'block';
     }
     return;
   }
 
-  const isCorrect = gameState.puzzleR2Placed.every((id, idx) => id === PUZZLE_R2_CORRECT[idx]);
+  const isCorrect = (
+    gameState.puzzleR2Placed[0] === PUZZLE_R2_CORRECT[0] &&
+    gameState.puzzleR2Placed[1] === PUZZLE_R2_CORRECT[1]
+  );
 
   if (isCorrect) {
     gameState.room2Completed = true;
     playSuccessFanfare();
-    speakBM('Tahniah! Ayat tunggal berjaya dibina dengan susunan subjek, kata kerja, dan keterangan yang gramatis. Portal ke Bilik 3 kini dibuka.');
+    speakBM('Tahniah! Simpulan bahasa Jawi Ulat Buku berjaya dibina dengan ejaan yang tepat. Portal ke Bilik 3 kini dibuka.');
 
     const puzzleView = document.getElementById('r2-puzzle-view');
     const successView = document.getElementById('r2-success-view');
@@ -829,19 +832,19 @@ export function checkPuzzleR2() {
     if (successView) successView.style.display = 'block';
     if (successScoreEl) successScoreEl.textContent = `${gameScores.room2} / 30`;
 
-    showItemToast('🌟', 'Tahniah! Ayat tunggal berjaya dibina dengan gramatis!');
+    showItemToast('🌟', 'Tahniah! Simpulan bahasa Jawi "اولت بوکو" tepat!');
   } else {
     gameScores.attemptsR2 += 1;
     // Deduct 5 marks per wrong attempt (minimum 10 marks)
     gameScores.room2 = Math.max(10, 30 - (gameScores.attemptsR2 * 5));
     updateR2ScoreDisplay();
     playErrorBuzzer();
-    speakBM('Susunan ayat belum tepat. Susun mengikut subjek, kata kerja, dan objek atau keterangan.');
+    speakBM('Susunan simpulan bahasa Jawi belum tepat. Ejaan Ulat Buku bermula dengan perkataan Ulat di petak kanan. Sila cuba lagi.');
 
     if (feedbackEl) {
       feedbackEl.className = 'feedback-banner error';
       feedbackEl.innerHTML = `
-        <strong>Susunan Belum Tepat!</strong> Struktur ayat tunggal Bahasa Melayu memerlukan susunan: <strong>[Subjek]</strong> (Murid-murid itu) + <strong>[Kata Kerja]</strong> (sedang membaca) + <strong>[Objek / Keterangan]</strong> (buku cerita di perpustakaan.). (-5 Markah Penalti)
+        <strong>Susunan Belum Tepat!</strong> Dalam tulisan Jawi (kanan ke kiri), simpulan bahasa "ULAT BUKU" bermula dengan perkataan <strong>اولت (Ulat)</strong> di petak kanan, dan diikuti oleh <strong>بوکو (Buku)</strong> di petak kiri. (-5 Markah Penalti)
       `;
       feedbackEl.style.display = 'block';
     }
@@ -857,116 +860,81 @@ export function proceedToRoom3() {
 }
 
 // ==========================================
-// 10. ROOM 3 MODAL: PERIBAHASA (30 Marks)
+// 10. ROOM 3: STUDIO SENI KHAT JAWI (30 Marks • DSKP 4.4.2)
 // ==========================================
 export function updateR3ScoreDisplay() {
   const scoreEl = document.getElementById('r3-live-score');
-  const attemptsEl = document.getElementById('r3-attempts');
   if (scoreEl) scoreEl.textContent = `${gameScores.room3} / 30`;
-  if (attemptsEl) attemptsEl.textContent = gameScores.attemptsR3;
 }
 
 export function openRoom3Modal() {
   updateR3ScoreDisplay();
+  updateArtboardDOM();
   const feedback = document.getElementById('r3-feedback');
   if (feedback) feedback.style.display = 'none';
-  renderR3Options();
   openModal('room3-modal');
 }
 
-export function renderR3Options() {
-  // Update button classes based on state
-  ['q1', 'q2'].forEach(qKey => {
-    const selectedVal = gameState.quizR3Answers[qKey];
-    const buttons = document.querySelectorAll(`[data-quiz-q="${qKey}"]`);
-    buttons.forEach(btn => {
-      if (btn.dataset.quizVal === selectedVal) {
-        btn.classList.add('selected');
-      } else {
-        btn.classList.remove('selected');
-      }
-    });
+export function updateArtboardDOM() {
+  const card = document.getElementById('artboard-card');
+  if (!card) return;
+
+  const { bg, textColor, frame } = gameState.artworkR3;
+  card.className = `artboard-card bg-${bg} text-${textColor} frame-${frame}`;
+
+  // Update button active indicators
+  ['batik', 'songket', 'vellum'].forEach(b => {
+    const btn = document.getElementById(`btn-bg-${b}`);
+    if (btn) btn.classList.toggle('active', bg === b);
+  });
+
+  ['gold', 'black', 'indigo'].forEach(c => {
+    const btn = document.getElementById(`btn-text-${c}`);
+    if (btn) btn.classList.toggle('active', textColor === c);
+  });
+
+  ['wood', 'gold', 'minimal'].forEach(f => {
+    const btn = document.getElementById(`btn-frame-${f}`);
+    if (btn) btn.classList.toggle('active', frame === f);
   });
 }
 
-export function selectQuizOption(qKey, val) {
-  gameState.quizR3Answers[qKey] = val;
-  renderR3Options();
+export function setArtworkBg(bgType) {
+  gameState.artworkR3.bg = bgType;
+  updateArtboardDOM();
+  playTone(523.25, 'triangle', 0.12);
+  const labels = { batik: 'Corak Batik Emas', songket: 'Corak Songket Diraja', vellum: 'Kertas Vellum' };
+  showItemToast('🖼️', `Latar Belakang: ${labels[bgType] || bgType}`);
 }
 
-export function submitQuizR3() {
-  const feedbackEl = document.getElementById('r3-feedback');
+export function setArtworkTextColor(colorType) {
+  gameState.artworkR3.textColor = colorType;
+  updateArtboardDOM();
+  playTone(659.25, 'triangle', 0.12);
+  const labels = { gold: 'Emas Berkilau', black: 'Hitam Klasik', indigo: 'Biru Nila' };
+  showItemToast('🖌️', `Warna Tulisan Khat: ${labels[colorType] || colorType}`);
+}
 
-  if (!gameState.quizR3Answers.q1 || !gameState.quizR3Answers.q2) {
-    playErrorBuzzer();
-    if (feedbackEl) {
-      feedbackEl.className = 'feedback-banner error';
-      feedbackEl.innerHTML = '⚠️ Sila pilih jawapan bagi kedua-dua soalan simpulan bahasa sebelum menghantar!';
-      feedbackEl.style.display = 'block';
-    }
-    speakBM('Sila pilih jawapan bagi kedua-dua soalan simpulan bahasa sebelum menghantar.');
-    return;
-  }
+export function setArtworkFrame(frameType) {
+  gameState.artworkR3.frame = frameType;
+  updateArtboardDOM();
+  playTone(783.99, 'sine', 0.15);
+  const labels = { wood: 'Bingkai Ukiran Kayu', gold: 'Bingkai Emas', minimal: 'Bingkai Minimalis' };
+  showItemToast('🖼️', `Bingkai Seni: ${labels[frameType] || frameType}`);
+}
 
-  const isQ1Correct = (gameState.quizR3Answers.q1 === QUIZ_R3_CORRECT.q1);
-  const isQ2Correct = (gameState.quizR3Answers.q2 === QUIZ_R3_CORRECT.q2);
+export function submitArtworkR3() {
+  gameState.room3Completed = true;
+  gameScores.room3 = 30;
+  playSuccessFanfare();
+  speakBM(`Tahniah ${studentProfile.name}! Anda berjaya mempersembahkan keindahan seni tulisan Jawi simpulan bahasa Ulat Buku dengan sangat kreatif.`);
 
-  if (isQ1Correct && isQ2Correct) {
-    // Both correct! Proceed to final PBD report
-    gameState.room3Completed = true;
-    playSuccessFanfare();
-    speakBM('Tahniah! Anda berjaya menjawab kedua-dua soalan simpulan bahasa dengan tepat!');
-    closeModal('room3-modal');
-
-    // Trigger Final PBD Report Card!
-    showFinalPBDReport();
-  } else {
-    // Trialogical Reflection & Retry:
-    // Do NOT immediately close Room 3. Deduct 5 marks per attempt (minimum 10 marks), increment attemptsR3, play buzzer, display reflection hint.
-    gameScores.attemptsR3 += 1;
-    gameScores.room3 = Math.max(10, 30 - (gameScores.attemptsR3 * 5));
-    updateR3ScoreDisplay();
-    playErrorBuzzer();
-
-    let hintHtml = '';
-    let voiceHint = '';
-
-    if (!isQ1Correct && !isQ2Correct) {
-      hintHtml = `
-        <strong>Refleksi Trialogikal:</strong> Kedua-dua jawapan anda belum tepat!<br>
-        • <em>Soalan 1:</em> Fikirkan simpulan bahasa bagi orang yang sangat rajin membaca buku di perpustakaan.<br>
-        • <em>Soalan 2:</em> Fikirkan simpulan bahasa bagi orang yang tidak pandai bermain bola sepak.<br>
-        <span style="color: #DC2626; font-size: 11px; font-weight: 700;">(-5 Markah Penalti • Percubaan Ke-${gameScores.attemptsR3})</span>
-      `;
-      voiceHint = 'Refleksi: Kedua-dua soalan belum tepat. Sila rujuk nota pintar ulat buku dan kaki bangku.';
-    } else if (!isQ1Correct) {
-      hintHtml = `
-        <strong>Refleksi Trialogikal:</strong> Soalan 1 belum tepat! (Soalan 2 anda betul: <em>Kaki Bangku</em>).<br>
-        Ingat kembali Nota Pintar #1: Apakah simpulan bahasa untuk murid yang sangat gemar membaca buku cerita di perpustakaan?<br>
-        <span style="color: #DC2626; font-size: 11px; font-weight: 700;">(-5 Markah Penalti • Percubaan Ke-${gameScores.attemptsR3})</span>
-      `;
-      voiceHint = 'Refleksi: Soalan 1 belum tepat. Fikirkan simpulan bahasa untuk orang yang suka membaca buku.';
-    } else {
-      hintHtml = `
-        <strong>Refleksi Trialogikal:</strong> Soalan 2 belum tepat! (Soalan 1 anda betul: <em>Ulat Buku</em>).<br>
-        Ingat kembali Nota Pintar #2: Apakah simpulan bahasa untuk murid yang tidak mahir bermain bola sepak di padang?<br>
-        <span style="color: #DC2626; font-size: 11px; font-weight: 700;">(-5 Markah Penalti • Percubaan Ke-${gameScores.attemptsR3})</span>
-      `;
-      voiceHint = 'Refleksi: Soalan 2 belum tepat. Fikirkan simpulan bahasa untuk orang yang tidak pandai menendang bola.';
-    }
-
-    if (feedbackEl) {
-      feedbackEl.className = 'feedback-banner error';
-      feedbackEl.innerHTML = hintHtml;
-      feedbackEl.style.display = 'block';
-    }
-
-    speakBM(voiceHint);
-  }
+  closeModal('room3-modal');
+  showFinalPBDReport();
 }
 
 // ==========================================
-// 11. FINAL PBD REPORT CARD (report-view)
+// 11. FINAL PBD REPORT CARD (Kad Laporan PBD)
 // ==========================================
 export function showFinalPBDReport() {
   const totalScore = gameScores.total();
@@ -979,19 +947,19 @@ export function showFinalPBDReport() {
   if (totalScore >= 90) {
     tpLevel = 'TP 6';
     tpClass = 'tp6';
-    rubricText = 'Tahap Penguasaan 6 (Cemerlang / Berdikari): Murid mempamerkan penguasaan menyeluruh dan cemerlang dalam sistem ejaan Jawi, sintaksis pembinaan ayat tunggal, serta pemahaman simpulan bahasa secara kontekstual melalui model pembelajaran Trialogikal berteraskan artifak digital.';
+    rubricText = 'Tahap Penguasaan 6 (Cemerlang / Berdikari): Murid berjaya menulis simpulan bahasa dalam Jawi dengan ejaan tepat dan mempersembahkan keindahan seni tulisan Jawi menggunakan corak dan bingkai yang sangat kreatif mengikut Standard Pembelajaran 4.4.2.';
   } else if (totalScore >= 75) {
     tpLevel = 'TP 5';
     tpClass = 'tp5';
-    rubricText = 'Tahap Penguasaan 5 (Sangat Baik / Terpuji): Murid berupaya menyusun huruf Jawi menjadi perkataan bermakna, mencantumkan keratan ayat dengan tepat mengikut rumus tatabahasa, serta memilih simpulan bahasa yang bersesuaian dengan senario harian.';
+    rubricText = 'Tahap Penguasaan 5 (Sangat Baik / Terpuji): Murid berupaya menyusun huruf Jawi menjadi perkataan bermakna, mencantumkan keratan simpulan bahasa Jawi dengan tepat, serta mempersembahkan seni khat Jawi dengan gubahan artistik yang menarik.';
   } else if (totalScore >= 60) {
     tpLevel = 'TP 4';
     tpClass = 'tp4';
-    rubricText = 'Tahap Penguasaan 4 (Memuaskan / Baik): Murid berupaya melengkapkan tugasan pembelajaran di bilik darjah bestari, perpustakaan, dan padang sekolah dengan menunjukkan kefahaman asas terhadap konsep bahasa Melayu.';
+    rubricText = 'Tahap Penguasaan 4 (Memuaskan / Baik): Murid berupaya melengkapkan tugasan pembelajaran di bilik darjah bestari, perpustakaan, dan studio seni khat dengan menunjukkan kefahaman yang memuaskan terhadap tulisan Jawi dan simpulan bahasa.';
   } else {
     tpLevel = 'TP 3';
     tpClass = 'tp3';
-    rubricText = 'Tahap Penguasaan 3 (Tahap Asas): Murid berupaya membina artifak digital bahasa pada tahap asas dengan sedikit bimbingan guru dan digalakkan untuk mengulang kaji padanan huruf Jawi dan frasa ayat.';
+    rubricText = 'Tahap Penguasaan 3 (Tahap Asas): Murid berupaya membina artifak digital Jawi pada tahap asas dan digalakkan untuk terus memperkaya latihan seni kaligrafi Jawi.';
   }
 
   // Populate Report Card DOM
@@ -1006,9 +974,9 @@ export function showFinalPBDReport() {
 
   if (nameEl) nameEl.textContent = studentProfile.name;
   if (classEl) classEl.textContent = studentProfile.class;
-  if (scoreR1El) scoreR1El.textContent = `${gameScores.room1} / 40 (Percubaan salah: ${gameScores.attemptsR1})`;
-  if (scoreR2El) scoreR2El.textContent = `${gameScores.room2} / 30 (Percubaan salah: ${gameScores.attemptsR2})`;
-  if (scoreR3El) scoreR3El.textContent = `${gameScores.room3} / 30 (Percubaan salah: ${gameScores.attemptsR3})`;
+  if (scoreR1El) scoreR1El.textContent = `${gameScores.room1} / 40 (Cubaan salah: ${gameScores.attemptsR1})`;
+  if (scoreR2El) scoreR2El.textContent = `${gameScores.room2} / 30 (Cubaan salah: ${gameScores.attemptsR2})`;
+  if (scoreR3El) scoreR3El.textContent = `${gameScores.room3} / 30`;
   if (totalScoreEl) totalScoreEl.textContent = `${totalScore} / 100`;
 
   if (tpBadgeEl) {
@@ -1018,6 +986,13 @@ export function showFinalPBDReport() {
 
   if (rubricEl) {
     rubricEl.textContent = rubricText;
+  }
+
+  // Update Visual Miniature Replica of Customized Artwork in Report
+  const reportDisplay = document.getElementById('report-artwork-display');
+  if (reportDisplay) {
+    const { bg, textColor, frame } = gameState.artworkR3;
+    reportDisplay.className = `report-artwork-replica bg-${bg} text-${textColor} frame-${frame}`;
   }
 
   openModal('report-modal');
@@ -1045,8 +1020,12 @@ export function restartGame() {
   gameState.room2Completed = false;
   gameState.room3Completed = false;
   gameState.puzzleR1Placed = [null, null, null, null];
-  gameState.puzzleR2Placed = [null, null, null];
-  gameState.quizR3Answers = { q1: null, q2: null };
+  gameState.puzzleR2Placed = [null, null];
+  gameState.artworkR3 = {
+    bg: 'batik',
+    textColor: 'gold',
+    frame: 'wood'
+  };
 
   // Reset Collectibles
   const resetList = [...COLLECTIBLES_R1, ...COLLECTIBLES_R2, ...COLLECTIBLES_R3];
@@ -1075,7 +1054,7 @@ export function restartGame() {
 // ==========================================
 export function allowDrop(event) {
   event.preventDefault();
-  if (event.currentTarget && (event.currentTarget.classList.contains('drop-zone') || event.currentTarget.classList.contains('sentence-slot'))) {
+  if (event.currentTarget && (event.currentTarget.classList.contains('drop-zone') || event.currentTarget.classList.contains('jawi-idiom-zone') || event.currentTarget.classList.contains('letters-tray'))) {
     event.currentTarget.classList.add('drag-over');
   }
 }
@@ -1174,8 +1153,10 @@ window.handleZoneClickR2 = handleZoneClickR2;
 window.handleDropR2 = handleDropR2;
 window.handleDropToTrayR2 = handleDropToTrayR2;
 
-window.selectQuizOption = selectQuizOption;
-window.submitQuizR3 = submitQuizR3;
+window.setArtworkBg = setArtworkBg;
+window.setArtworkTextColor = setArtworkTextColor;
+window.setArtworkFrame = setArtworkFrame;
+window.submitArtworkR3 = submitArtworkR3;
 window.updateR3ScoreDisplay = updateR3ScoreDisplay;
 
 window.showFinalPBDReport = showFinalPBDReport;

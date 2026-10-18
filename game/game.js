@@ -1550,7 +1550,7 @@ function buildRoom2() {
 }
 
 // ==========================================
-// 7. ROOM 3: PADANG SEKOLAH & KANTIN (x: 300, z: 300)
+// 7. ROOM 3: BILIK SENI VISUAL & STUDIO KHAT (x: 300, z: 300)
 // ==========================================
 let r3AssemblyStation;
 
@@ -1559,432 +1559,314 @@ function buildRoom3() {
   const cx = center.x;
   const cz = center.z;
 
-  // 1. Vibrant Green Turf Floor & School Walls
-  buildCutawayRoomShell(cx, cz, 0x15803D, 0xF8FAFC, 0xEDE9FE, 0x166534);
+  // 1. Warm Wooden Parquet Floor & Studio Ivory Walls
+  buildCutawayRoomShell(cx, cz, 0x8A5A36, 0xFFFBF5, 0xF5EBE1, 0x92400E);
 
-  // White Football Pitch Markings
-  const pitchLines = new THREE.GridHelper(22, 11, 0xFFFFFF, 0x22C55E);
-  pitchLines.position.set(cx, 0.02, cz);
-  scene.add(pitchLines);
+  // Parquet Grid in Warm Amber Tones
+  const parquetGrid = new THREE.GridHelper(22, 11, 0x78350F, 0xD97706);
+  parquetGrid.position.set(cx, 0.02, cz);
+  scene.add(parquetGrid);
 
-  // Center Circle
-  const circle = new THREE.Mesh(
-    new THREE.RingGeometry(2.8, 3.0, 32),
-    new THREE.MeshBasicMaterial({ color: 0xFFFFFF, side: THREE.DoubleSide })
-  );
-  circle.rotation.x = -Math.PI / 2;
-  circle.position.set(cx, 0.03, cz);
-  scene.add(circle);
+  // Helper: Paint Splatter & Art Decal Texture
+  function createSplatterDecalTexture(title, subtitle, bgColor = '#FFFDF5', bannerColor = '#D97706') {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
 
-  // 2. Red Running Track Border along South Edge (+Z)
-  const trackMat = new THREE.MeshLambertMaterial({ color: 0xB91C1C });
-  const track = new THREE.Mesh(new THREE.BoxGeometry(17.8, 0.03, 2.4), trackMat);
-  track.position.set(cx, 0.025, cz + 8.6);
-  scene.add(track);
+    // Base parchment
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, 1024, 512);
 
-  // 3 White Running Lane Separator Lines
-  const lineMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
-  [cz + 7.8, cz + 8.6, cz + 9.4].forEach((lz) => {
-    const laneLine = new THREE.Mesh(new THREE.BoxGeometry(17.6, 0.035, 0.06), lineMat);
-    laneLine.position.set(cx, 0.03, lz);
-    scene.add(laneLine);
-  });
+    // Decorative paint splash droplets in background
+    const splashes = [
+      { x: 120, y: 120, r: 60, col: 'rgba(239, 68, 68, 0.25)' },
+      { x: 880, y: 140, r: 75, col: 'rgba(59, 130, 246, 0.25)' },
+      { x: 200, y: 380, r: 50, col: 'rgba(16, 185, 129, 0.25)' },
+      { x: 840, y: 400, r: 65, col: 'rgba(245, 158, 11, 0.3)' },
+      { x: 500, y: 90, r: 40, col: 'rgba(139, 92, 246, 0.25)' }
+    ];
+    splashes.forEach(s => {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.col;
+      ctx.fill();
+    });
 
-  // Sprint Finish Line Markings
-  const finishLine = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.036, 2.4), lineMat);
-  finishLine.position.set(cx + 6.0, 0.032, cz + 8.6);
-  scene.add(finishLine);
+    // Ornate Gold & Wood Frame
+    ctx.strokeStyle = '#78350F';
+    ctx.lineWidth = 14;
+    ctx.strokeRect(10, 10, 1004, 492);
 
-  // 3. Detailed Canteen Stall (Gerai Kantin Sekolah) on North Wall (-Z)
-  const cGroup = new THREE.Group();
-  cGroup.position.set(cx + 2.0, 0, cz - 9.0);
+    ctx.strokeStyle = bannerColor;
+    ctx.lineWidth = 6;
+    ctx.strokeRect(22, 22, 980, 468);
 
-  // Menu Signboard on North Wall (-Z)
-  const menuFrame = new THREE.Mesh(
-    new THREE.BoxGeometry(6.8, 1.4, 0.15),
+    // Header Plaque
+    ctx.fillStyle = bannerColor;
+    ctx.fillRect(60, 45, 904, 110);
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 50px "Fredoka", "Plus Jakarta Sans", Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(title, 512, 100);
+
+    // Central Calligraphy & Art Motif
+    ctx.fillStyle = '#1E293B';
+    ctx.font = 'bold 110px "Amiri", "Traditional Arabic", serif';
+    ctx.fillText('اولت بوکو', 512, 270);
+
+    ctx.fillStyle = '#475569';
+    ctx.font = '600 36px "Plus Jakarta Sans", Arial, sans-serif';
+    ctx.fillText(subtitle, 512, 400);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.minFilter = THREE.LinearFilter;
+    return texture;
+  }
+
+  // 2. North Wall (-Z): Main Studio Signboard
+  const studioSignFrame = new THREE.Mesh(
+    new THREE.BoxGeometry(8.8, 1.5, 0.16),
     new THREE.MeshLambertMaterial({ color: 0x78350F })
   );
-  menuFrame.position.set(0, 3.2, -1.85);
-  cGroup.add(menuFrame);
+  studioSignFrame.position.set(cx, 3.2, cz - 10.85);
+  scene.add(studioSignFrame);
 
-  const menuTex = createTextCanvasTexture(
-    'KANTIN SEKOLAH BESTARI',
-    '#064E3B',
+  const studioSignTex = createTextCanvasTexture(
+    'BILIK SENI VISUAL & STUDIO KHAT',
+    '#92400E',
     '#FFFFFF',
     1024,
     256,
-    50,
-    'MENU SIHAT: NASI LEMAK • MEE SUP • ROTI CANAI • AIR BUAH'
+    48,
+    'DSKP 4.4.2: MEMPERSEMBAHKAN KEINDAHAN SENI TULISAN JAWI'
   );
-  const menuFace = new THREE.Mesh(
-    new THREE.PlaneGeometry(6.6, 1.2),
-    new THREE.MeshBasicMaterial({ map: menuTex })
+  const studioSignFace = new THREE.Mesh(
+    new THREE.PlaneGeometry(8.6, 1.3),
+    new THREE.MeshBasicMaterial({ map: studioSignTex })
   );
-  menuFace.position.set(0, 3.2, -1.76);
-  cGroup.add(menuFace);
+  studioSignFace.position.set(cx, 3.2, cz - 10.76);
+  scene.add(studioSignFace);
 
-  // Canteen Counter Body (Golden Yellow)
-  const counter = new THREE.Mesh(
-    new THREE.BoxGeometry(7.2, 1.15, 1.8),
-    new THREE.MeshLambertMaterial({ color: 0xF59E0B })
+  // 3. West Wall (-X): Calligraphy Scrolls & Batik Motifs
+  const westMuralTex = createSplatterDecalTexture(
+    'KHAZANAH SENI KALIGRAFI JAWI',
+    'Keindahan Seni Tulisan Jawi Melalui Simpulan Bahasa',
+    '#FFFDF8',
+    '#065F46'
   );
-  counter.position.y = 0.58;
-  counter.castShadow = true;
-  cGroup.add(counter);
+  const westFrame = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.4, 4.8), new THREE.MeshLambertMaterial({ color: 0x78350F }));
+  westFrame.position.set(cx - 12.85, 2.6, cz);
+  scene.add(westFrame);
 
-  // Clean Ivory Countertop
-  const counterTop = new THREE.Mesh(
-    new THREE.BoxGeometry(7.4, 0.08, 2.0),
-    new THREE.MeshLambertMaterial({ color: 0xF8FAFC })
+  const westSurface = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 2.2), new THREE.MeshBasicMaterial({ map: westMuralTex }));
+  westSurface.rotation.y = Math.PI / 2;
+  westSurface.position.set(cx - 12.78, 2.6, cz);
+  scene.add(westSurface);
+
+  // 4. East Wall (+X): Art Appreciation & Motivation Banner
+  const eastMuralTex = createTextCanvasTexture(
+    'APRESIASI SENI KHAT',
+    '#1E3A8A',
+    '#FFFFFF',
+    1024,
+    340,
+    46,
+    'EKSPRESI KREATIF • CORAK BATIK • SONGKET DIRAJA'
   );
-  counterTop.position.y = 1.18;
-  counterTop.castShadow = true;
-  cGroup.add(counterTop);
+  const eastFrame = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.2, 4.4), new THREE.MeshLambertMaterial({ color: 0x78350F }));
+  eastFrame.position.set(cx + 12.85, 2.6, cz);
+  scene.add(eastFrame);
 
-  // Front Service Plaque
-  const cPlaqueTex = createTextCanvasTexture('GERAI MAKANAN & MINUMAN KANTIN', '#1E3A8A', '#FFFFFF', 512, 128, 40);
-  const cPlaque = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 0.65), new THREE.MeshBasicMaterial({ map: cPlaqueTex }));
-  cPlaque.position.set(0, 0.6, 0.92);
-  cGroup.add(cPlaque);
+  const eastSurface = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 2.0), new THREE.MeshBasicMaterial({ map: eastMuralTex }));
+  eastSurface.rotation.y = -Math.PI / 2;
+  eastSurface.position.set(cx + 12.78, 2.6, cz);
+  scene.add(eastSurface);
 
-  // Red & White Striped Awning Overhead
-  const awning = new THREE.Mesh(
-    new THREE.BoxGeometry(7.6, 0.35, 2.2),
-    new THREE.MeshLambertMaterial({ color: 0xEF4444 })
-  );
-  awning.position.set(0, 2.85, 0.2);
-  cGroup.add(awning);
+  // 5. Standing 3D Wooden Art Easels (Kanvas Lukisan)
+  function createArtEasel(posX, posZ, rotY, canvasColor = 0xFEF3C7, artText = 'Seni Khat') {
+    const easelGroup = new THREE.Group();
+    easelGroup.position.set(posX, 0, posZ);
+    easelGroup.rotation.y = rotY;
 
-  // Awning Support Poles
-  const poleMat = new THREE.MeshLambertMaterial({ color: 0x94A3B8 });
-  [[-3.6, 1.1], [3.6, 1.1]].forEach(([px, pz]) => {
-    const aPole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.8, 8), poleMat);
-    aPole.position.set(px, 1.95, pz);
-    cGroup.add(aPole);
-  });
+    const woodMat = new THREE.MeshLambertMaterial({ color: 0x854D0E });
 
-  // 3D Food Props on Canteen Counter
-  // 3 Colorful Drinks Dispenser Cylinders
-  function makeDrinkDispenser(dx, liquidColor, capColor = 0xE2E8F0) {
-    const dispGroup = new THREE.Group();
-    dispGroup.position.set(dx, 1.22, -0.2);
+    // 2 Front Tripod Legs
+    [-0.45, 0.45].forEach(lx => {
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 2.4, 6), woodMat);
+      leg.position.set(lx, 1.15, 0);
+      leg.rotation.z = (lx > 0 ? 0.12 : -0.12);
+      easelGroup.add(leg);
+    });
 
-    // Chrome Base
-    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.2, 0.1, 16), new THREE.MeshStandardMaterial({ color: 0x94A3B8, metalness: 0.8 }));
-    dispGroup.add(base);
+    // 1 Back Support Leg
+    const backLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 2.4, 6), woodMat);
+    backLeg.position.set(0, 1.15, 0.55);
+    backLeg.rotation.x = -0.25;
+    easelGroup.add(backLeg);
 
-    // Translucent Cylinder Tank
-    const tank = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.18, 0.18, 0.45, 16),
-      new THREE.MeshStandardMaterial({ color: liquidColor, emissive: liquidColor, emissiveIntensity: 0.35, transparent: true, opacity: 0.85 })
+    // Crossbar Shelf
+    const shelf = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.06, 0.18), woodMat);
+    shelf.position.set(0, 0.95, -0.06);
+    easelGroup.add(shelf);
+
+    // Stretched Art Canvas on the Easel
+    const canvasBack = new THREE.Mesh(
+      new THREE.BoxGeometry(1.0, 1.25, 0.05),
+      new THREE.MeshLambertMaterial({ color: 0x78350F })
     );
-    tank.position.y = 0.28;
-    dispGroup.add(tank);
+    canvasBack.position.set(0, 1.55, -0.05);
+    easelGroup.add(canvasBack);
 
-    // Chrome Lid
-    const lid = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.18, 0.06, 16), new THREE.MeshStandardMaterial({ color: capColor, metalness: 0.8 }));
-    lid.position.y = 0.53;
-    dispGroup.add(lid);
+    // Artwork texture
+    const paintingTex = createTextCanvasTexture(artText, '#1E293B', '#F59E0B', 512, 600, 48, 'KARYA MURID');
+    const canvasFace = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.92, 1.15),
+      new THREE.MeshBasicMaterial({ map: paintingTex })
+    );
+    canvasFace.position.set(0, 1.55, -0.02);
+    easelGroup.add(canvasFace);
 
-    // Little Pouring Spigot
-    const spigot = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.08), new THREE.MeshStandardMaterial({ color: 0xF59E0B }));
-    spigot.position.set(0, 0.12, 0.2);
-    dispGroup.add(spigot);
-
-    cGroup.add(dispGroup);
+    scene.add(easelGroup);
+    colliders.push({ minX: posX - 0.7, maxX: posX + 0.7, minZ: posZ - 0.7, maxZ: posZ + 0.7 });
   }
 
-  // Dispenser 1: Orange Juice
-  makeDrinkDispenser(-0.8, 0xFB923C);
-  // Dispenser 2: Sirap Ros
-  makeDrinkDispenser(-0.1, 0xF43F5E);
-  // Dispenser 3: Milo Ais
-  makeDrinkDispenser(0.6, 0x78350F);
+  // 4 Art Easels around the studio aisles
+  createArtEasel(cx - 7.5, cz - 4.5, 0.4, 0xFEF3C7, 'Corak Batik');
+  createArtEasel(cx + 7.5, cz - 4.5, -0.4, 0xDBEAFE, 'Seni Songket');
+  createArtEasel(cx - 7.5, cz + 4.5, 0.2, 0xFEE2E2, 'Khat Nasakh');
+  createArtEasel(cx + 7.5, cz + 4.5, -0.2, 0xECFDF5, 'Khat Thuluth');
 
-  // Plates of Food on Counter
-  function makeFoodPlate(px, pz, foodMesh) {
-    const pGroup = new THREE.Group();
-    pGroup.position.set(px, 1.23, pz);
+  // 6. Studio Work Tables with Paint Palettes & Art Supplies
+  function createArtTable(posX, posZ) {
+    const tableGroup = new THREE.Group();
+    tableGroup.position.set(posX, 0, posZ);
 
-    const plate = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.24, 0.2, 0.03, 16),
-      new THREE.MeshLambertMaterial({ color: 0xFFFFFF })
-    );
-    pGroup.add(plate);
-
-    foodMesh.position.y = 0.08;
-    pGroup.add(foodMesh);
-    cGroup.add(pGroup);
-  }
-
-  // Plate 1: Nasi Lemak Bungkus Daun Pisang (Green pyramid)
-  const nasiLemak = new THREE.Mesh(
-    new THREE.ConeGeometry(0.14, 0.22, 4),
-    new THREE.MeshLambertMaterial({ color: 0x15803D })
-  );
-  nasiLemak.rotation.y = Math.PI / 4;
-  makeFoodPlate(1.5, 0.1, nasiLemak);
-
-  // Plate 2: Curry Puffs & Golden Pastries
-  const pastries = new THREE.Group();
-  [-0.08, 0.08].forEach((ox) => {
-    const puff = new THREE.Mesh(new THREE.DodecahedronGeometry(0.07), new THREE.MeshLambertMaterial({ color: 0xD97706 }));
-    puff.position.set(ox, 0, 0);
-    pastries.add(puff);
-  });
-  makeFoodPlate(2.3, 0.1, pastries);
-
-  // Plate 3: Sliced Fresh Tropical Fruits
-  const fruitGroup = new THREE.Group();
-  const melon = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.05, 8), new THREE.MeshLambertMaterial({ color: 0xEF4444 }));
-  fruitGroup.add(melon);
-  makeFoodPlate(3.1, 0.1, fruitGroup);
-
-  // Cashier Till
-  const till = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.35, 0.5), new THREE.MeshLambertMaterial({ color: 0x334155 }));
-  till.position.set(4.0, 1.4, 0);
-  cGroup.add(till);
-
-  scene.add(cGroup);
-  colliders.push({ minX: cx - 1.8, maxX: cx + 5.8, minZ: cz - 10.1, maxZ: cz - 8.0 });
-
-  // 4. Tiled Patio Area & 2 Canteen Picnic Tables with Benches
-  const patio = new THREE.Mesh(
-    new THREE.BoxGeometry(9.6, 0.03, 3.8),
-    new THREE.MeshLambertMaterial({ color: 0xE2E8F0 })
-  );
-  patio.position.set(cx + 1.8, 0.02, cz - 5.8);
-  scene.add(patio);
-
-  function makePicnicTable(tx, tz, tableColor) {
-    const tGroup = new THREE.Group();
-    tGroup.position.set(tx, 0, tz);
+    const deskMat = new THREE.MeshLambertMaterial({ color: 0x92400E });
 
     // Tabletop
-    const top = new THREE.Mesh(
-      new THREE.BoxGeometry(3.2, 0.12, 1.1),
-      new THREE.MeshLambertMaterial({ color: tableColor })
-    );
-    top.position.y = 0.82;
+    const top = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.1, 1.6), deskMat);
+    top.position.y = 0.95;
     top.castShadow = true;
-    tGroup.add(top);
+    tableGroup.add(top);
 
-    // 4 Steel Legs
-    [[-1.4, -0.4], [1.4, -0.4], [-1.4, 0.4], [1.4, 0.4]].forEach(([lx, lz]) => {
-      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.8, 6), new THREE.MeshLambertMaterial({ color: 0x475569 }));
-      leg.position.set(lx, 0.4, lz);
-      tGroup.add(leg);
+    // 4 Legs
+    [[-1.6, -0.65], [1.6, -0.65], [-1.6, 0.65], [1.6, 0.65]].forEach(([lx, lz]) => {
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.95, 6), deskMat);
+      leg.position.set(lx, 0.475, lz);
+      tableGroup.add(leg);
     });
 
-    // 2 Benches (North and South)
-    [-0.8, 0.8].forEach((bz) => {
-      const bench = new THREE.Mesh(
-        new THREE.BoxGeometry(3.0, 0.08, 0.42),
-        new THREE.MeshLambertMaterial({ color: 0x94A3B8 })
+    // 3D Wooden Paint Palette on table
+    const paletteMat = new THREE.MeshLambertMaterial({ color: 0xD97706 });
+    const paletteMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.42, 0.03, 16), paletteMat);
+    paletteMesh.position.set(-0.7, 1.02, 0);
+    paletteMesh.scale.set(1.2, 1, 0.85);
+    tableGroup.add(paletteMesh);
+
+    // Dollops of paint on the palette
+    const paintColors = [0xEF4444, 0x3B82F6, 0x10B981, 0xF59E0B, 0x8B5CF6, 0xFFFFFF];
+    paintColors.forEach((color, idx) => {
+      const ang = (idx * Math.PI * 1.5) / 5 - 1.2;
+      const dot = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.045, 0.05, 0.02, 8),
+        new THREE.MeshStandardMaterial({ color, roughness: 0.2 })
       );
-      bench.position.set(0, 0.46, bz);
-      bench.castShadow = true;
-      tGroup.add(bench);
-
-      [[-1.2, bz], [1.2, bz]].forEach(([bx, bzz]) => {
-        const bLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.46, 6), new THREE.MeshLambertMaterial({ color: 0x334155 }));
-        bLeg.position.set(bx, 0.23, 0);
-        bench.add(bLeg);
-      });
+      dot.position.set(-0.7 + Math.cos(ang) * 0.28, 1.04, Math.sin(ang) * 0.2);
+      tableGroup.add(dot);
     });
 
-    scene.add(tGroup);
-    colliders.push({ minX: tx - 1.7, maxX: tx + 1.7, minZ: tz - 0.9, maxZ: tz + 0.9 });
+    // Calligraphy Brush resting on palette
+    const brushStem = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.015, 0.015, 0.45, 6),
+      new THREE.MeshLambertMaterial({ color: 0x451A03 })
+    );
+    brushStem.rotation.z = Math.PI / 3;
+    brushStem.position.set(-0.55, 1.04, 0.05);
+    tableGroup.add(brushStem);
+
+    // Ceramic Paint Water Jars
+    const jar1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 0.24, 12), new THREE.MeshLambertMaterial({ color: 0x38BDF8 }));
+    jar1.position.set(0.6, 1.12, -0.3);
+    tableGroup.add(jar1);
+
+    const jar2 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.2, 12), new THREE.MeshLambertMaterial({ color: 0xFDE047 }));
+    jar2.position.set(0.85, 1.1, -0.25);
+    tableGroup.add(jar2);
+
+    // Stack of Parchment / Art Paper
+    const paper = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.05, 0.6), new THREE.MeshLambertMaterial({ color: 0xFFFDF0 }));
+    paper.position.set(0.3, 1.02, 0.2);
+    tableGroup.add(paper);
+
+    scene.add(tableGroup);
+    colliders.push({ minX: posX - 2.0, maxX: posX + 2.0, minZ: posZ - 1.0, maxZ: posZ + 1.0 });
   }
 
-  // Picnic Table 1 (Blue)
-  makePicnicTable(cx - 0.8, cz - 5.8, 0x0284C7);
-  // Picnic Table 2 (Emerald)
-  makePicnicTable(cx + 4.4, cz - 5.8, 0x10B981);
+  // Two studio work desks on the sides
+  createArtTable(cx - 4.5, cz - 7.5);
+  createArtTable(cx + 4.5, cz - 7.5);
 
-  // 5. Football Pitch Goalpost on West Wall (-X)
-  const goalGroup = new THREE.Group();
-  goalGroup.position.set(cx - 11.8, 0, cz);
-
-  const barMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.25 });
-  const post1 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2.4, 8), barMat);
-  post1.position.set(0, 1.2, -2.5);
-  goalGroup.add(post1);
-
-  const post2 = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 2.4, 8), barMat);
-  post2.position.set(0, 1.2, 2.5);
-  goalGroup.add(post2);
-
-  const crossbar = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 5.0, 8), barMat);
-  crossbar.rotation.x = Math.PI / 2;
-  crossbar.position.set(0, 2.4, 0);
-  goalGroup.add(crossbar);
-
-  // Goal Net
-  const netMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0.35, wireframe: true });
-  const netMesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.3, 4.9), netMat);
-  netMesh.position.set(-0.6, 1.15, 0);
-  goalGroup.add(netMesh);
-
-  scene.add(goalGroup);
-  colliders.push({ minX: cx - 12.8, maxX: cx - 11.0, minZ: cz - 2.8, maxZ: cz + 2.8 });
-
-  // 6. 3D Black-and-White Football Resting on Grass near Goalpost
-  const ballGroup = new THREE.Group();
-  ballGroup.position.set(cx - 10.4, 0.22, cz + 1.2);
-
-  // White Ball Sphere
-  const ballSphere = new THREE.Mesh(
-    new THREE.SphereGeometry(0.22, 16, 16),
-    new THREE.MeshLambertMaterial({ color: 0xFFFFFF })
-  );
-  ballSphere.castShadow = true;
-  ballGroup.add(ballSphere);
-
-  // Black Pentagonal Patches
-  const patchMat = new THREE.MeshBasicMaterial({ color: 0x0F172A });
-  const patchAngles = [
-    [0.18, 0.12, 0],
-    [-0.18, 0.12, 0],
-    [0, -0.18, 0.12],
-    [0, 0.18, -0.12],
-    [0.12, 0, 0.18],
-    [-0.12, 0, -0.18]
-  ];
-  patchAngles.forEach(([px, py, pz]) => {
-    const patch = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.02, 5), patchMat);
-    patch.position.set(px, py, pz);
-    patch.lookAt(px * 2, py * 2, pz * 2);
-    ballGroup.add(patch);
-  });
-
-  // Soft Ball Shadow
-  const ballShadow = new THREE.Mesh(
-    new THREE.CircleGeometry(0.24, 12),
-    new THREE.MeshBasicMaterial({ color: 0x0A361A, transparent: true, opacity: 0.5 })
-  );
-  ballShadow.rotation.x = -Math.PI / 2;
-  ballShadow.position.y = -0.21;
-  ballGroup.add(ballShadow);
-
-  scene.add(ballGroup);
-
-  // 7. Corner Flags at Field Corners
-  function makeCornerFlag(fx, fz) {
-    const fGroup = new THREE.Group();
-    fGroup.position.set(fx, 0, fz);
-
-    const fPole = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.025, 0.025, 1.5, 6),
-      new THREE.MeshLambertMaterial({ color: 0xFFFFFF })
-    );
-    fPole.position.y = 0.75;
-    fGroup.add(fPole);
-
-    const fFlag = new THREE.Mesh(
-      new THREE.BoxGeometry(0.02, 0.32, 0.45),
-      new THREE.MeshLambertMaterial({ color: 0xEF4444 })
-    );
-    fFlag.position.set(0.02, 1.32, 0.22);
-    fGroup.add(fFlag);
-
-    scene.add(fGroup);
-  }
-
-  makeCornerFlag(cx - 11.2, cz - 8.8);
-  makeCornerFlag(cx - 11.2, cz + 7.2);
-  makeCornerFlag(cx + 11.2, cz - 8.8);
-  makeCornerFlag(cx + 11.2, cz + 7.2);
-
-  // 8. Tiered Spectator Bench (Astaka / Bangku Penonton) along West Wall (-X)
-  const astakaGroup = new THREE.Group();
-  astakaGroup.position.set(cx - 11.8, 0, cz + 4.8);
-
-  // Tier 1 Bench (Lower Step)
-  const tier1 = new THREE.Mesh(
-    new THREE.BoxGeometry(1.0, 0.45, 4.4),
-    new THREE.MeshLambertMaterial({ color: 0x2563EB })
-  );
-  tier1.position.set(0.35, 0.225, 0);
-  tier1.castShadow = true;
-  astakaGroup.add(tier1);
-
-  // Tier 2 Bench (Upper Step)
-  const tier2 = new THREE.Mesh(
-    new THREE.BoxGeometry(1.0, 0.9, 4.4),
-    new THREE.MeshLambertMaterial({ color: 0x1D4ED8 })
-  );
-  tier2.position.set(-0.35, 0.45, 0);
-  tier2.castShadow = true;
-  astakaGroup.add(tier2);
-
-  // Overhead Astaka Canopy Roof
-  const canopy = new THREE.Mesh(
-    new THREE.BoxGeometry(1.5, 0.08, 4.8),
-    new THREE.MeshLambertMaterial({ color: 0xF8FAFC })
-  );
-  canopy.position.set(0, 2.6, 0);
-  astakaGroup.add(canopy);
-
-  // Canopy Posts
-  [[-0.6, -2.2], [0.6, -2.2], [-0.6, 2.2], [0.6, 2.2]].forEach(([px, pz]) => {
-    const cPole = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 2.6, 6), poleMat);
-    cPole.position.set(px, 1.3, pz);
-    astakaGroup.add(cPole);
-  });
-
-  // Astaka Banner: 'ASTAKA BESTARI'
-  const astakaTex = createTextCanvasTexture('ASTAKA BESTARI', '#1E3A8A', '#FFFFFF', 512, 128, 42, 'MAJULAH SUKAN UNTUK NEGARA');
-  const astakaPlaque = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 0.65), new THREE.MeshBasicMaterial({ map: astakaTex }));
-  astakaPlaque.rotation.y = Math.PI / 2;
-  astakaPlaque.position.set(0.76, 2.6, 0);
-  astakaGroup.add(astakaPlaque);
-
-  scene.add(astakaGroup);
-  colliders.push({ minX: cx - 12.8, maxX: cx - 10.8, minZ: cz + 2.4, maxZ: cz + 7.2 });
-
-  // 9. Trophy Podium in Center (Pentas Cabaran 1-2-3 - Assembly Station)
+  // 7. Central Masterpiece Canvas (Kanvas Pameran Utama - Assembly Station)
   const podGroup = new THREE.Group();
-  podGroup.position.set(cx, 0, cz);
+  podGroup.position.set(cx, 0, cz - 0.5);
 
-  // 1st Place (Center Gold)
-  const p1 = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.8, 1.6), new THREE.MeshLambertMaterial({ color: 0xF59E0B }));
-  p1.position.set(0, 0.4, 0);
-  podGroup.add(p1);
+  // Grand Wooden Art Easel Stand
+  const gWoodMat = new THREE.MeshLambertMaterial({ color: 0x78350F });
+  [-0.9, 0.9].forEach(gx => {
+    const mainPost = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 3.4, 8), gWoodMat);
+    mainPost.position.set(gx, 1.7, 0);
+    podGroup.add(mainPost);
+  });
 
-  // 2nd Place (Left Silver)
-  const p2 = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.6, 1.4), new THREE.MeshLambertMaterial({ color: 0x94A3B8 }));
-  p2.position.set(-1.5, 0.3, 0);
-  podGroup.add(p2);
+  const topCrossbar = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.1, 0.15), gWoodMat);
+  topCrossbar.position.set(0, 3.2, 0);
+  podGroup.add(topCrossbar);
 
-  // 3rd Place (Right Bronze)
-  const p3 = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.45, 1.4), new THREE.MeshLambertMaterial({ color: 0xD97706 }));
-  p3.position.set(1.5, 0.225, 0);
-  podGroup.add(p3);
+  const baseShelf = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.14, 0.25), gWoodMat);
+  baseShelf.position.set(0, 0.9, 0);
+  podGroup.add(baseShelf);
 
-  // Golden Championship Cup
-  const cup = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.35, 0.15, 0.6, 12),
-    new THREE.MeshStandardMaterial({ color: 0xFCD34D, metalness: 0.8, roughness: 0.2 })
+  // Large Masterpiece Canvas Board (2.2m x 1.7m)
+  const masterTex = createSplatterDecalTexture(
+    'KANVAS PAMERAN UTAMA',
+    'Dekati & Tekan E untuk mereka bentuk karya seni khat Jawi',
+    '#FFFDF5',
+    '#D97706'
   );
-  cup.position.set(0, 1.1, 0);
-  podGroup.add(cup);
 
+  const masterFrame = new THREE.Mesh(
+    new THREE.BoxGeometry(2.35, 1.85, 0.1),
+    new THREE.MeshStandardMaterial({ color: 0xF59E0B, metalness: 0.75, roughness: 0.25 })
+  );
+  masterFrame.position.set(0, 1.95, -0.05);
+  podGroup.add(masterFrame);
+
+  const masterFace = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.2, 1.7),
+    new THREE.MeshBasicMaterial({ map: masterTex })
+  );
+  masterFace.position.set(0, 1.95, 0.01);
+  podGroup.add(masterFace);
+
+  // Glowing Golden Assembly Beacon overhead
   const beacon = new THREE.Mesh(
-    new THREE.ConeGeometry(0.3, 0.9, 8),
-    new THREE.MeshStandardMaterial({ color: 0xF59E0B, emissive: 0xD97706, emissiveIntensity: 0.9 })
+    new THREE.ConeGeometry(0.32, 0.95, 8),
+    new THREE.MeshStandardMaterial({ color: 0xF59E0B, emissive: 0xD97706, emissiveIntensity: 0.95 })
   );
-  beacon.position.set(0, 2.3, 0);
+  beacon.position.set(0, 3.5, 0);
   beacon.rotation.z = Math.PI;
   podGroup.add(beacon);
 
-  const bLight = new THREE.PointLight(0xF59E0B, 1.5, 6);
-  bLight.position.set(0, 2.2, 0);
+  const bLight = new THREE.PointLight(0xF59E0B, 1.8, 8);
+  bLight.position.set(0, 3.2, 0.5);
   podGroup.add(bLight);
 
   scene.add(podGroup);
   r3AssemblyStation = { group: podGroup, beacon };
-  colliders.push({ minX: cx - 2.4, maxX: cx + 2.4, minZ: cz - 1.0, maxZ: cz + 1.0 });
+  colliders.push({ minX: cx - 1.8, maxX: cx + 1.8, minZ: cz - 1.2, maxZ: cz + 0.8 });
 }
 
 // ==========================================
@@ -2156,8 +2038,8 @@ function setupCollectiblesList(items, geomType = 'crystal') {
       bookGroup.scale.set(1.5, 1.5, 1.5); // 1.5x Enlarge
       mainMesh = bookGroup;
 
-      // Floating THREE.Sprite tag directly above each book showing 'Frasa 1', 'Frasa 2', and 'Frasa 3'
-      const tagText = item.id === 'frag1' ? 'Frasa 1' : item.id === 'frag2' ? 'Frasa 2' : item.id === 'frag3' ? 'Frasa 3' : (item.name || 'Buku');
+      // Floating THREE.Sprite tag directly above each Jawi book fragment
+      const tagText = `${item.char} (${item.name})`;
       const bookTag = createTextSprite(
         `📖 ${tagText}`,
         'rgba(15, 23, 42, 0.94)',
@@ -2170,93 +2052,76 @@ function setupCollectiblesList(items, geomType = 'crystal') {
       bookTag.position.set(0, 1.65, 0);
       itemGroup.add(bookTag);
     } else {
-      // 3D Golden Star Medal / Trophy Badge (geomType === 'orb')
-      const medalGroup = new THREE.Group();
+      // 3D Art Studio Supplies (geomType === 'orb' / Alatan Seni Khat)
+      const supplyGroup = new THREE.Group();
 
-      const medalMat = new THREE.MeshStandardMaterial({
-        color: 0xF59E0B, // Golden amber
-        metalness: 0.85,
-        roughness: 0.22,
-        emissive: 0xD97706,
-        emissiveIntensity: 0.4
-      });
+      if (item.id === 'orb1') {
+        // Berus Khat (Bamboo Calligraphy Brush)
+        const stemMat = new THREE.MeshLambertMaterial({ color: 0xD97706 });
+        const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 1.15, 8), stemMat);
+        supplyGroup.add(stem);
 
-      const ribbonMat = new THREE.MeshLambertMaterial({
-        color: item.color
-      });
-
-      // Coin disc facing front/back (upright)
-      const coin = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.56, 0.56, 0.1, 24),
-        medalMat
-      );
-      coin.rotation.x = Math.PI / 2;
-      medalGroup.add(coin);
-
-      // Outer Raised Coin Rim
-      const coinRim = new THREE.Mesh(
-        new THREE.TorusGeometry(0.56, 0.045, 12, 24),
-        medalMat
-      );
-      medalGroup.add(coinRim);
-
-      // Inner Colored Medallion Core
-      const coreGem = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.38, 0.38, 0.12, 20),
-        new THREE.MeshStandardMaterial({
-          color: item.color,
-          emissive: item.color,
-          emissiveIntensity: 0.65,
-          metalness: 0.5,
-          roughness: 0.2
-        })
-      );
-      coreGem.rotation.x = Math.PI / 2;
-      medalGroup.add(coreGem);
-
-      // 3D Golden Star Emblem on both Front and Back faces
-      function makeStarEmblem(posZ) {
-        const starCenter = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.16, 0.16, 0.04, 5),
-          medalMat
+        // Gold Ferrule Ring
+        const ferrule = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.055, 0.055, 0.16, 8),
+          new THREE.MeshStandardMaterial({ color: 0xFCD34D, metalness: 0.85, roughness: 0.2 })
         );
-        starCenter.rotation.x = Math.PI / 2;
-        starCenter.position.z = posZ;
-        medalGroup.add(starCenter);
+        ferrule.position.y = 0.58;
+        supplyGroup.add(ferrule);
 
-        for (let sp = 0; sp < 5; sp++) {
-          const ang = (sp * Math.PI * 2) / 5 - Math.PI / 2;
-          const point = new THREE.Mesh(
-            new THREE.ConeGeometry(0.09, 0.2, 4),
-            medalMat
+        // Pointed Calligraphy Bristle Tip
+        const tip = new THREE.Mesh(
+          new THREE.ConeGeometry(0.075, 0.38, 12),
+          new THREE.MeshStandardMaterial({ color: 0x0F172A, roughness: 0.5 })
+        );
+        tip.position.y = 0.85;
+        supplyGroup.add(tip);
+
+        supplyGroup.rotation.z = Math.PI / 4;
+      } else if (item.id === 'orb2') {
+        // Palet Warna (Artist Palette)
+        const palMat = new THREE.MeshLambertMaterial({ color: 0xB45309 });
+        const pal = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.52, 0.06, 16), palMat);
+        pal.scale.set(1.15, 1, 0.85);
+        pal.rotation.x = Math.PI / 4;
+        supplyGroup.add(pal);
+
+        // Paint drops on palette
+        const colors = [0xEF4444, 0x3B82F6, 0x10B981, 0xF59E0B, 0xFFFFFF];
+        colors.forEach((col, idx) => {
+          const ang = (idx * Math.PI * 1.5) / 4 - 1.2;
+          const drop = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.05, 0.06, 0.03, 8),
+            new THREE.MeshStandardMaterial({ color: col, roughness: 0.2 })
           );
-          point.position.set(Math.cos(ang) * 0.24, Math.sin(ang) * 0.24, posZ);
-          point.rotation.z = ang - Math.PI / 2;
-          medalGroup.add(point);
-        }
+          drop.position.set(Math.cos(ang) * 0.35, 0.04, Math.sin(ang) * 0.25);
+          supplyGroup.add(drop);
+        });
+      } else {
+        // Kanvas Lukisan (Mini Framed Art Canvas)
+        const frameMat = new THREE.MeshLambertMaterial({ color: 0x78350F });
+        const frameMesh = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.1, 0.08), frameMat);
+        supplyGroup.add(frameMesh);
+
+        const faceMat = new THREE.MeshStandardMaterial({ color: 0xFFFDF0, roughness: 0.4 });
+        const face = new THREE.Mesh(new THREE.PlaneGeometry(0.75, 0.98), faceMat);
+        face.position.z = 0.045;
+        supplyGroup.add(face);
+
+        const goldBorder = new THREE.Mesh(
+          new THREE.BoxGeometry(0.79, 1.02, 0.04),
+          new THREE.MeshStandardMaterial({ color: 0xF59E0B, metalness: 0.7 })
+        );
+        goldBorder.position.z = 0.025;
+        supplyGroup.add(goldBorder);
       }
 
-      makeStarEmblem(0.065);  // Front star
-      makeStarEmblem(-0.065); // Back star
+      supplyGroup.scale.set(1.5, 1.5, 1.5);
+      mainMesh = supplyGroup;
 
-      // Dual Hanging Award Ribbon Tails at top
-      const ribLeft = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.45, 0.03), ribbonMat);
-      ribLeft.position.set(-0.15, 0.62, 0);
-      ribLeft.rotation.z = -0.28;
-      medalGroup.add(ribLeft);
-
-      const ribRight = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.45, 0.03), ribbonMat);
-      ribRight.position.set(0.15, 0.62, 0);
-      ribRight.rotation.z = 0.28;
-      medalGroup.add(ribRight);
-
-      medalGroup.scale.set(1.5, 1.5, 1.5); // 1.5x Enlarge
-      mainMesh = medalGroup;
-
-      // Floating THREE.Sprite label reading 'Senario 1', 'Senario 2', 'Senario 3'
-      const tagText = item.id === 'orb1' ? 'Senario 1' : item.id === 'orb2' ? 'Senario 2' : item.id === 'orb3' ? 'Senario 3' : (item.label || 'Senario');
+      // Floating THREE.Sprite label showing Art Supply name
       const medalTag = createTextSprite(
-        `⭐ ${tagText}`,
+        `${item.char} ${item.label}`,
         'rgba(15, 23, 42, 0.94)',
         '#FDE047',
         512,
@@ -2548,9 +2413,9 @@ export function teleportTo(roomId) {
   if (roomId === 'room1') {
     updateMissionText('Misi: Cari 4 kristal Jawi di bilik darjah & susun di Meja Guru.');
   } else if (roomId === 'room2') {
-    updateMissionText('Misi: Cari 3 buku frasa di Pusat Sumber & bina ayat di Meja Bacaan.');
+    updateMissionText('Misi: Cari 2 kad Jawi di Pusat Sumber & bina simpulan bahasa di Meja Bacaan.');
   } else if (roomId === 'room3') {
-    updateMissionText('Misi: Terokai 3 senario di padang/kantin & selesaikan cabaran di Pentas!');
+    updateMissionText('Misi: Cari 3 alatan seni di bilik seni & persembahkan karya di Kanvas Utama.');
   } else {
     updateMissionText('Misi: Terokai dataran & dekati portal bercahaya untuk ke Bilik 1.');
   }
@@ -2867,17 +2732,17 @@ function animate() {
     const dPortal = playerGroup.position.distanceTo(portals.portalR3.group.position);
     if (dTable <= 3.2) {
       foundTarget = 'tableR2';
-      promptText = 'Tekan E untuk Bina Ayat (Meja Bacaan)';
+      promptText = 'Tekan E untuk Bina Simpulan Bahasa Jawi (Meja Bacaan)';
     } else if (dPortal <= 2.6) {
       foundTarget = 'portalR3';
-      promptText = 'Tekan E untuk Masuk ke Bilik 3 (Padang & Kantin)';
+      promptText = 'Tekan E untuk Masuk ke Bilik 3 (Studio Seni Khat)';
     }
   } else if (gameState.currentRoom === 'room3') {
     const dTable = playerGroup.position.distanceTo(r3AssemblyStation.group.position);
     const dReturn = playerGroup.position.distanceTo(portals.returnLobby.group.position);
-    if (dTable <= 2.8) {
+    if (dTable <= 3.2) {
       foundTarget = 'tableR3';
-      promptText = 'Tekan E untuk Kuiz Peribahasa (Pentas Cabaran)';
+      promptText = 'Tekan E untuk Studio Seni Khat Jawi (Kanvas Pameran Utama)';
     } else if (dReturn <= 2.6) {
       foundTarget = 'returnLobby';
       promptText = 'Tekan E untuk Kembali ke Dataran Sekolah';
