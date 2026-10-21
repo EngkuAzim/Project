@@ -89,6 +89,9 @@ export const gameState = {
   room4Completed: false,
   // Room 1: Sequential step tracker (1 to 10)
   currentR1Step: 1,
+  // Room 2: 2-Session Batch System
+  r2Session: 1, // 1: Ulat Buku & Anak Emas | 2: Buah Hati & Cahaya Mata
+  r2Session1Completed: false,
   // Slot states
   puzzleR1Placed: [null, null, null, null],
   puzzleR2Placed: [null, null],
@@ -283,11 +286,13 @@ export const COLLECTIBLES_R1 = [
 ];
 
 // ==========================================
-// 2. COLLECTIBLES ROOM 2 (Makmal Kata Visual: 8 Illustrated Picture Tiles)
+// 2. COLLECTIBLES ROOM 2 (2-Session Batch System on 4 Special Pedestal Desks)
+// Pedestals: [195, 196], [205, 196], [195, 202], [205, 202]
 // ==========================================
-export const COLLECTIBLES_R2 = [
+export const COLLECTIBLES_R2_SESSION1 = [
   {
     id: 'ulat',
+    session: 1,
     name: 'Ulat Bulu',
     rumi: 'Ulat',
     char: '🐛',
@@ -296,12 +301,13 @@ export const COLLECTIBLES_R2 = [
     idiomGroup: 'ulat_buku',
     color: 0x10B981,
     desc: 'Ulat Bulu Hijau (اولت)',
-    pos: { x: 192.0, y: 1.4, z: 194.0 },
-    mesh: null, gemMesh: null, ringMesh: null,
+    pos: { x: 195.0, y: 1.45, z: 196.0 },
+    mesh: null, gemMesh: null, ringMesh: null, pointLight: null,
     isPopping: false, popScale: 1.0, collected: false
   },
   {
     id: 'buku',
+    session: 1,
     name: 'Buku',
     rumi: 'Buku',
     char: '📖',
@@ -310,12 +316,13 @@ export const COLLECTIBLES_R2 = [
     idiomGroup: 'ulat_buku',
     color: 0x3B82F6,
     desc: 'Buku Ilmu (بوکو)',
-    pos: { x: 196.5, y: 1.4, z: 193.5 },
-    mesh: null, gemMesh: null, ringMesh: null,
+    pos: { x: 205.0, y: 1.45, z: 196.0 },
+    mesh: null, gemMesh: null, ringMesh: null, pointLight: null,
     isPopping: false, popScale: 1.0, collected: false
   },
   {
     id: 'anak',
+    session: 1,
     name: 'Anak / Bayi',
     rumi: 'Anak',
     char: '👶',
@@ -324,12 +331,13 @@ export const COLLECTIBLES_R2 = [
     idiomGroup: 'anak_emas',
     color: 0xF59E0B,
     desc: 'Anak / Bayi Comel (انق)',
-    pos: { x: 203.5, y: 1.4, z: 193.5 },
-    mesh: null, gemMesh: null, ringMesh: null,
+    pos: { x: 195.0, y: 1.45, z: 202.0 },
+    mesh: null, gemMesh: null, ringMesh: null, pointLight: null,
     isPopping: false, popScale: 1.0, collected: false
   },
   {
     id: 'emas',
+    session: 1,
     name: 'Jongkong Emas',
     rumi: 'Emas',
     char: '🪙',
@@ -338,12 +346,16 @@ export const COLLECTIBLES_R2 = [
     idiomGroup: 'anak_emas',
     color: 0xEAB308,
     desc: 'Jongkong Emas Berharga (امس)',
-    pos: { x: 208.0, y: 1.4, z: 194.0 },
-    mesh: null, gemMesh: null, ringMesh: null,
+    pos: { x: 205.0, y: 1.45, z: 202.0 },
+    mesh: null, gemMesh: null, ringMesh: null, pointLight: null,
     isPopping: false, popScale: 1.0, collected: false
-  },
+  }
+];
+
+export const COLLECTIBLES_R2_SESSION2 = [
   {
     id: 'buah',
+    session: 2,
     name: 'Buah Epal',
     rumi: 'Buah',
     char: '🍎',
@@ -352,12 +364,13 @@ export const COLLECTIBLES_R2 = [
     idiomGroup: 'buah_hati',
     color: 0xEF4444,
     desc: 'Buah Epal Manis (بواه)',
-    pos: { x: 192.0, y: 1.4, z: 200.0 },
-    mesh: null, gemMesh: null, ringMesh: null,
+    pos: { x: 195.0, y: 1.45, z: 196.0 },
+    mesh: null, gemMesh: null, ringMesh: null, pointLight: null,
     isPopping: false, popScale: 1.0, collected: false
   },
   {
     id: 'hati',
+    session: 2,
     name: 'Hati / Kasih',
     rumi: 'Hati',
     char: '💖',
@@ -366,12 +379,13 @@ export const COLLECTIBLES_R2 = [
     idiomGroup: 'buah_hati',
     color: 0xEC4899,
     desc: 'Hati / Lambang Kasih (هاتي)',
-    pos: { x: 196.5, y: 1.4, z: 201.0 },
-    mesh: null, gemMesh: null, ringMesh: null,
+    pos: { x: 205.0, y: 1.45, z: 196.0 },
+    mesh: null, gemMesh: null, ringMesh: null, pointLight: null,
     isPopping: false, popScale: 1.0, collected: false
   },
   {
     id: 'cahaya',
+    session: 2,
     name: 'Cahaya Suria',
     rumi: 'Cahaya',
     char: '☀️',
@@ -380,12 +394,13 @@ export const COLLECTIBLES_R2 = [
     idiomGroup: 'cahaya_mata',
     color: 0xF97316,
     desc: 'Cahaya Berseri-seri (چهاي)',
-    pos: { x: 203.5, y: 1.4, z: 201.0 },
-    mesh: null, gemMesh: null, ringMesh: null,
+    pos: { x: 195.0, y: 1.45, z: 202.0 },
+    mesh: null, gemMesh: null, ringMesh: null, pointLight: null,
     isPopping: false, popScale: 1.0, collected: false
   },
   {
     id: 'mata',
+    session: 2,
     name: 'Mata',
     rumi: 'Mata',
     char: '👁️',
@@ -394,10 +409,16 @@ export const COLLECTIBLES_R2 = [
     idiomGroup: 'cahaya_mata',
     color: 0x06B6D4,
     desc: 'Mata Penyeri (مات)',
-    pos: { x: 208.0, y: 1.4, z: 200.0 },
-    mesh: null, gemMesh: null, ringMesh: null,
+    pos: { x: 205.0, y: 1.45, z: 202.0 },
+    mesh: null, gemMesh: null, ringMesh: null, pointLight: null,
     isPopping: false, popScale: 1.0, collected: false
   }
+];
+
+// Combined list for general inventory and HUD display
+export const COLLECTIBLES_R2 = [
+  ...COLLECTIBLES_R2_SESSION1,
+  ...COLLECTIBLES_R2_SESSION2
 ];
 
 // ==========================================

@@ -46,6 +46,11 @@ export function registerTeleportHandlers(handlers) {
   teleportCallbacks = { ...teleportCallbacks, ...handlers };
 }
 
+let r2SessionCallback = null;
+export function registerR2SessionHandler(fn) {
+  r2SessionCallback = fn;
+}
+
 // ==========================================
 // 1. AUDIO SYNTHESIZER (Web Audio API)
 // ==========================================
@@ -220,7 +225,8 @@ export function updateInventoryHUD() {
 
   if (room === 'room2') {
     const collected = COLLECTIBLES_R2.filter(c => c.collected).length;
-    if (invTitleTextEl) invTitleTextEl.textContent = 'Makmal Kata Visual';
+    const sessionLabel = gameState.r2Session === 1 ? 'Sesi 1 (Ulat Buku & Anak Emas)' : 'Sesi 2 (Buah Hati & Cahaya Mata)';
+    if (invTitleTextEl) invTitleTextEl.textContent = `Makmal Kata • ${sessionLabel}`;
     if (invCountEl) invCountEl.textContent = `${collected} / 8 Jubin`;
 
     COLLECTIBLES_R2.forEach(item => {
@@ -629,6 +635,16 @@ export function updateR2ScoreDisplay() {
 }
 
 export function switchR2Tab(tabIdx) {
+  if (tabIdx >= 2 && gameState.r2Session === 1) {
+    const feedback = document.getElementById('r2-feedback');
+    if (feedback) {
+      feedback.className = 'feedback-banner error';
+      feedback.textContent = '🔒 Sesi 2 belum dibuka. Sila lengkapkan ejaan Sesi 1 (Tab 1: Ulat Buku & Tab 2: Anak Emas) terlebih dahulu!';
+      feedback.style.display = 'block';
+    }
+    speakBM('Sesi dua belum dibuka. Sila lengkapkan ejaan sesi satu terlebih dahulu.');
+    return;
+  }
   r2ActiveTab = tabIdx;
   document.querySelectorAll('.r2-tab-btn').forEach((btn, idx) => {
     btn.classList.toggle('active', idx === tabIdx);
@@ -763,6 +779,18 @@ export function checkCurrentTabR2() {
       feedback.className = 'feedback-banner success';
       feedback.textContent = `✅ Syabas! Ejaan perkataan Jawi "${pair.w1.jawi}" dan "${pair.w2.jawi}" adalah tepat!`;
       feedback.style.display = 'block';
+    }
+
+    // Check if Sesi 1 (Tab 0 & 1) is completed -> Trigger Sesi 2 (Buah Hati & Cahaya Mata)
+    if (r2TabCompleted[0] && r2TabCompleted[1] && gameState.r2Session === 1) {
+      if (r2SessionCallback) {
+        r2SessionCallback();
+      }
+      if (feedback) {
+        feedback.innerHTML = `✅ Syabas! Ejaan perkataan Jawi "${pair.w1.jawi}" dan "${pair.w2.jawi}" tepat!<br><strong style="color: #F59E0B;">✨ Sesi 1 Selesai! 4 Objek Sesi 2 (Buah Hati & Cahaya Mata) telah muncul di bilik!</strong>`;
+      }
+      showItemToast('✨', 'Sesi 1 Selesai! 4 Objek Sesi 2 (Buah Hati & Cahaya Mata) telah muncul di bilik!');
+      speakBM('Sesi satu selesai! Empat objek sesi dua telah muncul di bilik.');
     }
 
     // Check if all 4 tabs completed
