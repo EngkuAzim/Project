@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kembara Bahasa Sekolah Bestari - Inovasi Digital PdP Bahasa Melayu</title>
+  <title>Kembara Bahasa Sekolah Bestari - Inovasi Digital PdP Bahasa Melayu (DSKP SP 4.4.2)</title>
   
   <!-- Google Fonts: Fredoka, Plus Jakarta Sans & Amiri for authentic Jawi typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Amiri:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- External Stylesheet -->
+  <!-- External Stylesheet with Cache-Buster -->
   <link rel="stylesheet" href="./style.css?v=4.4.2">
 
   <!-- Three.js CDN -->
@@ -29,7 +29,7 @@
         <div class="brand-icon">🏫</div>
         <div class="brand-text">
           <h1>Kembara Bahasa Sekolah Bestari</h1>
-          <p><span id="location-badge" class="badge-area">Dataran Sekolah</span> PdP Bahasa Melayu</p>
+          <p><span id="location-badge" class="badge-area">Dataran Sekolah</span> DSKP SP 4.4.2</p>
         </div>
       </div>
 
@@ -51,7 +51,7 @@
       <!-- Dynamic Inventory HUD Card -->
       <div class="inventory-card">
         <div class="inventory-title">
-          <span id="inventory-title-text">Koleksi Huruf Jawi</span> <span id="inventory-count">0 / 4</span>
+          <span id="inventory-title-text">Dataran Sekolah</span> <span id="inventory-count">Bersedia</span>
         </div>
         <div class="inventory-slots" id="inventory-slots-container">
           <!-- Dynamically populated by ui.js -->
@@ -84,7 +84,7 @@
           </div>
           <button id="dpad-down" class="dpad-btn dpad-down" aria-label="Gerak Bawah">▼</button>
         </div>
-        <button id="touch-action-btn" class="touch-action-btn" aria-label="Interaksi (E)">
+        <button id="touch-action-btn" class="touch-action-btn" aria-label="Interaksi (E)" onclick="handleCurrentInteraction()">
           <span class="action-key-circle">E</span>
           <span class="action-label">Interaksi</span>
         </button>
@@ -114,7 +114,7 @@
   </div>
 
   <!-- ==========================================
-       MODAL 1: STUDENT PROFILE (Nama Murid & Kelas)
+       MODAL 0: STUDENT PROFILE (Nama Murid & Kelas)
        ========================================== -->
   <div id="profile-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'profile-modal')">
     <div class="modal-card" style="max-width: 440px;">
@@ -124,7 +124,7 @@
       <div class="trialogic-tag">✦ Maklumat Pentaksiran Bilik Darjah (PBD)</div>
       
       <p style="font-size: 13px; color: #64748B; margin-bottom: 16px;">
-        Sila masukkan nama dan kelas anda untuk dipaparkan pada Kad Laporan Pentaksiran Bilik Darjah.
+        Sila masukkan nama dan kelas anda untuk dipaparkan pada Sijil Pentaksiran Bilik Darjah.
       </p>
 
       <div class="form-group">
@@ -145,403 +145,376 @@
   </div>
 
   <!-- ==========================================
-       MODAL 2: ROOM 1 - EJAAN JAWI 'GUNA' (40 Marks)
+       MODAL 1: ROOM 1 - CARTA INTERAKTIF HURUF JAWI (ALIF - NYA)
        ========================================== -->
   <div id="room1-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'room1-modal')">
-    <div class="modal-card" style="max-width: 560px;">
+    <div class="modal-card" style="max-width: 680px;">
       <button class="modal-close-btn" onclick="closeModal('room1-modal')">&times;</button>
 
-      <!-- Puzzle View -->
-      <div id="r1-puzzle-view">
-        <div class="modal-hero-icon" style="background: linear-gradient(135deg, #48BFE3, #5E60CE);">✍️</div>
-        <h2>Bilik 1: Bilik Darjah Bestari</h2>
-        <div class="trialogic-tag">
-          ✦ Fasa 1: Merangka & Membina Artifak (Trialogical Drafting)
-        </div>
+      <div class="modal-hero-icon" style="background: linear-gradient(135deg, #10B981, #059669);">🌿</div>
+      <h2>Bilik 1: Taman Pagar Sesat Jawi</h2>
+      <div class="trialogic-tag">✦ Carta Interaktif 37 Huruf Jawi (Alif hingga Nya)</div>
 
-        <div class="target-word-badge">
-          Sasaran Kata: "GUNA" (ݢونا) • 40 Markah
-        </div>
-
-        <div style="font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px;">
-          Markah Semasa: <span id="r1-live-score" class="score-badge-live">40 / 40</span> 
-          <span style="font-size: 11px; color: #94A3B8; margin-left: 6px;">(Percubaan: <span id="r1-attempts">0</span>)</span>
-        </div>
-
-        <p class="puzzle-instructions">
-          Tarik atau klik huruf-huruf koleksi anda ke dalam petak mengikut turutan ejaan Jawi yang betul (dari kanan ke kiri).
-        </p>
-
-        <!-- Drop Zones Container (Right-to-Left) -->
-        <div class="puzzle-board-container">
-          <div class="jawi-direction-guide">
-            <span>Arah Tulisan Jawi (Kanan ke Kiri)</span>
-            <span>&larr;</span>
-          </div>
-
-          <div class="drop-zones-row">
-            <!-- Slot 0: Kanan Sekali (Ga) -->
-            <div class="drop-zone" data-slot="0" ondragover="allowDrop(event)" ondrop="handleDropR1(event, 0)" onclick="handleZoneClickR1(0)">
-              <span class="zone-idx">1 (Kanan)</span>
-            </div>
-            <!-- Slot 1: Wau -->
-            <div class="drop-zone" data-slot="1" ondragover="allowDrop(event)" ondrop="handleDropR1(event, 1)" onclick="handleZoneClickR1(1)">
-              <span class="zone-idx">2</span>
-            </div>
-            <!-- Slot 2: Nun -->
-            <div class="drop-zone" data-slot="2" ondragover="allowDrop(event)" ondrop="handleDropR1(event, 2)" onclick="handleZoneClickR1(2)">
-              <span class="zone-idx">3</span>
-            </div>
-            <!-- Slot 3: Kiri Sekali (Alif) -->
-            <div class="drop-zone" data-slot="3" ondragover="allowDrop(event)" ondrop="handleDropR1(event, 3)" onclick="handleZoneClickR1(3)">
-              <span class="zone-idx">4 (Kiri)</span>
-            </div>
-          </div>
-
-          <!-- Live Assembled Word Preview -->
-          <div class="word-preview-box">
-            <span class="word-preview-label">Pratonton Artifak:</span>
-            <span id="r1-assembled-preview" class="word-preview-text">ـ ـ ـ ـ</span>
-          </div>
-
-          <!-- Available Collected Letters Tray -->
-          <div class="tray-title">Dulang Huruf Koleksi Anda (Klik / Tarik):</div>
-          <div id="r1-letters-tray" class="letters-tray" ondragover="allowDrop(event)" ondrop="handleDropToTrayR1(event)">
-            <!-- Dynamically populated -->
-          </div>
-        </div>
-
-        <!-- Feedback Alert Banner -->
-        <div id="r1-feedback" class="feedback-banner"></div>
-
-        <div style="display: flex; gap: 10px;">
-          <button class="btn-secondary" style="flex: 1;" onclick="resetPuzzleR1()">
-            Susun Semula
-          </button>
-          <button class="btn-primary" style="flex: 2;" onclick="checkPuzzleR1()">
-            Semak Semula (Cantumkan)
-          </button>
-        </div>
-      </div>
-
-      <!-- Success / Transition View -->
-      <div id="r1-success-view" style="display: none;">
-        <div class="modal-hero-icon" style="background: linear-gradient(135deg, #10B981, #059669);">🎉</div>
-        <h2>Tahniah! Ejaan Jawi Tepat</h2>
-        <div class="trialogic-tag">✦ Artifak Bilik 1 Berjaya Dibina</div>
-
-        <div class="report-card" style="margin: 16px 0;">
-          <div class="report-artifact-box">
-            <div class="artifact-title">Perkataan Jawi Terbina</div>
-            <div class="artifact-word-showcase">ݢونا</div>
-            <div class="artifact-meaning">G-U-N-A (Guna)</div>
-          </div>
-          <p style="font-size: 13px; color: #166534; margin-top: 10px; text-align: center;">
-            Markah Diperoleh: <strong id="r1-success-score" style="font-size: 15px;">40 / 40</strong>
-          </p>
-        </div>
-
-        <button class="btn-primary" style="width: 100%;" onclick="proceedToRoom2()">
-          Teruskan ke Bilik 2 (Pusat Sumber) &rarr;
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ==========================================
-       MODAL 3: ROOM 2 - MEMBINA SIMPULAN BAHASA JAWI (30 Marks)
-       ========================================== -->
-  <div id="room2-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'room2-modal')">
-    <div class="modal-card" style="max-width: 580px;">
-      <button class="modal-close-btn" onclick="closeModal('room2-modal')">&times;</button>
-
-      <!-- Puzzle View -->
-      <div id="r2-puzzle-view">
-        <div class="modal-hero-icon" style="background: linear-gradient(135deg, #3B82F6, #1D4ED8);">📖</div>
-        <h2>Bilik 2: Pusat Sumber (Perpustakaan)</h2>
-        <div class="trialogic-tag">
-          ✦ Fasa 2: Membina Simpulan Bahasa Jawi (SP 4.4.2)
-        </div>
-
-        <div class="target-word-badge" style="background: #DBEAFE; color: #1E40AF;">
-          Simpulan Bahasa: "ULAT BUKU" (اولت بوکو) • 30 Markah
-        </div>
-
-        <div style="font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px;">
-          Markah Semasa: <span id="r2-live-score" class="score-badge-live">30 / 30</span>
-          <span style="font-size: 11px; color: #94A3B8; margin-left: 6px;">(Percubaan: <span id="r2-attempts">0</span>)</span>
-        </div>
-
-        <p class="puzzle-instructions">
-          Susun 2 kad perkataan Jawi yang anda temui mengikut turutan simpulan bahasa yang betul dari kanan ke kiri.
-        </p>
-
-        <!-- Drop Zones Container (Right-to-Left) -->
-        <div class="puzzle-board-container">
-          <div class="jawi-direction-guide">
-            <span>Arah Tulisan Jawi (Kanan ke Kiri)</span>
-            <span>&larr;</span>
-          </div>
-
-          <div class="jawi-idiom-zones-row">
-            <!-- Slot 0: Kanan Sekali (Ulat - اولت) -->
-            <div class="jawi-idiom-zone" data-slot="0" ondragover="allowDrop(event)" ondrop="handleDropR2(event, 0)" onclick="handleZoneClickR2(0)">
-              <span class="zone-idx">1. Perkataan Pertama (Kanan)</span>
-              <span class="zone-placeholder" style="font-size: 11px; color: #94A3B8;">[Letak kad Jawi di sini]</span>
-            </div>
-            <!-- Slot 1: Kiri Sekali (Buku - بوکو) -->
-            <div class="jawi-idiom-zone" data-slot="1" ondragover="allowDrop(event)" ondrop="handleDropR2(event, 1)" onclick="handleZoneClickR2(1)">
-              <span class="zone-idx">2. Perkataan Kedua (Kiri)</span>
-              <span class="zone-placeholder" style="font-size: 11px; color: #94A3B8;">[Letak kad Jawi di sini]</span>
-            </div>
-          </div>
-
-          <!-- Assembled Preview -->
-          <div class="word-preview-box">
-            <span class="word-preview-label">Pratonton Simpulan Bahasa:</span>
-            <span id="r2-sentence-preview" class="word-preview-text" style="font-size: 18px; font-family: var(--font-jawi);">ـ ـ</span>
-          </div>
-
-          <!-- Available Jawi Fragments Tray -->
-          <div class="tray-title">Dulang Kad Jawi Perpustakaan (Klik / Tarik):</div>
-          <div id="r2-frags-tray" class="letters-tray" ondragover="allowDrop(event)" ondrop="handleDropToTrayR2(event)">
-            <!-- Dynamically populated -->
-          </div>
-        </div>
-
-        <!-- Feedback Alert Banner -->
-        <div id="r2-feedback" class="feedback-banner"></div>
-
-        <div style="display: flex; gap: 10px;">
-          <button class="btn-secondary" style="flex: 1;" onclick="resetPuzzleR2()">
-            Susun Semula
-          </button>
-          <button class="btn-primary" style="flex: 2;" onclick="checkPuzzleR2()">
-            Semak Susunan Simpulan Bahasa
-          </button>
-        </div>
-      </div>
-
-      <!-- Success / Transition View -->
-      <div id="r2-success-view" style="display: none;">
-        <div class="modal-hero-icon" style="background: linear-gradient(135deg, #10B981, #059669);">🎉</div>
-        <h2>Tahniah! Simpulan Bahasa Tepat</h2>
-        <div class="trialogic-tag">✦ Artifak Bilik 2 Berjaya Dibina</div>
-
-        <div class="report-card" style="margin: 16px 0;">
-          <div class="report-artifact-box">
-            <div class="artifact-title">Simpulan Bahasa Jawi Terhasil</div>
-            <div style="font-family: var(--font-jawi); font-size: 42px; font-weight: 700; color: #1E3A8A; padding: 10px; line-height: 1.2;">
-              اولت بوکو
-            </div>
-            <div class="artifact-meaning">ULAT BUKU • Bermaksud orang yang sangat rajin dan gemar membaca buku.</div>
-          </div>
-          <p style="font-size: 13px; color: #166534; margin-top: 10px; text-align: center;">
-            Markah Diperoleh: <strong id="r2-success-score" style="font-size: 15px;">30 / 30</strong>
-          </p>
-        </div>
-
-        <button class="btn-primary" style="width: 100%;" onclick="proceedToRoom3()">
-          Teruskan ke Bilik 3 (Studio Seni Khat) &rarr;
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ==========================================
-       MODAL 4: ROOM 3 - STUDIO SENI KHAT JAWI (30 Marks • DSKP 4.4.2)
-       ========================================== -->
-  <div id="room3-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'room3-modal')">
-    <div class="modal-card" style="max-width: 600px;">
-      <button class="modal-close-btn" onclick="closeModal('room3-modal')">&times;</button>
-
-      <div class="modal-hero-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">🎨</div>
-      <h2>Studio Seni Khat Jawi</h2>
-      <div class="trialogic-tag">
-        ✦ Fasa 3: Mempersembahkan Keindahan Seni Tulisan Jawi (DSKP 4.4.2)
-      </div>
-
-      <div class="target-word-badge" style="background: #FEF3C7; color: #B45309;">
-        Persembahan Seni Simpulan Bahasa • 30 Markah
+      <div class="target-word-badge" style="background: #ECFDF5; color: #065F46;">
+        Kembara Huruf Jawi: <span id="r1-unlocked-count">0</span> / 10 Pos Maze Dibuka
       </div>
 
       <p class="puzzle-instructions">
-        Gunakan alatan seni khat yang telah anda kumpulkan untuk mereka bentuk dan mempersembahkan simpulan bahasa <strong>اولت بوکو</strong> dalam gubahan seni yang kreatif.
+        Terokai 10 pos berperingkat dalam pagar sesat. Klik mana-mana kad huruf di bawah untuk mendengar sebutan Bahasa Melayu yang betul!
       </p>
 
-      <!-- Central Artboard Canvas Display -->
-      <div class="artboard-container">
-        <div id="artboard-card" class="artboard-card bg-batik text-gold frame-wood">
-          <div id="artboard-calligraphy" class="artboard-calligraphy">اولت بوکو</div>
-          <div id="artboard-subtext" class="artboard-subtext">Simpulan Bahasa: Ulat Buku (Rajin Membaca)</div>
+      <!-- Quick Action Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px;">
+        <button type="button" class="btn-quick-complete" onclick="quickCollectR1()" title="Uji carta penuh serta-merta untuk penilai/guru">
+          🚀 Mod Pantas (Kumpul Semua Huruf)
+        </button>
+        <span style="font-size: 11px; color: #64748B;">Klik kad untuk mendengar suara 🔊</span>
+      </div>
+
+      <!-- 37 Jawi Alphabet Interactive Grid -->
+      <div id="jawi-chart-grid" class="jawi-chart-grid">
+        <!-- Dynamically rendered by ui.js -->
+      </div>
+
+      <div id="r1-feedback" class="feedback-banner" style="margin-top: 12px;"></div>
+
+      <div style="display: flex; gap: 10px; margin-top: 16px;">
+        <button class="btn-secondary" style="flex: 1;" onclick="closeModal('room1-modal')">
+          Tutup & Teruskan Meneroka
+        </button>
+        <button id="btn-proceed-r2" class="btn-primary" style="flex: 2;" onclick="proceedToRoom2()">
+          Teruskan ke Bilik 2 (Makmal Kata) &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 2: ROOM 2 - MAKMAL EJAAN 4 PASANGAN KATA (30 Marks)
+       ========================================== -->
+  <div id="room2-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'room2-modal')">
+    <div class="modal-card" style="max-width: 680px;">
+      <button class="modal-close-btn" onclick="closeModal('room2-modal')">&times;</button>
+
+      <div class="modal-hero-icon" style="background: linear-gradient(135deg, #0284C7, #0369A1);">🧪</div>
+      <h2>Bilik 2: Makmal Kata Jawi</h2>
+      <div class="trialogic-tag">✦ Ejaan 4 Pasangan Kata Simpulan Bahasa (30 Markah)</div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <div class="target-word-badge" style="margin: 0; background: #E0F2FE; color: #0369A1;">
+          Markah Ejaan: <span id="r2-live-score" class="score-badge-live">30 / 30</span>
+        </div>
+        <div style="font-size: 12px; color: #64748B; font-weight: 700;">
+          Percubaan: <span id="r2-attempts">0</span> (Tolak 5 markah jika salah, min 10)
         </div>
       </div>
 
-      <!-- Interactive Decorator Controls (3 Rows) -->
-      <div class="decorator-controls">
-        <!-- Row 1: Background Patterns -->
-        <div class="decorator-group">
-          <div class="decorator-title">
-            <span>🖼️</span> 1. Pilih Latar Belakang (Corak Seni):
-          </div>
-          <div class="decorator-row">
-            <button type="button" class="decorator-btn active" id="btn-bg-batik" onclick="setArtworkBg('batik')">
-              ✨ Corak Batik
-            </button>
-            <button type="button" class="decorator-btn" id="btn-bg-songket" onclick="setArtworkBg('songket')">
-              👑 Corak Songket
-            </button>
-            <button type="button" class="decorator-btn" id="btn-bg-vellum" onclick="setArtworkBg('vellum')">
-              📜 Kertas Vellum
-            </button>
-          </div>
-        </div>
-
-        <!-- Row 2: Calligraphy Colors -->
-        <div class="decorator-group">
-          <div class="decorator-title">
-            <span>🖌️</span> 2. Pilih Warna Seni Khat Jawi:
-          </div>
-          <div class="decorator-row">
-            <button type="button" class="decorator-btn active" id="btn-text-gold" onclick="setArtworkTextColor('gold')">
-              🟡 Emas
-            </button>
-            <button type="button" class="decorator-btn" id="btn-text-black" onclick="setArtworkTextColor('black')">
-              ⚫ Hitam Klasik
-            </button>
-            <button type="button" class="decorator-btn" id="btn-text-indigo" onclick="setArtworkTextColor('indigo')">
-              🔵 Biru Nila
-            </button>
-          </div>
-        </div>
-
-        <!-- Row 3: Art Frames -->
-        <div class="decorator-group">
-          <div class="decorator-title">
-            <span>🖼️</span> 3. Pilih Bingkai Seni Tradisional:
-          </div>
-          <div class="decorator-row">
-            <button type="button" class="decorator-btn active" id="btn-frame-wood" onclick="setArtworkFrame('wood')">
-              🪵 Bingkai Kayu
-            </button>
-            <button type="button" class="decorator-btn" id="btn-frame-gold" onclick="setArtworkFrame('gold')">
-              🏆 Bingkai Emas
-            </button>
-            <button type="button" class="decorator-btn" id="btn-frame-minimal" onclick="setArtworkFrame('minimal')">
-              ◻️ Bingkai Minimalis
-            </button>
-          </div>
-        </div>
+      <!-- 4 Tabs Bar -->
+      <div class="r2-tabs-bar" id="r2-tabs-bar">
+        <button class="r2-tab-btn active" onclick="switchR2Tab(0)">
+          <span>🐛 📖</span> Tab 1: Ulat Buku
+        </button>
+        <button class="r2-tab-btn" onclick="switchR2Tab(1)">
+          <span>👶 🪙</span> Tab 2: Anak Emas
+        </button>
+        <button class="r2-tab-btn" onclick="switchR2Tab(2)">
+          <span>🍎 💖</span> Tab 3: Buah Hati
+        </button>
+        <button class="r2-tab-btn" onclick="switchR2Tab(3)">
+          <span>☀️ 👁️</span> Tab 4: Cahaya Mata
+        </button>
       </div>
 
-      <!-- Feedback Banner -->
-      <div id="r3-feedback" class="feedback-banner"></div>
+      <!-- Active Tab Content Area -->
+      <div class="r2-tab-content" id="r2-tab-content">
+        <!-- Dynamically rendered by ui.js -->
+      </div>
 
-      <button class="btn-primary" style="width: 100%;" onclick="submitArtworkR3()">
-        🎨 Hasilkan Karya Seni & Pamerkan di PBD &rarr;
+      <div id="r2-feedback" class="feedback-banner" style="margin-top: 12px;"></div>
+
+      <div style="display: flex; gap: 10px; margin-top: 14px;">
+        <button class="btn-secondary" style="flex: 1;" onclick="resetCurrentTabR2()">
+          Susun Semula Tab Ini
+        </button>
+        <button class="btn-primary" style="flex: 2;" onclick="checkCurrentTabR2()">
+          Semak Ejaan Pasangan Ini
+        </button>
+      </div>
+
+      <button id="btn-proceed-r3" class="btn-primary" style="width: 100%; margin-top: 12px; display: none;" onclick="proceedToRoom3()">
+        🎉 Semua 4 Ejaan Selesai! Teruskan ke Bilik 3 (Arkib Simpulan Bahasa) &rarr;
       </button>
     </div>
   </div>
 
   <!-- ==========================================
-       MODAL 5: FINAL PBD ASSESSMENT REPORT CARD (Kad Laporan PBD)
+       MODAL 3: ROOM 3 - CANTUMAN & MAKSUD SIMPULAN BAHASA (30 Marks)
        ========================================== -->
-  <div id="report-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'report-modal')">
-    <div class="modal-card" style="max-width: 620px;">
-      <button class="modal-close-btn" onclick="closeModal('report-modal')">&times;</button>
+  <div id="room3-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'room3-modal')">
+    <div class="modal-card" style="max-width: 680px;">
+      <button class="modal-close-btn" onclick="closeModal('room3-modal')">&times;</button>
 
-      <div class="modal-hero-icon" style="background: linear-gradient(135deg, #10B981, #059669);">🎓</div>
-      <h2>Kad Laporan Pentaksiran Bilik Darjah (PBD)</h2>
-      <div class="trialogic-tag">
-        ✦ Pembelajaran Berasaskan Artifak Digital (Trialogical Learning • SP 4.4.2)
+      <div class="modal-hero-icon" style="background: linear-gradient(135deg, #78350F, #92400E);">📚</div>
+      <h2>Bilik 3: Arkib Simpulan Bahasa</h2>
+      <div class="trialogic-tag">✦ Cantuman Kata & Padanan Maksud (30 Markah)</div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <div class="target-word-badge" style="margin: 0; background: #FEF3C7; color: #78350F;">
+          Markah Cantuman: <span id="r3-live-score" class="score-badge-live">30 / 30</span>
+        </div>
+        <div style="font-size: 12px; color: #64748B; font-weight: 700;">
+          Percubaan: <span id="r3-attempts">0</span> (Tolak 5 markah jika salah, min 10)
+        </div>
       </div>
 
-      <!-- Certificate Card -->
-      <div class="report-card">
-        <div class="report-header">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <div class="report-emblem">🏫</div>
-            <div class="report-header-text">
-              <h3>Kembara Bahasa Sekolah Bestari</h3>
-              <p>Kementerian Pendidikan Malaysia • Inovasi PdP BM</p>
+      <p class="puzzle-instructions">
+        Cantumkan 4 pasangan kata visual yang telah dipelajari menjadi simpulan bahasa, dan padankan dengan maksud tersirat yang tepat.
+      </p>
+
+      <!-- 4 Visual Idiom Matching Rows -->
+      <div class="idiom-matching-list" id="idiom-matching-list">
+        <!-- Dynamically rendered by ui.js -->
+      </div>
+
+      <div id="r3-feedback" class="feedback-banner" style="margin-top: 12px;"></div>
+
+      <div style="display: flex; gap: 10px; margin-top: 14px;">
+        <button class="btn-secondary" style="flex: 1;" onclick="resetMatchingR3()">
+          Susun Semula
+        </button>
+        <button class="btn-primary" style="flex: 2;" onclick="checkMatchingR3()">
+          Semak Padanan Maksud
+        </button>
+      </div>
+
+      <button id="btn-proceed-r4" class="btn-primary" style="width: 100%; margin-top: 12px; display: none;" onclick="proceedToRoom4()">
+        🎉 Hebat! Teruskan ke Bilik 4 (Studio Persembahan Seni Khat) &rarr;
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 4: ROOM 4 - STUDIO PERSEMBAHAN SENI TULISAN JAWI (40 Marks • SP 4.4.2)
+       ========================================== -->
+  <div id="room4-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'room4-modal')">
+    <div class="modal-card" style="max-width: 740px;">
+      <button class="modal-close-btn" onclick="closeModal('room4-modal')">&times;</button>
+
+      <div class="modal-hero-icon" style="background: linear-gradient(135deg, #B45309, #D97706);">🎨</div>
+      <h2>Bilik 4: Studio Persembahan Seni Khat Jawi</h2>
+      <div class="trialogic-tag">✦ Standard Pembelajaran 4.4.2 (40 Markah)</div>
+
+      <div class="target-word-badge" style="background: #FFFBEB; color: #9A3412; margin-bottom: 12px;">
+        Mempersembahkan Keindahan Seni Tulisan Jawi Melalui Simpulan Bahasa
+      </div>
+
+      <!-- Step 1: Pilih Simpulan Bahasa -->
+      <div class="khat-step-section">
+        <div class="khat-step-header">
+          <span class="step-num">1</span>
+          <strong>Pilih Simpulan Bahasa untuk Dipersembahkan:</strong>
+        </div>
+        <div class="khat-idiom-selector" id="khat-idiom-selector">
+          <button type="button" class="khat-idiom-choice active" onclick="selectKhatIdiom('ulat_buku')">
+            <span class="choice-icons">🐛 📖</span>
+            <span class="choice-jawi">اولت بوکو</span>
+            <span class="choice-rumi">Ulat Buku</span>
+          </button>
+          <button type="button" class="khat-idiom-choice" onclick="selectKhatIdiom('anak_emas')">
+            <span class="choice-icons">👶 🪙</span>
+            <span class="choice-jawi">انق امس</span>
+            <span class="choice-rumi">Anak Emas</span>
+          </button>
+          <button type="button" class="khat-idiom-choice" onclick="selectKhatIdiom('buah_hati')">
+            <span class="choice-icons">🍎 💖</span>
+            <span class="choice-jawi">بواه هاتي</span>
+            <span class="choice-rumi">Buah Hati</span>
+          </button>
+          <button type="button" class="khat-idiom-choice" onclick="selectKhatIdiom('cahaya_mata')">
+            <span class="choice-icons">☀️ 👁️</span>
+            <span class="choice-jawi">چهاي مات</span>
+            <span class="choice-rumi">Cahaya Mata</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Surih / Lukis Khat di atas Kanvas Interaktif -->
+      <div class="khat-step-section">
+        <div class="khat-step-header">
+          <span class="step-num">2</span>
+          <strong>Lukis & Surih Aksara Khat Jawi:</strong>
+          <span style="font-size: 11px; color: #64748B; margin-left: auto;">Sokong Sentuhan Skrin & Tetikus</span>
+        </div>
+
+        <!-- Canvas Drawing Surface -->
+        <div class="khat-canvas-wrapper" id="khat-canvas-wrapper">
+          <canvas id="khat-canvas" width="680" height="340"></canvas>
+        </div>
+
+        <!-- Calligraphy Toolbar -->
+        <div class="khat-toolbar">
+          <!-- Brush Sizes -->
+          <div class="toolbar-group">
+            <span class="toolbar-label">Saiz Berus:</span>
+            <button type="button" class="khat-tool-btn" id="brush-s" onclick="setKhatBrush(4)">Halus (4px)</button>
+            <button type="button" class="khat-tool-btn active" id="brush-m" onclick="setKhatBrush(8)">Sederhana (8px)</button>
+            <button type="button" class="khat-tool-btn" id="brush-l" onclick="setKhatBrush(16)">Tebal (16px)</button>
+          </div>
+
+          <!-- Ink Colors -->
+          <div class="toolbar-group">
+            <span class="toolbar-label">Dakwat:</span>
+            <button type="button" class="khat-color-dot active" style="background: #0F172A;" title="Hitam Klasik" onclick="setKhatInk('#0F172A', this)"></button>
+            <button type="button" class="khat-color-dot" style="background: #D97706;" title="Emas Diraja" onclick="setKhatInk('#D97706', this)"></button>
+            <button type="button" class="khat-color-dot" style="background: #1E3A8A;" title="Biru Nilam" onclick="setKhatInk('#1E3A8A', this)"></button>
+            <button type="button" class="khat-color-dot" style="background: #991B1B;" title="Merah Delima" onclick="setKhatInk('#991B1B', this)"></button>
+          </div>
+
+          <!-- Utility Actions -->
+          <div class="toolbar-group" style="margin-left: auto;">
+            <button type="button" class="khat-tool-btn" onclick="toggleTracingGuide()">
+              👁️ <span id="guide-btn-text">Sembunyi Surihan</span>
+            </button>
+            <button type="button" class="khat-tool-btn" onclick="clearKhatDrawing()">
+              🗑️ Padam
+            </button>
+            <button type="button" class="khat-tool-btn accent" onclick="autoCalligraphyStencil()" title="Cap tulisan khat berseni secara automatik">
+              ✨ Kemaskan Khat Automatik
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Hias Latar, Ilustrasi Mini & Bingkai Seni -->
+      <div class="khat-step-section">
+        <div class="khat-step-header">
+          <span class="step-num">3</span>
+          <strong>Hias Latar Belakang & Bingkai Persembahan:</strong>
+        </div>
+
+        <div class="khat-decor-grid">
+          <!-- Background Pattern -->
+          <div class="decor-card">
+            <div class="decor-card-title">Corak Latar Kanvas:</div>
+            <div class="decor-options-row">
+              <button type="button" class="decor-opt-btn active" id="bg-opt-vellum" onclick="setCanvasBackgroundTheme('vellum')">📜 Kertas Vellum</button>
+              <button type="button" class="decor-opt-btn" id="bg-opt-songket" onclick="setCanvasBackgroundTheme('songket')">👑 Songket Emas</button>
+              <button type="button" class="decor-opt-btn" id="bg-opt-batik" onclick="setCanvasBackgroundTheme('batik')">🌸 Batik Pastel</button>
+              <button type="button" class="decor-opt-btn" id="bg-opt-night" onclick="setCanvasBackgroundTheme('night')">🌌 Malam Bintang</button>
             </div>
           </div>
-          <div id="report-tp-badge" class="tp-badge-large tp6">
-            TP 6
+
+          <!-- Frame Style -->
+          <div class="decor-card">
+            <div class="decor-card-title">Gaya Bingkai Ukiran:</div>
+            <div class="decor-options-row">
+              <button type="button" class="decor-opt-btn active" id="frame-opt-wood" onclick="setCanvasFrameStyle('wood')">🪵 Kayu Ukir Melayu</button>
+              <button type="button" class="decor-opt-btn" id="frame-opt-gold" onclick="setCanvasFrameStyle('gold')">🏆 Emas Berkembar</button>
+              <button type="button" class="decor-opt-btn" id="frame-opt-modern" onclick="setCanvasFrameStyle('modern')">◻️ Galeri Moden</button>
+            </div>
           </div>
         </div>
 
-        <!-- Student Meta Grid -->
-        <div class="report-meta-grid">
-          <div class="meta-box">
-            <div class="meta-label">Nama Murid</div>
-            <div class="meta-val" id="report-student-name">Penjelajah Bestari</div>
+        <!-- Badges & Seal Toggles -->
+        <div style="display: flex; gap: 16px; margin-top: 10px; font-size: 12px; color: #334155;">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" id="toggle-icons-check" checked onchange="toggleDecorativeIcons(this.checked)">
+            Pamerkan Ikon Visual Simpulan Bahasa (cth: 🐛 📖)
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" id="toggle-seal-check" checked onchange="toggleArtistSeal(this.checked)">
+            Cap Mohor Pelukis Diraja (Seal Rasmi)
+          </label>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <button class="btn-primary" style="width: 100%; margin-top: 16px; font-size: 16px; padding: 14px;" onclick="finalizeAndExhibitArtwork()">
+        🎨 Pamerkan di Galeri 3D & Jana Sijil PBD (40 Markah) &rarr;
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 5: FINAL PBD ASSESSMENT REPORT CARD (Kad Laporan Pentaksiran Bilik Darjah)
+       ========================================== -->
+  <div id="report-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'report-modal')">
+    <div class="modal-card" style="max-width: 680px;">
+      <button class="modal-close-btn" onclick="closeModal('report-modal')">&times;</button>
+
+      <div class="report-card" id="report-view">
+        <!-- Header -->
+        <div class="report-header">
+          <div class="report-emblem">ج</div>
+          <div class="report-header-text">
+            <h3>Sijil Pentaksiran Bilik Darjah (PBD)</h3>
+            <p>Bahasa Melayu Tahun 3 • Standard Pembelajaran 4.4.2</p>
           </div>
-          <div class="meta-box">
-            <div class="meta-label">Kelas / Tahun</div>
-            <div class="meta-val" id="report-student-class">3 Inovatif</div>
+          <div id="report-tp-badge" class="tp-badge-large tp6">Tahap Penguasaan 6</div>
+        </div>
+
+        <!-- Student Meta Details -->
+        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #475569; margin-bottom: 14px; background: #F8FAFC; padding: 10px 14px; border-radius: 12px; border: 1px solid #E2E8F0;">
+          <div>Nama Murid: <strong id="report-student-name" style="color: #0F172A;">Penjelajah Bestari</strong></div>
+          <div>Kelas: <strong id="report-student-class" style="color: #0F172A;">3 Inovatif</strong></div>
+          <div>Tarikh: <strong id="report-date" style="color: #0F172A;">-</strong></div>
+        </div>
+
+        <!-- Masterpiece Exhibition Display -->
+        <div style="text-align: center; margin-bottom: 16px;">
+          <div style="font-size: 12px; font-weight: 700; color: #64748B; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+            🖼️ Karya Seni Khat Jawi Murid (Dipamerkan di Easel 3D):
           </div>
-          <div class="meta-box">
-            <div class="meta-label">Pedagogi</div>
-            <div class="meta-val">Model Pembelajaran Trialogikal</div>
-          </div>
-          <div class="meta-box">
-            <div class="meta-label">Status Kembara</div>
-            <div class="meta-val" style="color: #059669; font-weight: 800;">3 / 3 Bilik Selesai ✓</div>
+          <div class="report-khat-frame">
+            <img id="report-khat-img" src="" alt="Karya Seni Khat Jawi Murid" style="width: 100%; border-radius: 10px; display: block;">
           </div>
         </div>
 
-        <!-- Visual Artboard Replica of Student's Customized Calligraphy Artwork -->
-        <div class="report-artwork-section">
-          <div class="report-artwork-badge">✨ Artifak Seni Tulisan Jawi (DSKP 4.4.2)</div>
-          <div id="report-artwork-display" class="report-artwork-replica bg-batik text-gold frame-wood">
-            <div class="artboard-calligraphy" id="report-calligraphy-text">اولت بوکو</div>
-            <div class="artboard-subtext" id="report-subtext-text">Simpulan Bahasa: Ulat Buku (Rajin Membaca)</div>
-          </div>
-        </div>
-
-        <!-- Detailed Mark Breakdown Table -->
+        <!-- Score Breakdown Table -->
         <table class="score-breakdown-table">
           <thead>
             <tr>
-              <th>Stesen Pembelajaran</th>
-              <th>Fokus Kemahiran</th>
+              <th>Aktiviti Pembelajaran (Bilik)</th>
+              <th>Kemahiran Standard Pembelajaran</th>
               <th style="text-align: right;">Markah</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><strong>Bilik 1: Bilik Darjah</strong></td>
-              <td>Ejaan Jawi: 'GUNA' (ݢونا)</td>
-              <td style="text-align: right;" id="report-score-r1">40 / 40</td>
+              <td><strong>Bilik 1: Taman Pagar Sesat</strong></td>
+              <td>Kembara 37 Huruf Jawi (Alif - Nya)</td>
+              <td style="text-align: right; color: #059669; font-weight: 700;" id="report-score-r1">Selesai (100%)</td>
             </tr>
             <tr>
-              <td><strong>Bilik 2: Perpustakaan</strong></td>
-              <td>Simpulan Bahasa: 'ULAT BUKU' (اولت بوکو)</td>
-              <td style="text-align: right;" id="report-score-r2">30 / 30</td>
+              <td><strong>Bilik 2: Makmal Kata</strong></td>
+              <td>Ejaan 4 Pasangan Kata Visual Jawi</td>
+              <td style="text-align: right; font-weight: 700;" id="report-score-r2">30 / 30</td>
             </tr>
             <tr>
-              <td><strong>Bilik 3: Studio Seni Khat</strong></td>
-              <td>Mempersembahkan Seni Khat Jawi (DSKP 4.4.2)</td>
-              <td style="text-align: right;" id="report-score-r3">30 / 30</td>
+              <td><strong>Bilik 3: Arkib Simpulan Bahasa</strong></td>
+              <td>Cantuman Kata & Padanan Maksud</td>
+              <td style="text-align: right; font-weight: 700;" id="report-score-r3">30 / 30</td>
+            </tr>
+            <tr>
+              <td><strong>Bilik 4: Studio Seni Khat</strong></td>
+              <td>Persembahan Seni Tulisan Jawi (SP 4.4.2)</td>
+              <td style="text-align: right; font-weight: 700;" id="report-score-r4">40 / 40</td>
             </tr>
             <tr class="total-row">
               <td colspan="2">Jumlah Keseluruhan Markah:</td>
-              <td style="text-align: right; color: #059669;" id="report-score-total">100 / 100</td>
+              <td style="text-align: right; color: #059669; font-size: 15px;" id="report-score-total">100 / 100</td>
             </tr>
           </tbody>
         </table>
 
         <!-- Rubric Statement Description -->
         <div class="rubric-text" id="report-rubric-desc">
-          Tahap Penguasaan 6 (Cemerlang / Berdikari): Murid berjaya menulis simpulan bahasa dalam Jawi dengan ejaan tepat dan mempersembahkan keindahan seni tulisan Jawi menggunakan corak dan bingkai yang sangat kreatif mengikut Standard Pembelajaran 4.4.2.
+          <strong>Tahap Penguasaan 6 (Cemerlang):</strong> Murid berupaya menulis simpulan bahasa dalam Jawi dengan ejaan tepat dan mempersembahkan keindahan seni tulisan Jawi menggunakan corak dan bingkai yang sangat kreatif mengikut Standard Pembelajaran 4.4.2.
         </div>
 
         <!-- Explanation of Scoring -->
         <div style="font-size: 11px; color: #64748B; line-height: 1.4; border-top: 1px dashed #CBD5E1; padding-top: 8px;">
-          <em>* Kaedah Pengiraan Markah: Bilik 1 (40 markah, tolak 5 markah setiap cubaan salah, min 10). Bilik 2 (30 markah, tolak 5 markah setiap cubaan salah, min 10). Bilik 3 (30 markah penyempurnaan karya seni tulisan Jawi SP 4.4.2).</em>
+          <em>* Kaedah Pengiraan Markah: Bilik 2 (30 markah ejaan, tolak 5 setiap percubaan salah, min 10). Bilik 3 (30 markah cantuman & maksud, tolak 5 setiap percubaan salah, min 10). Bilik 4 (40 markah persembahan kaligrafi & hiasan seni SP 4.4.2). Jumlah Maksimum: 100 Markah.</em>
         </div>
       </div>
 
@@ -551,13 +524,13 @@
           🔄 Main Semula
         </button>
         <button class="btn-primary" style="flex: 2;" onclick="window.print()">
-          🖨️ Cetak / Simpan Laporan (PDF)
+          🖨️ Cetak / Simpan Sijil PBD (PDF)
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Main ES6 Module Game Script -->
+  <!-- Main ES6 Module Game Script with Cache-Buster -->
   <script type="module" src="./game.js?v=4.4.2"></script>
 </body>
 </html>
