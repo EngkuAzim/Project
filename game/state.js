@@ -81,7 +81,7 @@ export const gameScores = {
 // Global state container
 export const gameState = {
   currentRoom: 'lobby',
-  activeModal: null,
+  activeModal: 'intro-modal',
   nearbyTarget: null, // 'portalR1' | 'portalR2' | 'portalR3' | 'portalR4' | 'returnLobby' | 'tableR1' | 'tableR2' | 'tableR3' | 'tableR4' | 'npcTeacher'
   room1Completed: false,
   room2Completed: false,

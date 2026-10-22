@@ -897,6 +897,8 @@ html, body {
   color: #0284C7;
   cursor: pointer;
   transition: all 0.2s;
+  user-select: none;
+  position: relative;
 }
 
 .rtl-letter-slot.filled {
@@ -909,8 +911,38 @@ html, body {
   border-color: #0369A1;
 }
 
+.rtl-letter-slot.drop-zone.drag-over {
+  border-color: #F59E0B;
+  background: #FEF3C7;
+  transform: scale(1.06);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.45);
+}
+
+.letter-tile {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  user-select: none;
+}
+
+.letter-tile:active {
+  cursor: grabbing;
+}
+
+.slot-placeholder {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: #CBD5E1;
+  pointer-events: none;
+}
+
 .letters-pool {
   background: #F1F5F9;
+  border: 2px dashed transparent;
   border-radius: 14px;
   padding: 10px;
   display: flex;
@@ -918,6 +950,13 @@ html, body {
   gap: 8px;
   justify-content: center;
   margin-bottom: 10px;
+  transition: all 0.2s;
+  min-height: 52px;
+}
+
+.letters-pool.drag-over {
+  border-color: #38BDF8;
+  background: #E0F2FE;
 }
 
 .pool-letter-tile {
@@ -929,9 +968,14 @@ html, body {
   font-size: 24px;
   font-weight: 700;
   color: #0F172A;
-  cursor: pointer;
+  cursor: grab;
+  user-select: none;
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   transition: all 0.2s;
+}
+
+.pool-letter-tile:active {
+  cursor: grabbing;
 }
 
 .pool-letter-tile:hover {
@@ -1372,29 +1416,33 @@ html, body {
 
 /* Print Styles */
 @media print {
-  body * {
-    visibility: hidden;
+  @page { size: A4 portrait; margin: 12mm; }
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #FFFFFF !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
-  #report-modal, #report-modal *, #report-view, #report-view * {
-    visibility: visible;
+  #canvas-container, #hud-layer, .modal-overlay:not(#report-modal), .modal-close-btn, .report-actions-row {
+    display: none !important;
   }
-  #report-modal, #report-view {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-  }
-  .modal-overlay {
+  #report-modal {
+    position: static !important;
+    display: block !important;
+    opacity: 1 !important;
     background: transparent !important;
-  }
-  .modal-card {
-    box-shadow: none !important;
-    border: none !important;
-    max-width: 100% !important;
+    backdrop-filter: none !important;
     padding: 0 !important;
   }
-  .modal-close-btn, .btn-primary, .btn-secondary {
-    display: none !important;
+  #report-modal .modal-card {
+    box-shadow: none !important;
+    border: 2px solid #CBD5E1 !important;
+    transform: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }
 

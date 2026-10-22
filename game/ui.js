@@ -377,6 +377,21 @@ export function closeModal(modalId) {
   gameState.activeModal = null;
 }
 
+export function openIntroModal() {
+  openModal('intro-modal');
+  gameState.activeModal = 'intro-modal';
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      openIntroModal();
+    });
+  } else {
+    setTimeout(openIntroModal, 50);
+  }
+}
+
 export function handleOverlayClick(event, modalId) {
   if (event.target && event.target.id === modalId) {
     closeModal(modalId);
@@ -586,43 +601,115 @@ const R2_PAIRS = [
     tabIdx: 0,
     title: 'Ulat & Buku (Ulat Buku)',
     w1: { id: 'ulat', name: 'Ulat Bulu', rumi: 'ULAT', char: '🐛', jawi: 'اولت', letters: ['ا', 'و', 'ل', 'ت'] },
-    w2: { id: 'buku', name: 'Buku', rumi: 'BUKU', char: '📖', jawi: 'بوکو', letters: ['ب', 'و', 'ک', 'و'] },
-    pool: ['ا', 'و', 'ل', 'ت', 'ب', 'و', 'ک', 'و']
+    w2: { id: 'buku', name: 'Buku', rumi: 'BUKU', char: '📖', jawi: 'بوکو', letters: ['ب', 'و', 'ک', 'و'] }
   },
   {
     tabIdx: 1,
     title: 'Anak & Emas (Anak Emas)',
     w1: { id: 'anak', name: 'Anak / Bayi', rumi: 'ANAK', char: '👶', jawi: 'انق', letters: ['ا', 'ن', 'ق'] },
-    w2: { id: 'emas', name: 'Jongkong Emas', rumi: 'EMAS', char: '🪙', jawi: 'امس', letters: ['ا', 'م', 'س'] },
-    pool: ['ا', 'ن', 'ق', 'ا', 'م', 'س']
+    w2: { id: 'emas', name: 'Jongkong Emas', rumi: 'EMAS', char: '🪙', jawi: 'امس', letters: ['ا', 'م', 'س'] }
   },
   {
     tabIdx: 2,
     title: 'Buah & Hati (Buah Hati)',
     w1: { id: 'buah', name: 'Buah Epal', rumi: 'BUAH', char: '🍎', jawi: 'بواه', letters: ['ب', 'و', 'ا', 'ه'] },
-    w2: { id: 'hati', name: 'Hati / Kasih', rumi: 'HATI', char: '💖', jawi: 'هاتي', letters: ['ه', 'ا', 'ت', 'ي'] },
-    pool: ['ب', 'و', 'ا', 'ه', 'ه', 'ا', 'ت', 'ي']
+    w2: { id: 'hati', name: 'Hati / Kasih', rumi: 'HATI', char: '💖', jawi: 'هاتي', letters: ['ه', 'ا', 'ت', 'ي'] }
   },
   {
     tabIdx: 3,
     title: 'Cahaya & Mata (Cahaya Mata)',
     w1: { id: 'cahaya', name: 'Cahaya Suria', rumi: 'CAHAYA', char: '☀️', jawi: 'چهاي', letters: ['چ', 'ه', 'ا', 'ي'] },
-    w2: { id: 'mata', name: 'Mata', rumi: 'MATA', char: '👁️', jawi: 'مات', letters: ['م', 'ا', 'ت'] },
-    pool: ['چ', 'ه', 'ا', 'ي', 'م', 'ا', 'ت']
+    w2: { id: 'mata', name: 'Mata', rumi: 'MATA', char: '👁️', jawi: 'مات', letters: ['م', 'ا', 'ت'] }
   }
 ];
 
+// True Fisher-Yates shuffle that is NEVER pre-sorted
+function fisherYatesShuffle(arr) {
+  if (!arr || arr.length <= 1) return [...(arr || [])];
+  let shuffled;
+  let attempts = 0;
+  do {
+    shuffled = [...arr];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    attempts++;
+  } while (attempts < 30 && shuffled.every((v, i) => v === arr[i]));
+  return shuffled;
+}
+
 let r2ActiveTab = 0;
 let r2TabCompleted = [false, false, false, false];
-let r2UserSlots = [
-  { w1: [null, null, null, null], w2: [null, null, null, null] },
-  { w1: [null, null, null], w2: [null, null, null] },
-  { w1: [null, null, null, null], w2: [null, null, null, null] },
-  { w1: [null, null, null, null], w2: [null, null, null] }
-];
+let r2Trays = [null, null, null, null];
+let r2UserSlots = [null, null, null, null];
+let r2DragData = null;
+let r2JustDragged = false;
+
+// Initialize tray with scrambled letters and empty slots
+function initR2TabTray(tabIdx) {
+  const pair = R2_PAIRS[tabIdx];
+  const w1Shuffled = fisherYatesShuffle(pair.w1.letters);
+  const w2Shuffled = fisherYatesShuffle(pair.w2.letters);
+
+  r2Trays[tabIdx] = {
+    w1: w1Shuffled.map((letter, idx) => ({ id: `w1_${tabIdx}_${idx}_${Math.random().toString(36).substr(2, 4)}`, letter, wordKey: 'w1' })),
+    w2: w2Shuffled.map((letter, idx) => ({ id: `w2_${tabIdx}_${idx}_${Math.random().toString(36).substr(2, 4)}`, letter, wordKey: 'w2' }))
+  };
+
+  r2UserSlots[tabIdx] = {
+    w1: pair.w1.letters.map(() => null),
+    w2: pair.w2.letters.map(() => null)
+  };
+}
+
+// Pre-initialize trays for all 4 tabs
+R2_PAIRS.forEach((_, idx) => initR2TabTray(idx));
+
+// Update Tab buttons based on current active session and completion
+export function updateR2TabsBar() {
+  const isSesi2 = (gameState.r2Session >= 2);
+  const btn0 = document.getElementById('r2-tab-0');
+  const btn1 = document.getElementById('r2-tab-1');
+  const btn2 = document.getElementById('r2-tab-2');
+  const btn3 = document.getElementById('r2-tab-3');
+
+  if (btn0) {
+    btn0.style.display = 'flex';
+    btn0.classList.toggle('active', r2ActiveTab === 0);
+    btn0.innerHTML = `<span>🐛 📖</span> ${r2TabCompleted[0] ? '✅ ' : ''}Ulat Buku`;
+  }
+  if (btn1) {
+    btn1.style.display = 'flex';
+    btn1.classList.toggle('active', r2ActiveTab === 1);
+    btn1.innerHTML = `<span>👶 🪙</span> ${r2TabCompleted[1] ? '✅ ' : ''}Anak Emas`;
+  }
+  if (btn2) {
+    btn2.style.display = isSesi2 ? 'flex' : 'none';
+    btn2.classList.toggle('active', r2ActiveTab === 2);
+    btn2.innerHTML = `<span>🍎 💖</span> ${r2TabCompleted[2] ? '✅ ' : ''}Buah Hati`;
+  }
+  if (btn3) {
+    btn3.style.display = isSesi2 ? 'flex' : 'none';
+    btn3.classList.toggle('active', r2ActiveTab === 3);
+    btn3.innerHTML = `<span>☀️ 👁️</span> ${r2TabCompleted[3] ? '✅ ' : ''}Cahaya Mata`;
+  }
+}
 
 export function openRoom2Modal() {
   updateR2ScoreDisplay();
+  if (gameState.r2Session >= 2) {
+    // Sesi 2: start at Tab 2 (Buah Hati) or Tab 3 (Cahaya Mata)
+    if (!r2TabCompleted[2]) r2ActiveTab = 2;
+    else if (!r2TabCompleted[3]) r2ActiveTab = 3;
+    else r2ActiveTab = 2;
+  } else {
+    // Sesi 1: start at Tab 0 (Ulat Buku) or Tab 1 (Anak Emas)
+    if (!r2TabCompleted[0]) r2ActiveTab = 0;
+    else if (!r2TabCompleted[1]) r2ActiveTab = 1;
+    else r2ActiveTab = 0;
+  }
+  updateR2TabsBar();
   renderR2Tab(r2ActiveTab);
   openModal('room2-modal');
 }
@@ -646,9 +733,7 @@ export function switchR2Tab(tabIdx) {
     return;
   }
   r2ActiveTab = tabIdx;
-  document.querySelectorAll('.r2-tab-btn').forEach((btn, idx) => {
-    btn.classList.toggle('active', idx === tabIdx);
-  });
+  updateR2TabsBar();
   renderR2Tab(tabIdx);
 }
 
@@ -658,84 +743,265 @@ export function renderR2Tab(tabIdx) {
   if (!contentEl) return;
   if (feedback) feedback.style.display = 'none';
 
-  const pair = R2_PAIRS[tabIdx];
-  const slots = r2UserSlots[tabIdx];
-  const isDone = r2TabCompleted[tabIdx];
+  if (!r2Trays[tabIdx]) {
+    initR2TabTray(tabIdx);
+  }
 
-  // Calculate remaining pool letters
-  const usedLetters = [...slots.w1, ...slots.w2].filter(Boolean);
-  const remainingPool = [...pair.pool];
-  usedLetters.forEach(l => {
-    const idx = remainingPool.indexOf(l);
-    if (idx !== -1) remainingPool.splice(idx, 1);
-  });
+  const pair = R2_PAIRS[tabIdx];
+  const tray = r2Trays[tabIdx];
+  const slots = r2UserSlots[tabIdx];
+
+  // Helper to get available (unplaced) tiles in tray for wordKey
+  const getAvailableTiles = (wordKey) => {
+    const placedIds = new Set(slots[wordKey].filter(Boolean).map(t => t.id));
+    return tray[wordKey].filter(t => !placedIds.has(t.id));
+  };
+
+  const availW1 = getAvailableTiles('w1');
+  const availW2 = getAvailableTiles('w2');
 
   contentEl.innerHTML = `
     <div class="r2-words-layout">
-      <!-- Word 1 -->
+      <!-- Word 1 Card -->
       <div class="r2-word-card">
         <div class="r2-word-illus">${pair.w1.char}</div>
         <div class="r2-word-title">${pair.w1.rumi} (${pair.w1.name})</div>
         <div style="font-size: 11px; color: #64748B; margin-bottom: 6px;">Ejaan Jawi (Kanan ke Kiri &larr;):</div>
+        
+        <!-- RTL Slots: Word 1 -->
         <div class="rtl-letter-slots">
-          ${pair.w1.letters.map((_, sIdx) => `
-            <div class="rtl-letter-slot ${slots.w1[sIdx] ? 'filled' : ''}" onclick="removeR2Letter('w1', ${sIdx})">
-              ${slots.w1[sIdx] || ''}
+          ${pair.w1.letters.map((_, sIdx) => {
+            const tile = slots.w1[sIdx];
+            return `
+              <div class="rtl-letter-slot drop-zone ${tile ? 'filled' : ''}"
+                   data-word="w1"
+                   data-slot="${sIdx}"
+                   ondragover="handleR2DragOver(event)"
+                   ondragleave="handleR2DragLeave(event)"
+                   ondrop="handleR2Drop(event, 'w1', ${sIdx})"
+                   onclick="handleR2SlotClick('w1', ${sIdx})">
+                ${tile ? `
+                  <div class="letter-tile"
+                       draggable="true"
+                       ondragstart="handleR2DragStart(event, 'slot', 'w1', ${sIdx}, '${tile.letter}', '${tile.id}')"
+                       ondragend="handleR2DragEnd(event)">
+                    ${tile.letter}
+                  </div>
+                ` : `<span class="slot-placeholder">${sIdx + 1}</span>`}
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <!-- Word 1 Shuffled Tray -->
+        <div style="font-size: 11px; font-weight: 700; color: #475569; margin: 10px 0 4px; text-align: center;">
+          Dulang Huruf (Klik/Tarik ke petak):
+        </div>
+        <div class="letters-pool"
+             ondragover="handleR2DragOver(event)"
+             ondragleave="handleR2DragLeave(event)"
+             ondrop="handleR2DropToTray(event, 'w1')">
+          ${availW1.length === 0 ? '<span style="font-size: 11px; color: #94A3B8;">Semua huruf telah diletakkan.</span>' : ''}
+          ${availW1.map((tile) => `
+            <div class="pool-letter-tile"
+                 draggable="true"
+                 data-id="${tile.id}"
+                 ondragstart="handleR2DragStart(event, 'tray', 'w1', -1, '${tile.letter}', '${tile.id}')"
+                 ondragend="handleR2DragEnd(event)"
+                 onclick="handleR2TrayClick('w1', '${tile.id}')">
+              ${tile.letter}
             </div>
           `).join('')}
         </div>
       </div>
 
-      <!-- Word 2 -->
+      <!-- Word 2 Card -->
       <div class="r2-word-card">
         <div class="r2-word-illus">${pair.w2.char}</div>
         <div class="r2-word-title">${pair.w2.rumi} (${pair.w2.name})</div>
         <div style="font-size: 11px; color: #64748B; margin-bottom: 6px;">Ejaan Jawi (Kanan ke Kiri &larr;):</div>
+        
+        <!-- RTL Slots: Word 2 -->
         <div class="rtl-letter-slots">
-          ${pair.w2.letters.map((_, sIdx) => `
-            <div class="rtl-letter-slot ${slots.w2[sIdx] ? 'filled' : ''}" onclick="removeR2Letter('w2', ${sIdx})">
-              ${slots.w2[sIdx] || ''}
+          ${pair.w2.letters.map((_, sIdx) => {
+            const tile = slots.w2[sIdx];
+            return `
+              <div class="rtl-letter-slot drop-zone ${tile ? 'filled' : ''}"
+                   data-word="w2"
+                   data-slot="${sIdx}"
+                   ondragover="handleR2DragOver(event)"
+                   ondragleave="handleR2DragLeave(event)"
+                   ondrop="handleR2Drop(event, 'w2', ${sIdx})"
+                   onclick="handleR2SlotClick('w2', ${sIdx})">
+                ${tile ? `
+                  <div class="letter-tile"
+                       draggable="true"
+                       ondragstart="handleR2DragStart(event, 'slot', 'w2', ${sIdx}, '${tile.letter}', '${tile.id}')"
+                       ondragend="handleR2DragEnd(event)">
+                    ${tile.letter}
+                  </div>
+                ` : `<span class="slot-placeholder">${sIdx + 1}</span>`}
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <!-- Word 2 Shuffled Tray -->
+        <div style="font-size: 11px; font-weight: 700; color: #475569; margin: 10px 0 4px; text-align: center;">
+          Dulang Huruf (Klik/Tarik ke petak):
+        </div>
+        <div class="letters-pool"
+             ondragover="handleR2DragOver(event)"
+             ondragleave="handleR2DragLeave(event)"
+             ondrop="handleR2DropToTray(event, 'w2')">
+          ${availW2.length === 0 ? '<span style="font-size: 11px; color: #94A3B8;">Semua huruf telah diletakkan.</span>' : ''}
+          ${availW2.map((tile) => `
+            <div class="pool-letter-tile"
+                 draggable="true"
+                 data-id="${tile.id}"
+                 ondragstart="handleR2DragStart(event, 'tray', 'w2', -1, '${tile.letter}', '${tile.id}')"
+                 ondragend="handleR2DragEnd(event)"
+                 onclick="handleR2TrayClick('w2', '${tile.id}')">
+              ${tile.letter}
             </div>
           `).join('')}
         </div>
       </div>
     </div>
-
-    <!-- Letter Bank Pool -->
-    <div style="font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px; text-align: left;">
-      Dulang Huruf Jawi (Klik untuk masukkan ke petak):
-    </div>
-    <div class="letters-pool">
-      ${remainingPool.length === 0 ? '<span style="font-size: 12px; color: #94A3B8;">Semua huruf telah dimasukkan ke dalam petak ejaan.</span>' : ''}
-      ${remainingPool.map((letter, pIdx) => `
-        <div class="pool-letter-tile" onclick="addR2Letter('${letter}')">${letter}</div>
-      `).join('')}
-    </div>
   `;
 }
 
-export function addR2Letter(letter) {
-  const pair = R2_PAIRS[r2ActiveTab];
-  const slots = r2UserSlots[r2ActiveTab];
+export function handleR2DragStart(event, sourceType, wordKey, slotIdx, letter, tileId) {
+  r2JustDragged = true;
+  r2DragData = { sourceType, wordKey, slotIdx, letter, tileId };
+  if (event.dataTransfer) {
+    event.dataTransfer.setData('text/plain', JSON.stringify(r2DragData));
+    event.dataTransfer.effectAllowed = 'move';
+  }
+}
 
-  // Try slotting into Word 1 first, then Word 2
-  const emptyW1 = slots.w1.findIndex(s => s === null);
-  if (emptyW1 !== -1) {
-    slots.w1[emptyW1] = letter;
-    playTone(440, 'sine', 0.1);
-    renderR2Tab(r2ActiveTab);
+export function handleR2DragEnd(event) {
+  r2DragData = null;
+  setTimeout(() => {
+    r2JustDragged = false;
+  }, 100);
+}
+
+export function handleR2DragOver(event) {
+  event.preventDefault();
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move';
+  }
+  const el = event.currentTarget;
+  if (el && el.classList.contains('drop-zone')) {
+    el.classList.add('drag-over');
+  }
+}
+
+export function handleR2DragLeave(event) {
+  const el = event.currentTarget;
+  if (el) el.classList.remove('drag-over');
+}
+
+export function handleR2Drop(event, targetWordKey, targetSlotIdx) {
+  event.preventDefault();
+  const el = event.currentTarget;
+  if (el) el.classList.remove('drag-over');
+
+  if (!r2DragData && event.dataTransfer) {
+    try {
+      const raw = event.dataTransfer.getData('text/plain');
+      if (raw) r2DragData = JSON.parse(raw);
+    } catch (e) {}
+  }
+  if (!r2DragData) return;
+
+  const { sourceType, wordKey: srcWordKey, slotIdx: srcSlotIdx, tileId } = r2DragData;
+  const slots = r2UserSlots[r2ActiveTab];
+  const tray = r2Trays[r2ActiveTab];
+
+  // Keep letters within their respective word card
+  if (srcWordKey !== targetWordKey) {
+    r2DragData = null;
+    setTimeout(() => { r2JustDragged = false; }, 100);
     return;
   }
 
-  const emptyW2 = slots.w2.findIndex(s => s === null);
-  if (emptyW2 !== -1) {
-    slots.w2[emptyW2] = letter;
+  if (sourceType === 'tray') {
+    // Letter dragged from tray into slot [targetWordKey, targetSlotIdx]
+    const tile = tray[srcWordKey].find(t => t.id === tileId);
+    if (!tile) return;
+
+    // Remove if tile is already in another slot of this word
+    slots[targetWordKey].forEach((s, idx) => {
+      if (s && s.id === tileId) slots[targetWordKey][idx] = null;
+    });
+
+    // Place new tile in target slot
+    slots[targetWordKey][targetSlotIdx] = tile;
+    playTone(440, 'sine', 0.1);
+  } else if (sourceType === 'slot') {
+    // Swapping or moving between slots within the word
+    const movingTile = slots[srcWordKey][srcSlotIdx];
+    const targetTile = slots[targetWordKey][targetSlotIdx];
+
+    slots[targetWordKey][targetSlotIdx] = movingTile;
+    slots[srcWordKey][srcSlotIdx] = targetTile;
     playTone(493.88, 'sine', 0.1);
+  }
+
+  r2DragData = null;
+  setTimeout(() => { r2JustDragged = false; }, 100);
+  renderR2Tab(r2ActiveTab);
+}
+
+export function handleR2DropToTray(event, targetWordKey) {
+  event.preventDefault();
+  const el = event.currentTarget;
+  if (el) el.classList.remove('drag-over');
+
+  if (!r2DragData && event.dataTransfer) {
+    try {
+      const raw = event.dataTransfer.getData('text/plain');
+      if (raw) r2DragData = JSON.parse(raw);
+    } catch (e) {}
+  }
+  if (!r2DragData) return;
+
+  if (r2DragData.sourceType === 'slot') {
+    // Remove from slot back to tray
+    const slots = r2UserSlots[r2ActiveTab];
+    slots[r2DragData.wordKey][r2DragData.slotIdx] = null;
+    playTone(330, 'triangle', 0.08);
+  }
+
+  r2DragData = null;
+  setTimeout(() => { r2JustDragged = false; }, 100);
+  renderR2Tab(r2ActiveTab);
+}
+
+// Click tray tile to place into first empty slot
+export function handleR2TrayClick(wordKey, tileId) {
+  const slots = r2UserSlots[r2ActiveTab];
+  const tray = r2Trays[r2ActiveTab];
+  const tile = tray[wordKey].find(t => t.id === tileId);
+  if (!tile) return;
+
+  // Find first empty slot in that word
+  const emptyIdx = slots[wordKey].findIndex(s => s === null);
+  if (emptyIdx !== -1) {
+    slots[wordKey][emptyIdx] = tile;
+    playTone(440, 'sine', 0.1);
     renderR2Tab(r2ActiveTab);
   }
 }
 
-export function removeR2Letter(wordKey, slotIdx) {
+// Click filled slot to remove tile back to tray
+export function handleR2SlotClick(wordKey, slotIdx) {
+  if (r2JustDragged) {
+    r2JustDragged = false;
+    return;
+  }
   const slots = r2UserSlots[r2ActiveTab];
   if (slots[wordKey][slotIdx]) {
     slots[wordKey][slotIdx] = null;
@@ -744,10 +1010,28 @@ export function removeR2Letter(wordKey, slotIdx) {
   }
 }
 
+// Backwards-compatible aliases
+export function addR2Letter(letter) {
+  const tray = r2Trays[r2ActiveTab];
+  if (!tray) return;
+  const t1 = tray.w1.find(t => t.letter === letter && !r2UserSlots[r2ActiveTab].w1.some(s => s && s.id === t.id));
+  if (t1) {
+    handleR2TrayClick('w1', t1.id);
+    return;
+  }
+  const t2 = tray.w2.find(t => t.letter === letter && !r2UserSlots[r2ActiveTab].w2.some(s => s && s.id === t.id));
+  if (t2) {
+    handleR2TrayClick('w2', t2.id);
+  }
+}
+
+export function removeR2Letter(wordKey, slotIdx) {
+  handleR2SlotClick(wordKey, slotIdx);
+}
+
+// Reset current tab: empty slots and re-shuffle letters via Fisher-Yates
 export function resetCurrentTabR2() {
-  const pair = R2_PAIRS[r2ActiveTab];
-  r2UserSlots[r2ActiveTab].w1 = pair.w1.letters.map(() => null);
-  r2UserSlots[r2ActiveTab].w2 = pair.w2.letters.map(() => null);
+  initR2TabTray(r2ActiveTab);
   renderR2Tab(r2ActiveTab);
 }
 
@@ -756,11 +1040,10 @@ export function checkCurrentTabR2() {
   const slots = r2UserSlots[r2ActiveTab];
   const feedback = document.getElementById('r2-feedback');
 
+  const userW1 = slots.w1.map(t => t ? t.letter : '').join('');
+  const userW2 = slots.w2.map(t => t ? t.letter : '').join('');
   const correctW1 = pair.w1.letters.join('');
-  const userW1 = slots.w1.join('');
-
   const correctW2 = pair.w2.letters.join('');
-  const userW2 = slots.w2.join('');
 
   if (userW1 === correctW1 && userW2 === correctW2) {
     r2TabCompleted[r2ActiveTab] = true;
@@ -768,38 +1051,72 @@ export function checkCurrentTabR2() {
     showItemToast('🎉', `Tahniah! Ejaan ${pair.title} tepat!`);
     speakBM(`Tahniah! Ejaan ${pair.title} tepat dan betul.`);
 
-    // Update tab button with checkmark
-    const tabBtns = document.querySelectorAll('.r2-tab-btn');
-    if (tabBtns[r2ActiveTab]) {
-      tabBtns[r2ActiveTab].style.borderColor = '#10B981';
-      tabBtns[r2ActiveTab].innerHTML = `✅ ${pair.title}`;
-    }
+    updateR2TabsBar();
 
-    if (feedback) {
-      feedback.className = 'feedback-banner success';
-      feedback.textContent = `✅ Syabas! Ejaan perkataan Jawi "${pair.w1.jawi}" dan "${pair.w2.jawi}" adalah tepat!`;
-      feedback.style.display = 'block';
-    }
-
-    // Check if Sesi 1 (Tab 0 & 1) is completed -> Trigger Sesi 2 (Buah Hati & Cahaya Mata)
-    if (r2TabCompleted[0] && r2TabCompleted[1] && gameState.r2Session === 1) {
-      if (r2SessionCallback) {
-        r2SessionCallback();
-      }
+    // Auto-advance logic:
+    // Tab 0 (Ulat Buku) -> advance after 700ms to Tab 1 (Anak Emas)
+    if (r2ActiveTab === 0) {
       if (feedback) {
-        feedback.innerHTML = `✅ Syabas! Ejaan perkataan Jawi "${pair.w1.jawi}" dan "${pair.w2.jawi}" tepat!<br><strong style="color: #F59E0B;">✨ Sesi 1 Selesai! 4 Objek Sesi 2 (Buah Hati & Cahaya Mata) telah muncul di bilik!</strong>`;
+        feedback.className = 'feedback-banner success';
+        feedback.textContent = `✅ Syabas! Ejaan "${pair.w1.jawi}" dan "${pair.w2.jawi}" tepat! Bersedia ke Tab 2 (Anak Emas)...`;
+        feedback.style.display = 'block';
       }
-      showItemToast('✨', 'Sesi 1 Selesai! 4 Objek Sesi 2 (Buah Hati & Cahaya Mata) telah muncul di bilik!');
-      speakBM('Sesi satu selesai! Empat objek sesi dua telah muncul di bilik.');
+      setTimeout(() => {
+        switchR2Tab(1);
+      }, 700);
+      return;
     }
 
-    // Check if all 4 tabs completed
-    if (r2TabCompleted.every(Boolean)) {
-      gameState.room2Completed = true;
-      const proceedBtn = document.getElementById('btn-proceed-r3');
-      if (proceedBtn) proceedBtn.style.display = 'block';
-      showItemToast('🏆', 'Semua 4 Pasangan Kata Berjaya Dieja!');
-      speakBM('Syabas! Anda telah berjaya mengeja semua 4 pasangan perkataan Jawi dengan cemerlang.');
+    // Tab 1 (Anak Emas) -> Sesi 1 completed!
+    if (r2ActiveTab === 1) {
+      if (r2TabCompleted[0] && r2TabCompleted[1] && gameState.r2Session === 1) {
+        if (r2SessionCallback) {
+          r2SessionCallback();
+        }
+        if (feedback) {
+          feedback.className = 'feedback-banner success';
+          feedback.innerHTML = `✅ Syabas! Ejaan "${pair.w1.jawi}" & "${pair.w2.jawi}" tepat!<br><strong style="color: #F59E0B;">✨ Sesi 1 Selesai! 4 Objek Sesi 2 (Buah Hati & Cahaya Mata) telah muncul di bilik!</strong>`;
+          feedback.style.display = 'block';
+        }
+        showItemToast('✨', 'Sesi 1 Selesai! 4 Objek Sesi 2 (Buah Hati & Cahaya Mata) telah muncul di bilik!');
+        speakBM('Tahniah! Sesi satu selesai. Sila kutip empat objek sesi dua di dalam bilik.');
+
+        // Close modal after 1100ms so student can collect the next 4 items in the classroom
+        setTimeout(() => {
+          closeModal('room2-modal');
+        }, 1100);
+      }
+      return;
+    }
+
+    // Tab 2 (Buah Hati) -> advance after 700ms to Tab 3 (Cahaya Mata)
+    if (r2ActiveTab === 2) {
+      if (feedback) {
+        feedback.className = 'feedback-banner success';
+        feedback.textContent = `✅ Syabas! Ejaan "${pair.w1.jawi}" dan "${pair.w2.jawi}" tepat! Bersedia ke Tab 4 (Cahaya Mata)...`;
+        feedback.style.display = 'block';
+      }
+      setTimeout(() => {
+        switchR2Tab(3);
+      }, 700);
+      return;
+    }
+
+    // Tab 3 (Cahaya Mata) -> All 4 completed!
+    if (r2ActiveTab === 3) {
+      if (r2TabCompleted.every(Boolean)) {
+        gameState.room2Completed = true;
+        const proceedBtn = document.getElementById('btn-proceed-r3');
+        if (proceedBtn) proceedBtn.style.display = 'block';
+        showItemToast('🏆', 'Semua 4 Simpulan Bahasa Berjaya Dieja!');
+        speakBM('Syabas! Anda telah berjaya mengeja semua 4 simpulan bahasa Jawi dengan cemerlang.');
+        if (feedback) {
+          feedback.className = 'feedback-banner success';
+          feedback.textContent = `🏆 Syabas! Semua 4 simpulan bahasa berjaya dieja dengan betul!`;
+          feedback.style.display = 'block';
+        }
+      }
+      return;
     }
   } else {
     gameScores.attemptsR2++;
@@ -978,6 +1295,8 @@ const KHAT_TEMPLATES = {
 export function openRoom4Modal() {
   openModal('room4-modal');
   initKhatCanvas();
+  const textEl = document.getElementById('guide-btn-text');
+  if (textEl) textEl.textContent = khatShowGuide ? 'Sembunyi Garisan' : 'Tunjuk Garisan';
 }
 
 export function initKhatCanvas() {
@@ -1064,7 +1383,7 @@ export function selectKhatIdiom(idiomId) {
 export function toggleTracingGuide() {
   khatShowGuide = !khatShowGuide;
   const textEl = document.getElementById('guide-btn-text');
-  if (textEl) textEl.textContent = khatShowGuide ? 'Sembunyi Surihan' : 'Tunjuk Surihan';
+  if (textEl) textEl.textContent = khatShowGuide ? 'Sembunyi Garisan' : 'Tunjuk Garisan';
   redrawKhatCanvas();
 }
 
@@ -1321,6 +1640,31 @@ export function showFinalPBDReport(dataUrl = null) {
   openModal('report-modal');
 }
 
+export function printPBDReport() {
+  const imgEl = document.getElementById('report-khat-img');
+  const triggerPrint = () => {
+    setTimeout(() => {
+      window.print();
+    }, 150);
+  };
+
+  if (!imgEl) {
+    triggerPrint();
+    return;
+  }
+
+  if ((!imgEl.src || imgEl.src === '') && khatCanvas) {
+    imgEl.src = khatCanvas.toDataURL('image/png');
+  }
+
+  if (imgEl.complete && imgEl.naturalWidth > 0) {
+    triggerPrint();
+  } else {
+    imgEl.onload = () => triggerPrint();
+    imgEl.onerror = () => triggerPrint();
+  }
+}
+
 export function restartGame() {
   location.reload();
 }
@@ -1329,6 +1673,7 @@ export function restartGame() {
 // 13. GLOBAL BINDINGS FOR HTML ONCLICK COMPATIBILITY
 // ==========================================
 if (typeof window !== 'undefined') {
+  window.openIntroModal = openIntroModal;
   window.openProfileModal = openProfileModal;
   window.saveProfile = saveProfile;
   window.toggleVoiceover = toggleVoiceover;
@@ -1349,6 +1694,14 @@ if (typeof window !== 'undefined') {
   window.resetCurrentTabR2 = resetCurrentTabR2;
   window.checkCurrentTabR2 = checkCurrentTabR2;
   window.proceedToRoom3 = proceedToRoom3;
+  window.handleR2DragStart = handleR2DragStart;
+  window.handleR2DragEnd = handleR2DragEnd;
+  window.handleR2DragOver = handleR2DragOver;
+  window.handleR2DragLeave = handleR2DragLeave;
+  window.handleR2Drop = handleR2Drop;
+  window.handleR2DropToTray = handleR2DropToTray;
+  window.handleR2TrayClick = handleR2TrayClick;
+  window.handleR2SlotClick = handleR2SlotClick;
 
   // Room 3
   window.openRoom3Modal = openRoom3Modal;
@@ -1372,6 +1725,7 @@ if (typeof window !== 'undefined') {
 
   // Final PBD Report
   window.showFinalPBDReport = showFinalPBDReport;
+  window.printPBDReport = printPBDReport;
   window.restartGame = restartGame;
 }
 

@@ -114,6 +114,59 @@
   </div>
 
   <!-- ==========================================
+       MODAL: MANDATORY STARTUP INSTRUCTION POPUP
+       ========================================== -->
+  <div id="intro-modal" class="modal-overlay active">
+    <div class="modal-card" style="max-width: 580px;">
+      <button class="modal-close-btn" onclick="closeModal('intro-modal')">&times;</button>
+      <div class="modal-hero-icon" style="background: linear-gradient(135deg, #10B981, #059669);">📜</div>
+      <h2>Panduan Kembara Jawi Bestari</h2>
+      <div class="trialogic-tag">✦ Standard Pembelajaran 4.4.2 DSKP Bahasa Melayu</div>
+      
+      <div class="intro-steps-list" style="margin: 16px 0; text-align: left; display: flex; flex-direction: column; gap: 10px;">
+        <div class="intro-step-item" style="display: flex; gap: 12px; align-items: flex-start; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 14px;">
+          <div style="font-size: 22px;">🎮</div>
+          <div style="font-size: 13px; line-height: 1.5; color: #1E293B;">
+            <strong>Kawalan:</strong> Gunakan kekunci <kbd style="background: #E2E8F0; padding: 2px 6px; border-radius: 4px; font-weight: 700;">W, A, S, D</kbd> atau <kbd style="background: #E2E8F0; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Anak Panah</kbd> untuk bergerak, dan tekan <kbd style="background: #FEF08A; padding: 2px 6px; border-radius: 4px; font-weight: 700; color: #854D0E;">E</kbd> untuk berinteraksi.
+          </div>
+        </div>
+
+        <div class="intro-step-item" style="display: flex; gap: 12px; align-items: flex-start; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 14px;">
+          <div style="font-size: 22px;">🌿</div>
+          <div style="font-size: 13px; line-height: 1.5; color: #1E293B;">
+            <strong>Bilik 1 (Taman Maze Jawi):</strong> Kumpul lencana huruf Jawi <em>Alif</em> hingga <em>Ya</em> mengikut turutan laluan.
+          </div>
+        </div>
+
+        <div class="intro-step-item" style="display: flex; gap: 12px; align-items: flex-start; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 14px;">
+          <div style="font-size: 22px;">🧪</div>
+          <div style="font-size: 13px; line-height: 1.5; color: #1E293B;">
+            <strong>Bilik 2 (Makmal Ejaan - 2 Sesi):</strong> Kumpul objek Sesi 1 (<em>Ulat Buku</em> &amp; <em>Anak Emas</em>), susun ejaan Jawi, kemudian selesaikan Sesi 2 (<em>Buah Hati</em> &amp; <em>Cahaya Mata</em>).
+          </div>
+        </div>
+
+        <div class="intro-step-item" style="display: flex; gap: 12px; align-items: flex-start; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 14px;">
+          <div style="font-size: 22px;">📚</div>
+          <div style="font-size: 13px; line-height: 1.5; color: #1E293B;">
+            <strong>Bilik 3 (Arkib Simpulan Bahasa):</strong> Padankan simpulan bahasa Jawi dengan maksud kiasannya.
+          </div>
+        </div>
+
+        <div class="intro-step-item" style="display: flex; gap: 12px; align-items: flex-start; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 14px;">
+          <div style="font-size: 22px;">🎨</div>
+          <div style="font-size: 13px; line-height: 1.5; color: #1E293B;">
+            <strong>Bilik 4 (Studio Seni Khat):</strong> Lukis/surih kaligrafi Jawi dan hias bingkai untuk menghasilkan Kad Laporan PBD.
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary" style="width: 100%; font-size: 15px; padding: 12px;" onclick="closeModal('intro-modal')">
+        ✨ Faham, Mula Kembara Sekarang!
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================
        MODAL 0: STUDENT PROFILE (Nama Murid & Kelas)
        ========================================== -->
   <div id="profile-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'profile-modal')">
@@ -211,16 +264,16 @@
 
       <!-- 4 Tabs Bar -->
       <div class="r2-tabs-bar" id="r2-tabs-bar">
-        <button class="r2-tab-btn active" onclick="switchR2Tab(0)">
+        <button id="r2-tab-0" class="r2-tab-btn active" onclick="switchR2Tab(0)">
           <span>🐛 📖</span> Tab 1: Ulat Buku
         </button>
-        <button class="r2-tab-btn" onclick="switchR2Tab(1)">
+        <button id="r2-tab-1" class="r2-tab-btn" onclick="switchR2Tab(1)">
           <span>👶 🪙</span> Tab 2: Anak Emas
         </button>
-        <button class="r2-tab-btn" onclick="switchR2Tab(2)">
+        <button id="r2-tab-2" class="r2-tab-btn" onclick="switchR2Tab(2)">
           <span>🍎 💖</span> Tab 3: Buah Hati
         </button>
-        <button class="r2-tab-btn" onclick="switchR2Tab(3)">
+        <button id="r2-tab-3" class="r2-tab-btn" onclick="switchR2Tab(3)">
           <span>☀️ 👁️</span> Tab 4: Cahaya Mata
         </button>
       </div>
@@ -237,7 +290,7 @@
           Susun Semula Tab Ini
         </button>
         <button class="btn-primary" style="flex: 2;" onclick="checkCurrentTabR2()">
-          Semak Ejaan Pasangan Ini
+          Semak Ejaan Simpulan Bahasa
         </button>
       </div>
 
@@ -373,7 +426,7 @@
           <!-- Utility Actions -->
           <div class="toolbar-group" style="margin-left: auto;">
             <button type="button" class="khat-tool-btn" onclick="toggleTracingGuide()">
-              👁️ <span id="guide-btn-text">Sembunyi Surihan</span>
+              👁️ <span id="guide-btn-text">Sembunyi Garisan</span>
             </button>
             <button type="button" class="khat-tool-btn" onclick="clearKhatDrawing()">
               🗑️ Padam
@@ -519,11 +572,11 @@
       </div>
 
       <!-- Action Buttons -->
-      <div style="display: flex; gap: 10px;">
+      <div class="report-actions-row" style="display: flex; gap: 10px;">
         <button class="btn-secondary" style="flex: 1;" onclick="restartGame()">
           🔄 Main Semula
         </button>
-        <button class="btn-primary" style="flex: 2;" onclick="window.print()">
+        <button class="btn-primary" style="flex: 2;" onclick="printPBDReport()">
           🖨️ Cetak / Simpan Sijil PBD (PDF)
         </button>
       </div>
