@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4361EE"/>
+      <stop offset="50%" stop-color="#3A0CA3"/>
+      <stop offset="100%" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="50%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Background with smooth rounded corners -->
+  <rect width="512" height="512" rx="110" fill="url(#bgGrad)"/>
+
+  <!-- Decorative Golden Border Ring -->
+  <rect x="24" y="24" width="464" height="464" rx="90" fill="none" stroke="url(#goldGrad)" stroke-width="6" opacity="0.6"/>
+
+  <!-- Geometric 8-point Islamic Star Backdrop -->
+  <g transform="translate(256, 240) scale(1.6)" opacity="0.15" fill="#FFFFFF">
+    <rect x="-60" y="-60" width="120" height="120" rx="14"/>
+    <rect x="-60" y="-60" width="120" height="120" rx="14" transform="rotate(45)"/>
+  </g>
+
+  <!-- Central Circle Badge -->
+  <circle cx="256" cy="235" r="145" fill="#1E1B4B" stroke="url(#goldGrad)" stroke-width="8" filter="url(#shadow)"/>
+
+  <!-- Decorative Motif Top (School Mortarboard / Star) -->
+  <g transform="translate(256, 128) scale(0.9)">
+    <polygon points="0,-18 28,-4 0,10 -28,-4" fill="url(#goldGrad)"/>
+    <polygon points="-8,4 -8,16 8,16 8,4" fill="url(#goldGrad)"/>
+    <circle cx="14" cy="4" r="3" fill="#FDE047"/>
+  </g>
+
+  <!-- Authentic Jawi Letter Jim "ج" -->
+  <text x="256" y="295" font-family="'Amiri', 'Traditional Arabic', 'Times New Roman', serif" font-size="190" font-weight="bold" text-anchor="middle" fill="url(#goldGrad)" filter="url(#shadow)">ج</text>
+
+  <!-- Ribbon Pill Bottom: "KEMBARA JAWI" -->
+  <g transform="translate(256, 420)">
+    <rect x="-140" y="-24" width="280" height="48" rx="24" fill="url(#goldGrad)" filter="url(#shadow)"/>
+    <text x="0" y="7" font-family="'Plus Jakarta Sans', 'Arial', sans-serif" font-size="20" font-weight="800" text-anchor="middle" fill="#1E1B4B" letter-spacing="1.5">KEMBARA JAWI</text>
+  </g>
+</svg>

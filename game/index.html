@@ -13,6 +13,14 @@
   <!-- External Stylesheet with Cache-Buster -->
   <link rel="stylesheet" href="./style.css?v=4.4.2">
 
+  <!-- PWA Manifest & Mobile App Meta Tags -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#4361EE">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Kembara Jawi">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+
   <!-- Three.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
@@ -39,6 +47,11 @@
       <!-- Prominent Gallery Toggle Button -->
       <button id="btn-gallery-toggle" class="gallery-toggle-btn" onclick="openGallerySidebar()" title="Buka Galeri Pameran Jawi">
         🖼️ <span class="gallery-btn-label">Galeri Pameran Jawi</span>
+      </button>
+
+      <!-- PWA Install Button (Prompted automatically on supported tablets/phones) -->
+      <button id="btn-pwa-install" class="gallery-toggle-btn" style="display: none; background: linear-gradient(135deg, #059669, #10B981); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);" onclick="installPWA()" title="Pasang Aplikasi pada Tablet / Telefon">
+        📲 <span class="gallery-btn-label">Pasang Aplikasi</span>
       </button>
 
       <!-- Student Profile Pill (Clickable) -->
@@ -670,5 +683,49 @@
 
   <!-- Main ES6 Module Game Script with Cache-Buster -->
   <script type="module" src="./game.js?v=4.4.2"></script>
+
+  <!-- PWA Service Worker Registration & Install Prompt Handler -->
+  <script>
+    // Register Service Worker for offline 3D caching & PWA installation
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then((reg) => {
+            console.log('[PWA] ServiceWorker berdaftar dengan skop:', reg.scope);
+          })
+          .catch((err) => {
+            console.warn('[PWA] Pendaftaran ServiceWorker gagal:', err);
+          });
+      });
+    }
+
+    // Handle Native PWA Install Prompt for Tablets & Mobile Devices
+    let deferredPWAInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPWAInstallPrompt = e;
+      const installBtn = document.getElementById('btn-pwa-install');
+      if (installBtn) {
+        installBtn.style.display = 'inline-flex';
+      }
+    });
+
+    window.installPWA = async function() {
+      if (deferredPWAInstallPrompt) {
+        deferredPWAInstallPrompt.prompt();
+        const { outcome } = await deferredPWAInstallPrompt.userChoice;
+        console.log('[PWA] Keputusan pemasangan:', outcome);
+        deferredPWAInstallPrompt = null;
+        const installBtn = document.getElementById('btn-pwa-install');
+        if (installBtn) installBtn.style.display = 'none';
+      }
+    };
+
+    window.addEventListener('appinstalled', () => {
+      console.log('[PWA] Kembara Bahasa Sekolah Bestari berjaya dipasang ke peranti!');
+      const installBtn = document.getElementById('btn-pwa-install');
+      if (installBtn) installBtn.style.display = 'none';
+    });
+  </script>
 </body>
 </html>
