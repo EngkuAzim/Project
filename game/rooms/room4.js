@@ -101,6 +101,7 @@ export function buildRoom4(arg1, arg2, arg3) {
   stationGroup.position.set(400.0, 0, 395.5);
 
   // Large Standing Masterpiece Easel
+  const easelMat = new THREE.MeshLambertMaterial({ color: 0x92400E });
   const mainEaselLegL = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 3.4, 8), easelMat);
   mainEaselLegL.position.set(-0.9, 1.6, 0.3);
   mainEaselLegL.rotation.z = 0.18;

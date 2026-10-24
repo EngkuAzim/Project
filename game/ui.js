@@ -54,11 +54,35 @@ export function registerR2SessionHandler(fn) {
 }
 
 // ==========================================
-// 1. AUDIO SYNTHESIZER (Web Audio API)
+// 1. AUDIO SYNTHESIZER (Web Audio API & Global Audio Unlocker)
 // ==========================================
 const audioCtx = (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined')
   ? new (window.AudioContext || window.webkitAudioContext)()
   : null;
+
+// Global Audio Unlocker for Mobile & Desktop Safari / Chrome / Firefox
+let isAudioUnlocked = false;
+export function unlockAudio() {
+  if (isAudioUnlocked) return;
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    try {
+      const silent = new SpeechSynthesisUtterance('');
+      silent.volume = 0.01;
+      silent.rate = 2.0;
+      window.speechSynthesis.speak(silent);
+    } catch (e) {}
+  }
+  isAudioUnlocked = true;
+}
+
+if (typeof window !== 'undefined') {
+  ['click', 'touchstart', 'touchend', 'pointerdown', 'keydown'].forEach(evt => {
+    window.addEventListener(evt, unlockAudio, { passive: true });
+  });
+}
 
 export function playTone(freq, type = 'sine', duration = 0.2, delay = 0) {
   if (!audioCtx) return;
@@ -68,7 +92,7 @@ export function playTone(freq, type = 'sine', duration = 0.2, delay = 0) {
     const gain = audioCtx.createGain();
     osc.type = type;
     osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
-    gain.gain.setValueAtTime(0.2, audioCtx.currentTime + delay);
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime + delay);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
@@ -84,6 +108,13 @@ export function playCollectChime() {
   playTone(659.25, 'triangle', 0.15, 0.08);  // E5
   playTone(783.99, 'triangle', 0.25, 0.16);  // G5
   playTone(1046.5, 'sine', 0.35, 0.24);      // C6
+}
+
+export function playJawiCardTone(stepIndex = 1) {
+  const baseFreqs = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25, 587.33, 659.25];
+  const freq = baseFreqs[(stepIndex - 1) % baseFreqs.length] || 440;
+  playTone(freq, 'triangle', 0.22, 0);
+  playTone(freq * 1.5, 'sine', 0.32, 0.07);
 }
 
 export function playSuccessFanfare() {
@@ -106,9 +137,20 @@ export function playErrorBuzzer() {
 }
 
 // ==========================================
-// 1.5 BAHASA MELAYU VOICEOVER (SpeechSynthesis)
+// 1.5 BAHASA MELAYU & JAWI VOICEOVER (SpeechSynthesis Engine)
 // ==========================================
 let isVoiceMuted = false;
+let cachedVoices = [];
+
+function loadVoices() {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    cachedVoices = window.speechSynthesis.getVoices() || [];
+  }
+}
+if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
 
 export function toggleVoiceover() {
   isVoiceMuted = !isVoiceMuted;
@@ -128,20 +170,63 @@ export function speakBM(text) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
   try {
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+    }
     window.speechSynthesis.cancel();
-    const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/[-•—_]/g, ' ');
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'ms-MY';
-    utterance.rate = 0.9;
-    utterance.pitch = 1.0;
 
-    const voices = window.speechSynthesis.getVoices();
-    const msVoice = voices.find(v => v.lang === 'ms-MY' || v.lang === 'ms_MY' || v.lang === 'ms' || v.lang.startsWith('id'));
-    if (msVoice) utterance.voice = msVoice;
+    const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/[-•—_]/g, ' ').trim();
+    if (!cleanText) return;
 
-    window.speechSynthesis.speak(utterance);
+    // Small delay ensures Safari/WebKit speech queue registers cleanly after cancel
+    setTimeout(() => {
+      try {
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.rate = 0.88;
+        utterance.pitch = 1.05;
+
+        if (!cachedVoices.length) {
+          cachedVoices = window.speechSynthesis.getVoices() || [];
+        }
+
+        // Tier 1: Look for Malay voice (ms-MY, ms)
+        let selectedVoice = cachedVoices.find(v => v.lang && (v.lang.startsWith('ms') || v.lang === 'ms-MY' || v.lang === 'ms_MY'));
+
+        // Tier 2: Look for Indonesian voice (id-ID, id) - phonetically identical
+        if (!selectedVoice) {
+          selectedVoice = cachedVoices.find(v => v.lang && (v.lang.startsWith('id') || v.lang === 'id-ID' || v.lang === 'id_ID'));
+        }
+
+        // Tier 3: Look for Arabic voice (ar-SA, ar) for authentic pronunciation of classical Jawi letters
+        if (!selectedVoice && /alif|ba|ta|tsa|jim|cha|ha|kha|dal|dzal|ra|zai|sin|syin|sod|dhad|tho|dzo|ain|ghain|nga|fa|pa|qaf|kaf|ga|lam|mim|nun|wau|va|hamzah|ya|ye|nya/i.test(cleanText)) {
+          selectedVoice = cachedVoices.find(v => v.lang && v.lang.startsWith('ar'));
+        }
+
+        // Tier 4: Fallback to system default or first available voice
+        if (!selectedVoice) {
+          selectedVoice = cachedVoices.find(v => v.default) || cachedVoices[0] || null;
+        }
+
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+          utterance.lang = selectedVoice.lang || 'ms-MY';
+        } else {
+          utterance.lang = 'ms-MY';
+        }
+
+        utterance.onerror = (e) => {
+          console.warn('SpeechSynthesis error:', e);
+          playJawiCardTone(1);
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } catch (err) {
+        console.warn('Speech dispatch error', err);
+        playJawiCardTone(1);
+      }
+    }, 45);
   } catch (e) {
-    console.warn('Speech error', e);
+    console.warn('Speech top-level error', e);
   }
 }
 
@@ -293,7 +378,8 @@ export function collectItem(item, currentRoom) {
 
   if (currentRoom === 'room1') {
     showItemToast(item.char, `Pos ${item.stepIndex} Ditemui: ${item.char} (${item.name})`);
-    speakBM(item.name);
+    playJawiCardTone(item.stepIndex);
+    speakBM(`Pos ${item.stepIndex}: Huruf ${item.name}. ${item.char}`);
     const count = COLLECTIBLES_R1.filter(c => c.collected).length;
     if (count === 10) {
       gameState.room1Completed = true;
@@ -559,14 +645,14 @@ export function renderJawiChartGrid() {
     `;
 
     card.onclick = () => {
-      if (isStepCollected) {
-        card.classList.add('speaking');
-        playTone(587.33, 'triangle', 0.15);
-        speakBM(item.name);
-        setTimeout(() => card.classList.remove('speaking'), 800);
-      } else {
-        playErrorBuzzer();
-        showItemToast('🔒', `Huruf ini berada di Pos ${item.step} dalam pagar sesat!`);
+      unlockAudio();
+      card.classList.add('speaking');
+      playJawiCardTone(item.step);
+      speakBM(`Huruf ${item.name}. ${item.char}`);
+      setTimeout(() => card.classList.remove('speaking'), 900);
+
+      if (!isStepCollected) {
+        showItemToast(item.char, `Huruf ${item.name} (${item.char}) • Pos ${item.step} dalam maze.`);
       }
     };
 
