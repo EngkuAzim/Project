@@ -15,6 +15,9 @@
 
   <!-- Three.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- html2pdf.js CDN for Direct Certificate PDF Download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -624,12 +627,15 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="report-actions-row" style="display: flex; gap: 10px;">
-        <button class="btn-secondary" style="flex: 1;" onclick="restartGame()">
+      <div class="report-actions-row" style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn-secondary" style="flex: 1; min-width: 120px;" onclick="restartGame()">
           🔄 Main Semula
         </button>
-        <button class="btn-primary" style="flex: 2;" onclick="printPBDReport()">
-          🖨️ Cetak / Simpan Sijil PBD (PDF)
+        <button class="btn-primary" id="btn-download-pdf" style="flex: 2; min-width: 180px; background: linear-gradient(135deg, #10B981, #059669); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);" onclick="downloadPBDReportPDF()">
+          📥 Simpan Sijil (PDF)
+        </button>
+        <button class="btn-secondary" id="btn-print-pbd" style="flex: 1; min-width: 110px;" onclick="printPBDReport()">
+          🖨️ Cetak
         </button>
       </div>
     </div>

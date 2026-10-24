@@ -1752,7 +1752,10 @@ html, body {
 
 /* Print Styles */
 @media print {
-  @page { size: A4 portrait; margin: 12mm; }
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
   html, body {
     height: auto !important;
     overflow: visible !important;
@@ -1773,12 +1776,25 @@ html, body {
   }
   #report-modal .modal-card {
     box-shadow: none !important;
-    border: 2px solid #CBD5E1 !important;
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
     transform: none !important;
     max-height: none !important;
     overflow: visible !important;
     width: 100% !important;
     max-width: 100% !important;
+  }
+  .report-card {
+    border: 2px solid #CBD5E1 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin: 0 auto !important;
+  }
+  .report-khat-frame {
+    max-width: 380px !important;
+    margin: 0 auto !important;
   }
 }
 

@@ -1729,29 +1729,89 @@ export function showFinalPBDReport(dataUrl = null) {
   openModal('report-modal');
 }
 
+/**
+ * Direct Client-Side PDF Download of PBD Report Card using html2pdf.js
+ * Generates an authentic Sijil_PBD_Jawi_[Nama_Murid].pdf directly to Downloads.
+ */
+export async function downloadPBDReportPDF() {
+  const reportCard = document.getElementById('report-view');
+  if (!reportCard) return;
+
+  const imgEl = document.getElementById('report-khat-img');
+  if (imgEl && (!imgEl.src || imgEl.src === '' || imgEl.src === window.location.href) && khatCanvas) {
+    try {
+      imgEl.src = khatCanvas.toDataURL('image/png');
+    } catch (e) {
+      console.warn('Canvas toDataURL failed:', e);
+    }
+  }
+
+  const btn = document.getElementById('btn-download-pdf');
+  const origText = btn ? btn.innerHTML : '📥 Simpan Sijil (PDF)';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Menjana Sijil PDF...';
+  }
+
+  const rawName = (studentProfile?.name || 'Murid').trim();
+  const cleanName = rawName.replace(/[^a-zA-Z0-9_\u0600-\u06FF\s-]/g, '').replace(/\s+/g, '_');
+  const filename = `Sijil_PBD_Jawi_${cleanName || 'Murid_Bestari'}.pdf`;
+
+  if (typeof html2pdf !== 'undefined') {
+    try {
+      const opt = {
+        margin: [6, 6, 6, 6],
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#FFFFFF',
+          scrollX: 0,
+          scrollY: 0,
+          logging: false
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: 'avoid-all' }
+      };
+
+      await html2pdf().set(opt).from(reportCard).save();
+      showItemToast('📄', `Sijil PBD berjaya disimpan: ${filename}`);
+      speakBM('Tahniah! Sijil PBD anda telah berjaya dimuat turun.');
+    } catch (err) {
+      console.warn('html2pdf generation error, falling back to window.print():', err);
+      printPBDReport();
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+    }
+  } else {
+    printPBDReport();
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = origText;
+    }
+  }
+}
+
 export function printPBDReport() {
   const imgEl = document.getElementById('report-khat-img');
-  const triggerPrint = () => {
-    setTimeout(() => {
-      window.print();
-    }, 150);
-  };
-
-  if (!imgEl) {
-    triggerPrint();
-    return;
+  if (imgEl && (!imgEl.src || imgEl.src === '' || imgEl.src === window.location.href) && khatCanvas) {
+    try {
+      imgEl.src = khatCanvas.toDataURL('image/png');
+    } catch (e) {
+      console.warn('Canvas toDataURL failed:', e);
+    }
   }
 
-  if ((!imgEl.src || imgEl.src === '') && khatCanvas) {
-    imgEl.src = khatCanvas.toDataURL('image/png');
-  }
+  const modalEl = document.getElementById('report-modal');
+  if (modalEl) modalEl.classList.add('active');
 
-  if (imgEl.complete && imgEl.naturalWidth > 0) {
-    triggerPrint();
-  } else {
-    imgEl.onload = () => triggerPrint();
-    imgEl.onerror = () => triggerPrint();
-  }
+  setTimeout(() => {
+    window.print();
+  }, 120);
 }
 
 export function restartGame() {
@@ -1942,6 +2002,7 @@ if (typeof window !== 'undefined') {
 
   // Final PBD Report
   window.showFinalPBDReport = showFinalPBDReport;
+  window.downloadPBDReportPDF = downloadPBDReportPDF;
   window.printPBDReport = printPBDReport;
   window.restartGame = restartGame;
 }
