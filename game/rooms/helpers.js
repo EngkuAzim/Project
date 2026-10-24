@@ -83,6 +83,171 @@ export function createTextCanvasTexture(text, bgColor = '#1E3A8A', textColor = '
 }
 
 /**
+ * Creates or retrieves a cached CanvasTexture for the Full School Noticeboard.
+ * Designed with a rich corkboard/parchment background, header banner, 4 pinned activity cards,
+ * and teacher endorsement for Cikgu Asyikin.
+ */
+export function createNoticeboardTexture() {
+  const cacheKey = 'school_noticeboard_full_v4';
+  if (canvasTextureCache.has(cacheKey)) {
+    return canvasTextureCache.get(cacheKey);
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 640;
+  const ctx = canvas.getContext('2d');
+
+  // 1. Board Background (Warm Wood / Corkboard)
+  ctx.fillStyle = '#78350F';
+  ctx.fillRect(0, 0, 1024, 640);
+
+  ctx.fillStyle = '#D97706';
+  ctx.fillRect(16, 16, 1024 - 32, 640 - 32);
+
+  ctx.fillStyle = '#FEF3C7';
+  ctx.fillRect(28, 28, 1024 - 56, 640 - 56);
+
+  // Decorative border
+  ctx.strokeStyle = '#B45309';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(34, 34, 1024 - 68, 640 - 68);
+
+  // 2. Header Banner (Green Emerald Ribbon)
+  ctx.fillStyle = '#065F46';
+  ctx.fillRect(50, 48, 1024 - 100, 96);
+
+  ctx.strokeStyle = '#F59E0B';
+  ctx.lineWidth = 5;
+  ctx.strokeRect(52, 50, 1024 - 104, 92);
+
+  // Header Title
+  ctx.fillStyle = '#FEF08A';
+  ctx.font = 'bold 38px "Fredoka", "Plus Jakarta Sans", Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🏫 PAPAN KENYATAAN BAHASA MELAYU', 512, 82);
+
+  // Subtitle
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '700 20px "Plus Jakarta Sans", Arial, sans-serif';
+  ctx.fillText('Kembara Bahasa Tahun 4 Inovatif • DSKP SP 4.4.2 (Seni Tulisan Jawi)', 512, 118);
+
+  // 3. Grid of 4 Pinned Activity Notice Cards
+  const cards = [
+    {
+      num: 'BILIK 1',
+      title: 'Taman Pagar Sesat',
+      desc: 'Kembara 37 huruf Jawi (Alif - Nya) di maze semak.',
+      color: '#059669',
+      tag: 'Kembara 37 Huruf'
+    },
+    {
+      num: 'BILIK 2',
+      title: 'Makmal Kata Jawi',
+      desc: 'Eja 4 pasangan simpulan bahasa berilustrasi.',
+      color: '#2563EB',
+      tag: '30 Markah'
+    },
+    {
+      num: 'BILIK 3',
+      title: 'Arkib Simpulan Bahasa',
+      desc: 'Cantum perkataan Jawi & padankan maksud kiasan.',
+      color: '#7C3AED',
+      tag: '30 Markah'
+    },
+    {
+      num: 'BILIK 4',
+      title: 'Studio Seni Khat',
+      desc: 'Hasilkan kaligrafi seni Jawi indah (SP 4.4.2).',
+      color: '#D97706',
+      tag: '40 Markah (SP 4.4.2)'
+    }
+  ];
+
+  const colWidth = 430;
+  const rowHeight = 175;
+  const startX = 64;
+  const startY = 168;
+  const gapX = 36;
+  const gapY = 22;
+
+  cards.forEach((card, i) => {
+    const col = i % 2;
+    const row = Math.floor(i / 2);
+    const x = startX + col * (colWidth + gapX);
+    const y = startY + row * (rowHeight + gapY);
+
+    // Card background with shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.08)';
+    ctx.fillRect(x + 4, y + 4, colWidth, rowHeight);
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(x, y, colWidth, rowHeight);
+
+    ctx.strokeStyle = '#E2E8F0';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, colWidth, rowHeight);
+
+    // Left color accent bar
+    ctx.fillStyle = card.color;
+    ctx.fillRect(x, y, 10, rowHeight);
+
+    // Red pushpin
+    ctx.fillStyle = '#DC2626';
+    ctx.beginPath();
+    ctx.arc(x + colWidth / 2, y + 14, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#FCA5A5';
+    ctx.beginPath();
+    ctx.arc(x + colWidth / 2 - 2, y + 12, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Card Header
+    ctx.textAlign = 'left';
+    ctx.fillStyle = card.color;
+    ctx.font = '800 15px "Plus Jakarta Sans", Arial, sans-serif';
+    ctx.fillText(card.num, x + 24, y + 36);
+
+    ctx.fillStyle = '#0F172A';
+    ctx.font = 'bold 22px "Fredoka", Arial, sans-serif';
+    ctx.fillText(card.title, x + 24, y + 66);
+
+    // Card Description
+    ctx.fillStyle = '#475569';
+    ctx.font = '500 16px "Plus Jakarta Sans", Arial, sans-serif';
+    ctx.fillText(card.desc, x + 24, y + 98);
+
+    // Badge
+    ctx.fillStyle = card.color;
+    ctx.fillRect(x + 24, y + 128, 150, 28);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '700 13px "Plus Jakarta Sans", Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(card.tag, x + 99, y + 146);
+  });
+
+  // 4. Footer Banner with Teacher Name
+  ctx.fillStyle = '#1E293B';
+  ctx.fillRect(50, 568, 1024 - 100, 48);
+
+  ctx.fillStyle = '#A7F3D0';
+  ctx.font = 'bold 18px "Plus Jakarta Sans", Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('👩‍🏫 Guru Pembimbing: Cikgu Asyikin • Pentaksiran Bilik Darjah (PBD) SK Bestari', 512, 592);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.needsUpdate = true;
+
+  canvasTextureCache.set(cacheKey, texture);
+  return texture;
+}
+
+/**
  * Creates or retrieves a cached floating 3D text sprite with rounded pill background.
  */
 export function createTextSprite(text, bgColor = 'rgba(15, 23, 42, 0.94)', textColor = '#FFFFFF', width = 512, height = 180, fontSize = 64) {

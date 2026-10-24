@@ -59,7 +59,7 @@
         <div class="profile-avatar">🎓</div>
         <div class="profile-info">
           <strong id="hud-student-name">Penjelajah Bestari</strong>
-          <span id="hud-student-class">3 Inovatif</span>
+          <span id="hud-student-class">4 Inovatif</span>
         </div>
         <span style="font-size: 11px; color: #94A3B8; margin-left: 4px;">✎ Ubah</span>
       </div>
@@ -94,18 +94,21 @@
 
     <!-- Bottom Controls & Mission Helper -->
     <div class="bottom-bar">
-      <!-- Touch / Mouse Virtual D-Pad & Action Button -->
+      <!-- Touch / Mouse Virtual Joystick & Action Button -->
       <div id="touch-controls-wrapper">
-        <div class="dpad-cluster">
-          <button id="dpad-up" class="dpad-btn dpad-up" aria-label="Gerak Atas">▲</button>
-          <div class="dpad-middle-row">
-            <button id="dpad-left" class="dpad-btn dpad-left" aria-label="Gerak Kiri">◀</button>
-            <div class="dpad-center"></div>
-            <button id="dpad-right" class="dpad-btn dpad-right" aria-label="Gerak Kanan">▶</button>
+        <div id="joystick-zone" class="joystick-zone" title="Kawalan Joystick Sentuh">
+          <div id="joystick-base" class="joystick-base">
+            <div class="joystick-ring"></div>
+            <div id="joystick-knob" class="joystick-knob">
+              <span class="joystick-knob-core"></span>
+            </div>
+            <span class="joystick-dir-indicator dir-up">▲</span>
+            <span class="joystick-dir-indicator dir-down">▼</span>
+            <span class="joystick-dir-indicator dir-left">◀</span>
+            <span class="joystick-dir-indicator dir-right">▶</span>
           </div>
-          <button id="dpad-down" class="dpad-btn dpad-down" aria-label="Gerak Bawah">▼</button>
         </div>
-        <button id="touch-action-btn" class="touch-action-btn" aria-label="Interaksi (E)" onclick="handleCurrentInteraction()">
+        <button id="touch-action-btn" class="touch-action-btn" aria-label="Interaksi (E)" onclick="handleCurrentInteraction()" title="Tekan untuk berinteraksi">
           <span class="action-key-circle">E</span>
           <span class="action-label">Interaksi</span>
         </button>
@@ -163,6 +166,16 @@
       <div class="gallery-loading">
         <div class="gallery-spinner"></div>
         <p>Memuatkan karya dari pangkalan data...</p>
+      </div>
+    </div>
+
+    <!-- Gallery Pagination Container -->
+    <div id="gallery-pagination-container" class="gallery-pagination-container">
+      <button id="btn-gallery-load-more" class="btn-primary gallery-load-more-btn" onclick="loadMoreGalleryArtworks()" style="display: none;">
+        📥 Muat Lebih Banyak (10 Karya)
+      </button>
+      <div id="gallery-no-more" class="gallery-no-more" style="display: none;">
+        ✨ Semua karya telah dipaparkan
       </div>
     </div>
   </div>
@@ -224,6 +237,51 @@
   </div>
 
   <!-- ==========================================
+       MODAL: NOTICEBOARD DIALOG (Papan Kenyataan Sekolah)
+       ========================================== -->
+  <div id="noticeboard-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'noticeboard-modal')">
+    <div class="modal-card" style="max-width: 640px;">
+      <button class="modal-close-btn" onclick="closeModal('noticeboard-modal')">&times;</button>
+      <div class="modal-hero-icon" style="background: linear-gradient(135deg, #059669, #047857);">📌</div>
+      <h2>Papan Kenyataan Bahasa Melayu</h2>
+      <div class="trialogic-tag">Sekolah Kebangsaan Bestari &bull; DSKP SP 4.4.2</div>
+
+      <div style="background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 14px; padding: 14px; margin: 16px 0; text-align: left;">
+        <h4 style="color: #78350F; margin-bottom: 6px; font-family: var(--font-display); font-size: 16px;">
+          📢 Pengumuman Kembara Bahasa (Tahun 4 Inovatif)
+        </h4>
+        <p style="font-size: 13px; color: #92400E; margin: 0; line-height: 1.5;">
+          Selamat datang murid-murid Tahun 4 Inovatif! Sila selesaikan 4 fasa penerokaan pembelajaran seni tulisan Jawi mengikut urutan bilik:
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; margin-bottom: 16px;">
+        <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-left: 5px solid #059669; border-radius: 10px; padding: 10px 12px;">
+          <strong style="color: #059669; font-size: 13px;">Bilik 1: Taman Pagar Sesat</strong>
+          <p style="font-size: 12px; color: #475569; margin: 4px 0 0 0;">Kumpul 37 huruf Jawi (Alif hingga Nya) di labirin semak.</p>
+        </div>
+        <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-left: 5px solid #2563EB; border-radius: 10px; padding: 10px 12px;">
+          <strong style="color: #2563EB; font-size: 13px;">Bilik 2: Makmal Kata Jawi</strong>
+          <p style="font-size: 12px; color: #475569; margin: 4px 0 0 0;">Susun ejaan 4 simpulan bahasa berilustrasi (30 Markah).</p>
+        </div>
+        <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-left: 5px solid #7C3AED; border-radius: 10px; padding: 10px 12px;">
+          <strong style="color: #7C3AED; font-size: 13px;">Bilik 3: Arkib Simpulan Bahasa</strong>
+          <p style="font-size: 12px; color: #475569; margin: 4px 0 0 0;">Cantum perkataan Jawi & padankan maksud kiasan (30 Markah).</p>
+        </div>
+        <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-left: 5px solid #D97706; border-radius: 10px; padding: 10px 12px;">
+          <strong style="color: #D97706; font-size: 13px;">Bilik 4: Studio Seni Khat</strong>
+          <p style="font-size: 12px; color: #475569; margin: 4px 0 0 0;">Lukis seni khat & hiasan corak persembahan SP 4.4.2 (40 Markah).</p>
+        </div>
+      </div>
+
+      <div style="font-size: 12px; color: #64748B; border-top: 1px dashed #CBD5E1; padding-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+        <span>👩‍🏫 Guru Pembimbing: <strong>Cikgu Asyikin</strong></span>
+        <button class="btn-primary" onclick="closeModal('noticeboard-modal')">Faham & Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
        MODAL 0: STUDENT PROFILE (Nama Murid & Kelas)
        ========================================== -->
   <div id="profile-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'profile-modal')">
@@ -244,7 +302,7 @@
 
       <div class="form-group">
         <label class="form-label" for="input-student-class">Kelas / Tahun:</label>
-        <input type="text" id="input-student-class" class="form-input" placeholder="3 Inovatif" maxlength="25">
+        <input type="text" id="input-student-class" class="form-input" placeholder="4 Inovatif" maxlength="25">
       </div>
 
       <div style="display: flex; gap: 10px; margin-top: 18px;">
@@ -569,7 +627,7 @@
           <div class="report-emblem">ج</div>
           <div class="report-header-text">
             <h3>Sijil Pentaksiran Bilik Darjah (PBD)</h3>
-            <p>Bahasa Melayu Tahun 3 • Standard Pembelajaran 4.4.2</p>
+            <p>Bahasa Melayu Tahun 4 • Standard Pembelajaran 4.4.2</p>
           </div>
           <div id="report-tp-badge" class="tp-badge-large tp6">Tahap Penguasaan 6</div>
         </div>
@@ -577,7 +635,7 @@
         <!-- Student Meta Details -->
         <div style="display: flex; justify-content: space-between; font-size: 13px; color: #475569; margin-bottom: 14px; background: #F8FAFC; padding: 10px 14px; border-radius: 12px; border: 1px solid #E2E8F0;">
           <div>Nama Murid: <strong id="report-student-name" style="color: #0F172A;">Penjelajah Bestari</strong></div>
-          <div>Kelas: <strong id="report-student-class" style="color: #0F172A;">3 Inovatif</strong></div>
+          <div>Kelas: <strong id="report-student-class" style="color: #0F172A;">4 Inovatif</strong></div>
           <div>Tarikh: <strong id="report-date" style="color: #0F172A;">-</strong></div>
         </div>
 

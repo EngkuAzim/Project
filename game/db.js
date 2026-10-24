@@ -2,7 +2,7 @@
 // DB.JS - Firebase Firestore Live Artwork Gallery
 // ==========================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy, limit, startAfter } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
 // Web app Firebase configuration
 const firebaseConfig = {
@@ -18,6 +18,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
+export const GALLERY_PAGE_SIZE = 10;
+
 /**
  * Saves a student's artwork to the 'gallery' collection in Firestore.
  * @param {string} studentName
@@ -29,7 +31,7 @@ export async function saveArtworkToDB(studentName, studentClass, base64Image) {
   try {
     const docRef = await addDoc(collection(db, 'gallery'), {
       studentName: studentName || 'Penjelajah Bestari',
-      studentClass: studentClass || '3 Inovatif',
+      studentClass: studentClass || '4 Inovatif',
       image: base64Image,
       timestamp: serverTimestamp(),
       createdAt: new Date().toISOString()
@@ -43,25 +45,41 @@ export async function saveArtworkToDB(studentName, studentClass, base64Image) {
 }
 
 /**
- * Fetches all artworks from the 'gallery' collection in Firestore,
- * ordered by timestamp descending.
- * @returns {Promise<Array>} List of artwork documents
+ * Fetches paginated artworks from the 'gallery' collection in Firestore.
+ * Uses limit(10) and startAfter() cursor to avoid browser freezing and bandwidth spikes.
+ * @param {number} pageSize - Number of items to fetch per batch (default: 10)
+ * @param {DocumentSnapshot|null} lastDoc - Cursor for next page
+ * @returns {Promise<{ artworks: Array, lastVisibleDoc: Object|null, hasMore: boolean }>}
  */
-export async function fetchGalleryArtworks() {
+export async function fetchGalleryArtworks(pageSize = GALLERY_PAGE_SIZE, lastDoc = null) {
   try {
     let q;
     try {
-      q = query(collection(db, 'gallery'), orderBy('timestamp', 'desc'));
+      if (lastDoc) {
+        q = query(
+          collection(db, 'gallery'),
+          orderBy('timestamp', 'desc'),
+          startAfter(lastDoc),
+          limit(pageSize)
+        );
+      } else {
+        q = query(
+          collection(db, 'gallery'),
+          orderBy('timestamp', 'desc'),
+          limit(pageSize)
+        );
+      }
     } catch (e) {
-      q = collection(db, 'gallery');
+      console.warn('Constructing query with orderBy failed:', e);
+      q = query(collection(db, 'gallery'), limit(pageSize));
     }
 
     let querySnapshot;
     try {
       querySnapshot = await getDocs(q);
     } catch (err) {
-      console.warn('OrderBy query failed, falling back to basic collection query:', err);
-      querySnapshot = await getDocs(collection(db, 'gallery'));
+      console.warn('OrderBy query failed, falling back to basic limited query:', err);
+      querySnapshot = await getDocs(query(collection(db, 'gallery'), limit(pageSize)));
     }
 
     const artworks = [];
@@ -73,16 +91,21 @@ export async function fetchGalleryArtworks() {
       });
     });
 
-    // Sort by timestamp or createdAt descending
-    artworks.sort((a, b) => {
-      const timeA = a.timestamp ? (a.timestamp.toMillis ? a.timestamp.toMillis() : (a.timestamp.seconds ? a.timestamp.seconds * 1000 : 0)) : (a.createdAt ? new Date(a.createdAt).getTime() : 0);
-      const timeB = b.timestamp ? (b.timestamp.toMillis ? b.timestamp.toMillis() : (b.timestamp.seconds ? b.timestamp.seconds * 1000 : 0)) : (b.createdAt ? new Date(b.createdAt).getTime() : 0);
-      return timeB - timeA;
-    });
+    const docs = querySnapshot.docs || [];
+    const lastVisibleDoc = docs.length > 0 ? docs[docs.length - 1] : null;
+    const hasMore = docs.length === pageSize;
 
-    return artworks;
+    return {
+      artworks,
+      lastVisibleDoc,
+      hasMore
+    };
   } catch (error) {
     console.error('Error fetching gallery artworks from Firestore:', error);
-    return [];
+    return {
+      artworks: [],
+      lastVisibleDoc: null,
+      hasMore: false
+    };
   }
 }

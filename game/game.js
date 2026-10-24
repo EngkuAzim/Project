@@ -7,6 +7,7 @@ import {
   PICKUP_RADIUS_2D,
   ROOM_CONFIG,
   keys,
+  joystickVector,
   gameState,
   COLLECTIBLES_R1,
   COLLECTIBLES_R2,
@@ -652,20 +653,26 @@ function animate() {
     }
   });
 
-  // Player Movement (Roblox 3rd-Person Front View Axes)
+  // Player Movement (Roblox 3rd-Person Front View Axes & Mobile Virtual Joystick)
   if (!gameState.activeModal) {
     let inputX = 0;
     let inputZ = 0;
 
-    if (keys.w || keys.ArrowUp) { inputZ -= 1; }
-    if (keys.s || keys.ArrowDown) { inputZ += 1; }
-    if (keys.a || keys.ArrowLeft) { inputX -= 1; }
-    if (keys.d || keys.ArrowRight) { inputX += 1; }
+    if (joystickVector && joystickVector.active) {
+      inputX = joystickVector.x;
+      inputZ = joystickVector.z;
+    } else {
+      if (keys.w || keys.ArrowUp) { inputZ -= 1; }
+      if (keys.s || keys.ArrowDown) { inputZ += 1; }
+      if (keys.a || keys.ArrowLeft) { inputX -= 1; }
+      if (keys.d || keys.ArrowRight) { inputX += 1; }
+    }
 
     if (inputX !== 0 || inputZ !== 0) {
       const length = Math.hypot(inputX, inputZ);
-      const moveX = (inputX / length) * PLAYER_SPEED;
-      const moveZ = (inputZ / length) * PLAYER_SPEED;
+      const speedFactor = (joystickVector && joystickVector.active) ? Math.min(1.0, length) : 1.0;
+      const moveX = (inputX / length) * PLAYER_SPEED * speedFactor;
+      const moveZ = (inputZ / length) * PLAYER_SPEED * speedFactor;
 
       const targetX = playerGroup.position.x + moveX;
       const targetZ = playerGroup.position.z + moveZ;
@@ -804,9 +811,14 @@ function animate() {
   if (gameState.currentRoom === 'lobby') {
     const dPortal = playerGroup.position.distanceTo(portals.portalR1.group.position);
     const dTeacher = playerGroup.position.distanceTo(new THREE.Vector3(2.0, 0, -3.2));
+    const dNotice = playerGroup.position.distanceTo(new THREE.Vector3(-9.2, 0, -1.0));
+
     if (dTeacher <= 2.6) {
       foundTarget = 'npcTeacher';
-      promptText = 'Tekan E untuk Bicara dengan Cikgu Aminah';
+      promptText = 'Tekan E untuk Bicara dengan Cikgu Asyikin';
+    } else if (dNotice <= 3.4) {
+      foundTarget = 'noticeboard';
+      promptText = 'Tekan E untuk Baca Papan Kenyataan Sekolah';
     } else if (dPortal <= 2.6) {
       foundTarget = 'portalR1';
       promptText = 'Tekan E untuk Masuk ke Bilik 1 (Taman Pagar Sesat Jawi)';

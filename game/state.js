@@ -57,10 +57,17 @@ export const keys = {
   e: false
 };
 
+// Mobile Touch Virtual Joystick Vector
+export const joystickVector = {
+  x: 0,
+  z: 0,
+  active: false
+};
+
 // Student Profile
 export const studentProfile = {
   name: 'Penjelajah Bestari',
-  class: '3 Inovatif'
+  class: '4 Inovatif'
 };
 
 // Scoring & Attempts tracking (Room 2: 30, Room 3: 30, Room 4: 40 = 100 total; Room 1 is 100% exploration)

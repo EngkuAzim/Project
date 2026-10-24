@@ -1,7 +1,7 @@
 // ==========================================
 // ROOMS/LOBBY.JS - Dataran Perhimpunan Sekolah Bestari (Lobby at 0, 0)
 // ==========================================
-import { createTextCanvasTexture, createTextSprite, buildCutawayRoomShell, resolveRoomArgs } from './helpers.js';
+import { createTextCanvasTexture, createNoticeboardTexture, createTextSprite, buildCutawayRoomShell, resolveRoomArgs } from './helpers.js';
  
 export function buildLobby(arg1, arg2, arg3) {
   const { targetGroup: roomGroup, collidersList: roomColliders } = resolveRoomArgs(arg1, arg2, arg3);
@@ -67,22 +67,36 @@ export function buildLobby(arg1, arg2, arg3) {
     roomColliders.push({ minX: px - 1.2, maxX: px + 1.2, minZ: 2.8, maxZ: 5.2 });
   });
 
-  // 5. School Noticeboard with Announcement
+  // 5. School Noticeboard with Announcement (Enlarged Full Stand)
   const noticeboard = new THREE.Group();
-  noticeboard.position.set(-10.5, 0, 0);
+  noticeboard.position.set(-9.2, 0, -1.0);
+  noticeboard.rotation.y = Math.PI / 2 - 0.22; // Slightly angled towards the courtyard path
 
-  const nBoardMesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 2.2, 3.2), new THREE.MeshLambertMaterial({ color: 0x78350F }));
-  nBoardMesh.position.y = 1.9;
+  // Main board frame
+  const nBoardMesh = new THREE.Mesh(new THREE.BoxGeometry(4.2, 2.6, 0.22), new THREE.MeshLambertMaterial({ color: 0x78350F }));
+  nBoardMesh.position.y = 2.1;
   noticeboard.add(nBoardMesh);
 
-  const nTex = createTextCanvasTexture('PAPAN KENYATAAN BM', '#065F46', '#FEF3C7', 512, 256, 36, 'Tema Minggu Ini: Seni Khat Simpulan Bahasa');
-  const nFace = new THREE.Mesh(new THREE.PlaneGeometry(3.0, 2.0), new THREE.MeshBasicMaterial({ map: nTex }));
-  nFace.position.set(0.18, 1.9, 0);
-  nFace.rotation.y = Math.PI / 2;
+  // Roof awning / cap
+  const nRoofMesh = new THREE.Mesh(new THREE.BoxGeometry(4.5, 0.16, 0.4), new THREE.MeshLambertMaterial({ color: 0xD97706 }));
+  nRoofMesh.position.y = 3.45;
+  noticeboard.add(nRoofMesh);
+
+  // Left & right supporting posts
+  [-1.85, 1.85].forEach((postX) => {
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.2, 0.18), new THREE.MeshLambertMaterial({ color: 0x451A03 }));
+    post.position.set(postX, 1.1, 0);
+    noticeboard.add(post);
+  });
+
+  // High-resolution full noticeboard canvas texture
+  const nTex = createNoticeboardTexture();
+  const nFace = new THREE.Mesh(new THREE.PlaneGeometry(3.9, 2.3), new THREE.MeshBasicMaterial({ map: nTex }));
+  nFace.position.set(0, 2.1, 0.12);
   noticeboard.add(nFace);
 
   roomGroup.add(noticeboard);
-  roomColliders.push({ minX: -11.5, maxX: -9.5, minZ: -1.8, maxZ: 1.8 });
+  roomColliders.push({ minX: -10.5, maxX: -7.8, minZ: -3.2, maxZ: 1.2 });
 
   // 6. Courtyard Wooden Benches
   [
@@ -122,7 +136,7 @@ export function buildLobby(arg1, arg2, arg3) {
   armL.add(sleeveL);
   teacherGroup.add(armL);
 
-  const teacherTag = createTextSprite('Cikgu Aminah (Guru BM)', 'rgba(6, 78, 59, 0.94)', '#A7F3D0', 512, 160, 52);
+  const teacherTag = createTextSprite('Cikgu Asyikin (Guru BM)', 'rgba(6, 78, 59, 0.94)', '#A7F3D0', 512, 160, 52);
   teacherTag.scale.set(3.0, 1.4, 1);
   teacherTag.position.set(0, 2.7, 0);
   teacherGroup.add(teacherTag);

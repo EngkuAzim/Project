@@ -11,7 +11,8 @@ import {
   COLLECTIBLES_R2,
   COLLECTIBLES_R3,
   COLLECTIBLES_R4,
-  keys
+  keys,
+  joystickVector
 } from './state.js?v=4.4.2';
 import { saveArtworkToDB, fetchGalleryArtworks } from './db.js';
 
@@ -351,7 +352,7 @@ export function saveProfile() {
   const classVal = classInput ? classInput.value.trim() : '';
 
   studentProfile.name = nameVal || 'Penjelajah Bestari';
-  studentProfile.class = classVal || '3 Inovatif';
+  studentProfile.class = classVal || '4 Inovatif';
 
   const hudName = document.getElementById('hud-student-name');
   const hudClass = document.getElementById('hud-student-class');
@@ -406,8 +407,13 @@ export function handleCurrentInteraction() {
   const target = gameState.nearbyTarget;
 
   if (target === 'npcTeacher') {
-    showItemToast('👩‍🏫', `Cikgu Aminah: "Selamat datang, ${studentProfile.name}! Sedia meneroka keindahan seni Jawi di Sekolah Bestari?"`);
+    showItemToast('👩‍🏫', `Cikgu Asyikin: "Selamat datang, ${studentProfile.name}! Sedia meneroka keindahan seni Jawi di Sekolah Bestari?"`);
     openProfileModal();
+    return;
+  }
+
+  if (target === 'noticeboard') {
+    openModal('noticeboard-modal');
     return;
   }
 
@@ -1839,6 +1845,45 @@ export function closeGallerySidebar() {
   if (backdrop) backdrop.classList.remove('open');
 }
 
+let galleryLastVisibleDoc = null;
+let galleryHasMore = false;
+let isGalleryLoadingMore = false;
+
+function buildGalleryCardHtml(item, idx) {
+  const safeName = (item.studentName || 'Murid Bestari').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeClass = (item.studentClass || '4 Inovatif').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  let dateStr = '';
+  if (item.timestamp && item.timestamp.toDate) {
+    dateStr = item.timestamp.toDate().toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+  } else if (item.createdAt) {
+    dateStr = new Date(item.createdAt).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  return `
+    <div class="gallery-card" onclick="openGalleryPreview(${idx})" title="Klik untuk paparan skrin penuh">
+      <img src="${item.image}" alt="Karya Seni ${safeName}" class="gallery-card-thumb" loading="lazy" />
+      <div class="gallery-card-info">
+        <strong class="gallery-card-name">${safeName}</strong>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 3px;">
+          <span class="gallery-card-class">🏫 ${safeClass}</span>
+          ${dateStr ? `<span class="gallery-card-date">${dateStr}</span>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function updateGalleryPaginationControls() {
+  const loadMoreBtn = document.getElementById('btn-gallery-load-more');
+  const noMoreEl = document.getElementById('gallery-no-more');
+  if (loadMoreBtn) {
+    loadMoreBtn.style.display = galleryHasMore ? 'block' : 'none';
+  }
+  if (noMoreEl) {
+    noMoreEl.style.display = (!galleryHasMore && cachedGalleryArtworks.length > 0) ? 'block' : 'none';
+  }
+}
+
 export async function refreshGalleryArtworks() {
   const grid = document.getElementById('gallery-grid');
   const countBadge = document.getElementById('gallery-count-badge');
@@ -1851,18 +1896,25 @@ export async function refreshGalleryArtworks() {
     </div>
   `;
 
+  galleryLastVisibleDoc = null;
+  galleryHasMore = false;
+  updateGalleryPaginationControls();
+
   try {
-    const artworks = await fetchGalleryArtworks();
-    cachedGalleryArtworks = artworks;
+    const res = await fetchGalleryArtworks(10, null);
+    cachedGalleryArtworks = res.artworks || [];
+    galleryLastVisibleDoc = res.lastVisibleDoc;
+    galleryHasMore = res.hasMore;
+
     if (typeof window !== 'undefined') {
-      window._cachedGalleryArtworks = artworks;
+      window._cachedGalleryArtworks = cachedGalleryArtworks;
     }
 
     if (countBadge) {
-      countBadge.textContent = `${artworks.length} Karya Terpamer`;
+      countBadge.textContent = `${cachedGalleryArtworks.length} Karya Terpamer`;
     }
 
-    if (artworks.length === 0) {
+    if (cachedGalleryArtworks.length === 0) {
       grid.innerHTML = `
         <div class="gallery-empty">
           <span style="font-size: 36px;">🎨</span>
@@ -1870,32 +1922,12 @@ export async function refreshGalleryArtworks() {
           <p style="font-size: 12px; color: #64748B;">Selesaikan lukisan khat di Bilik 4 dan tekan <em>"Pamerkan di Galeri 3D"</em> untuk melihat hasil seni anda di sini!</p>
         </div>
       `;
+      updateGalleryPaginationControls();
       return;
     }
 
-    grid.innerHTML = artworks.map((item, idx) => {
-      const safeName = (item.studentName || 'Murid Bestari').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      const safeClass = (item.studentClass || '3 Inovatif').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      let dateStr = '';
-      if (item.timestamp && item.timestamp.toDate) {
-        dateStr = item.timestamp.toDate().toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
-      } else if (item.createdAt) {
-        dateStr = new Date(item.createdAt).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
-      }
-
-      return `
-        <div class="gallery-card" onclick="openGalleryPreview(${idx})" title="Klik untuk paparan skrin penuh">
-          <img src="${item.image}" alt="Karya Seni ${safeName}" class="gallery-card-thumb" loading="lazy" />
-          <div class="gallery-card-info">
-            <strong class="gallery-card-name">${safeName}</strong>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 3px;">
-              <span class="gallery-card-class">🏫 ${safeClass}</span>
-              ${dateStr ? `<span class="gallery-card-date">${dateStr}</span>` : ''}
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
+    grid.innerHTML = cachedGalleryArtworks.map((item, idx) => buildGalleryCardHtml(item, idx)).join('');
+    updateGalleryPaginationControls();
   } catch (err) {
     console.error('Error refreshing gallery artworks:', err);
     grid.innerHTML = `
@@ -1905,6 +1937,52 @@ export async function refreshGalleryArtworks() {
         <button class="btn-secondary" onclick="refreshGalleryArtworks()" style="margin-top: 8px;">Cuba Semula</button>
       </div>
     `;
+    updateGalleryPaginationControls();
+  }
+}
+
+export async function loadMoreGalleryArtworks() {
+  if (isGalleryLoadingMore || !galleryHasMore || !galleryLastVisibleDoc) return;
+  const grid = document.getElementById('gallery-grid');
+  const loadMoreBtn = document.getElementById('btn-gallery-load-more');
+  const countBadge = document.getElementById('gallery-count-badge');
+
+  isGalleryLoadingMore = true;
+  if (loadMoreBtn) {
+    loadMoreBtn.disabled = true;
+    loadMoreBtn.innerHTML = '⏳ Memuatkan...';
+  }
+
+  try {
+    const res = await fetchGalleryArtworks(10, galleryLastVisibleDoc);
+    const newItems = res.artworks || [];
+    const startIndex = cachedGalleryArtworks.length;
+    cachedGalleryArtworks.push(...newItems);
+    galleryLastVisibleDoc = res.lastVisibleDoc;
+    galleryHasMore = res.hasMore;
+
+    if (typeof window !== 'undefined') {
+      window._cachedGalleryArtworks = cachedGalleryArtworks;
+    }
+
+    if (countBadge) {
+      countBadge.textContent = `${cachedGalleryArtworks.length} Karya Terpamer`;
+    }
+
+    if (grid && newItems.length > 0) {
+      const newHtml = newItems.map((item, idx) => buildGalleryCardHtml(item, startIndex + idx)).join('');
+      grid.insertAdjacentHTML('beforeend', newHtml);
+    }
+  } catch (err) {
+    console.error('Error loading more artworks:', err);
+    showItemToast('⚠️', 'Gagal memuatkan karya tambahan.');
+  } finally {
+    isGalleryLoadingMore = false;
+    if (loadMoreBtn) {
+      loadMoreBtn.disabled = false;
+      loadMoreBtn.innerHTML = '📥 Muat Lebih Banyak (10 Karya)';
+    }
+    updateGalleryPaginationControls();
   }
 }
 
@@ -1929,7 +2007,7 @@ export function openGalleryPreview(indexOrData) {
     } else if (item.createdAt) {
       dateStr = new Date(item.createdAt).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
     }
-    classEl.textContent = `${item.studentClass || '3 Inovatif'}${dateStr ? ' • ' + dateStr : ''}`;
+    classEl.textContent = `${item.studentClass || '4 Inovatif'}${dateStr ? ' • ' + dateStr : ''}`;
   }
   if (imgEl) {
     imgEl.src = item.image || '';
@@ -2000,6 +2078,9 @@ if (typeof window !== 'undefined') {
   window.toggleArtistSeal = toggleArtistSeal;
   window.finalizeAndExhibitArtwork = finalizeAndExhibitArtwork;
 
+  // Gallery Pagination
+  window.loadMoreGalleryArtworks = loadMoreGalleryArtworks;
+
   // Final PBD Report
   window.showFinalPBDReport = showFinalPBDReport;
   window.downloadPBDReportPDF = downloadPBDReportPDF;
@@ -2007,43 +2088,109 @@ if (typeof window !== 'undefined') {
   window.restartGame = restartGame;
 }
 
-// Touch event bindings for D-Pad
-function initTouchControls() {
-  const dpadUp = document.getElementById('dpad-up');
-  const dpadDown = document.getElementById('dpad-down');
-  const dpadLeft = document.getElementById('dpad-left');
-  const dpadRight = document.getElementById('dpad-right');
+// ==========================================
+// 14. MOBILE TOUCH & MOUSE VIRTUAL JOYSTICK
+// ==========================================
+export function initVirtualJoystick() {
+  const zone = document.getElementById('joystick-zone');
+  const base = document.getElementById('joystick-base');
+  const knob = document.getElementById('joystick-knob');
+  if (!zone || !base || !knob) return;
 
-  const bindDpad = (btn, keyProp) => {
-    if (!btn) return;
-    const press = (e) => {
-      e.preventDefault();
-      keys[keyProp] = true;
-      btn.classList.add('active');
+  const MAX_RADIUS = 38;
+  let activeTouchId = null;
+  let isDragging = false;
+
+  const getBaseCenter = () => {
+    const rect = base.getBoundingClientRect();
+    return {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2
     };
-    const release = (e) => {
-      e.preventDefault();
-      keys[keyProp] = false;
-      btn.classList.remove('active');
-    };
-    btn.addEventListener('mousedown', press);
-    btn.addEventListener('mouseup', release);
-    btn.addEventListener('mouseleave', release);
-    btn.addEventListener('touchstart', press, { passive: false });
-    btn.addEventListener('touchend', release, { passive: false });
-    btn.addEventListener('touchcancel', release, { passive: false });
   };
 
-  bindDpad(dpadUp, 'w');
-  bindDpad(dpadDown, 's');
-  bindDpad(dpadLeft, 'a');
-  bindDpad(dpadRight, 'd');
+  const updateJoystick = (clientX, clientY) => {
+    const center = getBaseCenter();
+    let dx = clientX - center.x;
+    let dy = clientY - center.y;
+    const distance = Math.hypot(dx, dy);
+
+    if (distance > MAX_RADIUS) {
+      dx = (dx / distance) * MAX_RADIUS;
+      dy = (dy / distance) * MAX_RADIUS;
+    }
+
+    knob.style.transform = `translate(${dx}px, ${dy}px)`;
+
+    // Map output directly to joystickVector X and Z (-1.0 to 1.0)
+    joystickVector.x = dx / MAX_RADIUS;
+    joystickVector.z = dy / MAX_RADIUS;
+    joystickVector.active = true;
+  };
+
+  const resetJoystick = () => {
+    knob.style.transform = 'translate(0px, 0px)';
+    joystickVector.x = 0;
+    joystickVector.z = 0;
+    joystickVector.active = false;
+    activeTouchId = null;
+    isDragging = false;
+  };
+
+  // Touch Handlers for Tablets & Phones
+  zone.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (activeTouchId !== null) return;
+    const touch = e.changedTouches[0];
+    activeTouchId = touch.identifier;
+    updateJoystick(touch.clientX, touch.clientY);
+  }, { passive: false });
+
+  window.addEventListener('touchmove', (e) => {
+    if (activeTouchId === null) return;
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === activeTouchId) {
+        e.preventDefault();
+        updateJoystick(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
+        break;
+      }
+    }
+  }, { passive: false });
+
+  const handleTouchEnd = (e) => {
+    if (activeTouchId === null) return;
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === activeTouchId) {
+        resetJoystick();
+        break;
+      }
+    }
+  };
+
+  window.addEventListener('touchend', handleTouchEnd, { passive: false });
+  window.addEventListener('touchcancel', handleTouchEnd, { passive: false });
+
+  // Mouse Handlers for Desktop Simulation
+  zone.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    isDragging = true;
+    updateJoystick(e.clientX, e.clientY);
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    updateJoystick(e.clientX, e.clientY);
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (isDragging) resetJoystick();
+  });
 
   window.addEventListener('blur', () => {
+    resetJoystick();
     keys.w = false; keys.s = false; keys.a = false; keys.d = false;
     keys.ArrowUp = false; keys.ArrowDown = false; keys.ArrowLeft = false; keys.ArrowRight = false;
-    document.querySelectorAll('.dpad-btn').forEach(b => b.classList.remove('active'));
   });
 }
 
-initTouchControls();
+initVirtualJoystick();

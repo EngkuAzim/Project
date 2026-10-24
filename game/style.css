@@ -359,58 +359,89 @@ html, body {
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* Touch Virtual D-Pad & Interaction Button */
+/* Touch Virtual Joystick & Interaction Button */
 #touch-controls-wrapper {
   pointer-events: auto;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   z-index: 20;
 }
 
-.dpad-cluster {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 6px;
-  border-radius: 20px;
-  border: 2px solid var(--glass-border);
-  box-shadow: var(--shadow-soft);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.dpad-middle-row {
-  display: flex;
-  align-items: center;
-}
-
-.dpad-btn {
-  width: 44px;
-  height: 44px;
-  background: #F8FAFC;
-  border: 1.5px solid #CBD5E1;
-  border-radius: 10px;
-  font-size: 16px;
-  color: #334155;
+/* Virtual Touch Joystick */
+.joystick-zone {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s;
 }
 
-.dpad-btn:active, .dpad-btn.active {
-  background: #3B82F6;
-  color: white;
-  transform: scale(0.92);
+.joystick-base {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.85) 0%, rgba(226, 232, 240, 0.92) 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), inset 0 2px 6px rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.dpad-center {
-  width: 38px;
-  height: 38px;
+.joystick-ring {
+  position: absolute;
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(100, 116, 139, 0.35);
+  pointer-events: none;
 }
+
+.joystick-knob {
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: transform 0.04s ease-out;
+  will-change: transform;
+}
+
+.joystick-knob-core {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+.joystick-dir-indicator {
+  position: absolute;
+  font-size: 10px;
+  color: rgba(100, 116, 139, 0.55);
+  pointer-events: none;
+  font-weight: 800;
+  user-select: none;
+}
+.joystick-dir-indicator.dir-up { top: 6px; }
+.joystick-dir-indicator.dir-down { bottom: 6px; }
+.joystick-dir-indicator.dir-left { left: 8px; }
+.joystick-dir-indicator.dir-right { right: 8px; }
 
 .touch-action-btn {
   width: 80px;
@@ -1691,6 +1722,40 @@ html, body {
   animation: spin 0.8s linear infinite;
 }
 
+/* Gallery Pagination */
+.gallery-pagination-container {
+  padding: 12px 14px;
+  background: #F8FAFC;
+  border-top: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gallery-load-more-btn {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #10B981, #059669);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gallery-load-more-btn:active {
+  transform: scale(0.97);
+}
+
+.gallery-no-more {
+  font-size: 11px;
+  color: #64748B;
+  font-weight: 600;
+  text-align: center;
+  padding: 4px 0;
+}
+
 /* Gallery Fullscreen Preview Modal */
 .gallery-preview-card {
   padding: 24px;
@@ -1823,16 +1888,19 @@ html, body {
     padding: 6px 10px;
   }
   #touch-controls-wrapper {
-    gap: 8px;
+    gap: 12px;
   }
-  .dpad-btn {
-    width: 38px;
-    height: 38px;
-    font-size: 14px;
+  .joystick-zone {
+    width: 104px;
+    height: 104px;
   }
-  .dpad-center {
-    width: 32px;
-    height: 32px;
+  .joystick-base {
+    width: 96px;
+    height: 96px;
+  }
+  .joystick-knob {
+    width: 44px;
+    height: 44px;
   }
   .touch-action-btn {
     width: 72px;
