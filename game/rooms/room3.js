@@ -6,7 +6,8 @@ import { createTextCanvasTexture, createTextSprite, buildCutawayRoomShell, resol
 export function buildRoom3(arg1, arg2, arg3) {
   const { targetGroup: roomGroup, collidersList: roomColliders } = resolveRoomArgs(arg1, arg2, arg3);
   const cx = 300, cz = 300;
-  buildCutawayRoomShell(roomGroup, roomColliders, cx, cz, 0x451A03, 0x78350F, 0x92400E, 0xD97706);
+  // Warm wooden floor with amber grid tiles (GridHelper at y = 0.01)
+  buildCutawayRoomShell(roomGroup, roomColliders, cx, cz, 0xC19A6B, 0x78350F, 0x92400E, 0xD97706, 26, 22, 0x92400E, 0xB45309);
 
   // 1. Library Main Banner on North Wall
   const libTex = createTextCanvasTexture(
@@ -22,7 +23,7 @@ export function buildRoom3(arg1, arg2, arg3) {
   bannerMesh.position.set(cx, 3.4, cz - 10.7);
   roomGroup.add(bannerMesh);
 
-  // 2. Tall Teak Bookshelves along North Wall
+  // 2. Tall Teak Bookshelves along North Wall Edge
   const shelfMat = new THREE.MeshLambertMaterial({ color: 0x592911 });
   [-8.0, -4.0, 4.0, 8.0].forEach((ox) => {
     const shelf = new THREE.Mesh(new THREE.BoxGeometry(3.2, 4.2, 0.9), shelfMat);
@@ -43,66 +44,43 @@ export function buildRoom3(arg1, arg2, arg3) {
     roomColliders.push({ minX: cx + ox - 1.7, maxX: cx + ox + 1.7, minZ: cz - 10.8, maxZ: cz - 9.6 });
   });
 
-  // 3. Sudut Nilam (Reading Corner with Circular Rug & Beanbags)
-  const sudutNilamGroup = new THREE.Group();
-  sudutNilamGroup.position.set(cx - 7.5, 0, cz + 4.5);
+  // 3. Perimeter Wall Furniture: Study Carrel / Reading Desk along West Wall
+  const studyDesk = new THREE.Group();
+  studyDesk.position.set(cx - 11.8, 0, cz + 2.5);
+  const sdTop = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.12, 3.2), new THREE.MeshLambertMaterial({ color: 0x78350F }));
+  sdTop.position.y = 0.9;
+  studyDesk.add(sdTop);
 
-  const nilamRug = new THREE.Mesh(
-    new THREE.CircleGeometry(3.0, 24),
-    new THREE.MeshLambertMaterial({ color: 0x059669 })
-  );
-  nilamRug.rotation.x = -Math.PI / 2;
-  nilamRug.position.y = 0.22;
-  sudutNilamGroup.add(nilamRug);
+  const sdLegs = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.84, 3.0), new THREE.MeshLambertMaterial({ color: 0x92400E }));
+  sdLegs.position.y = 0.42;
+  studyDesk.add(sdLegs);
 
-  // Colorful Beanbags
-  const beanColors = [0xF59E0B, 0x3B82F6, 0xEC4899];
-  [-1.4, 0, 1.4].forEach((bx, idx) => {
-    const beanbag = new THREE.Mesh(
-      new THREE.SphereGeometry(0.65, 12, 10),
-      new THREE.MeshLambertMaterial({ color: beanColors[idx] })
-    );
-    beanbag.scale.set(1.1, 0.65, 1.1);
-    beanbag.position.set(bx, 0.45, (idx === 1) ? 0.8 : -0.4);
-    sudutNilamGroup.add(beanbag);
-  });
+  const carrelDivider = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.6, 0.08), new THREE.MeshLambertMaterial({ color: 0xD97706 }));
+  carrelDivider.position.set(0, 1.25, 0);
+  studyDesk.add(carrelDivider);
 
-  const nilamSignTex = createTextCanvasTexture('SUDUT NILAM BESTARI', '#064E3B', '#FDE68A', 512, 160, 40, 'Membaca Jambatan Ilmu');
-  const nilamSign = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.8), new THREE.MeshBasicMaterial({ map: nilamSignTex }));
-  nilamSign.position.set(0, 1.8, -2.5);
-  sudutNilamGroup.add(nilamSign);
+  roomGroup.add(studyDesk);
+  roomColliders.push({ minX: cx - 12.6, maxX: cx - 11.0, minZ: cz + 0.8, maxZ: cz + 4.2 });
 
-  roomGroup.add(sudutNilamGroup);
-  roomColliders.push({ minX: cx - 10.0, maxX: cx - 5.0, minZ: cz + 2.0, maxZ: cz + 7.0 });
-
-  // 4. Librarian Circulation Counter (Kaunter Pustakawan)
+  // 4. Perimeter Wall Furniture: Librarian Circulation Counter along East Wall
   const counterGroup = new THREE.Group();
-  counterGroup.position.set(cx + 7.5, 0, cz + 4.5);
+  counterGroup.position.set(cx + 10.5, 0, cz + 3.5);
 
-  const cDesk = new THREE.Mesh(new THREE.BoxGeometry(4.0, 1.1, 1.4), new THREE.MeshLambertMaterial({ color: 0x78350F }));
+  const cDesk = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.1, 4.0), new THREE.MeshLambertMaterial({ color: 0x78350F }));
   cDesk.position.y = 0.55;
   counterGroup.add(cDesk);
 
-  const cTop = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.1, 1.6), new THREE.MeshLambertMaterial({ color: 0xD97706 }));
+  const cTop = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.1, 4.2), new THREE.MeshLambertMaterial({ color: 0xD97706 }));
   cTop.position.y = 1.12;
   counterGroup.add(cTop);
 
   // Computer monitor on counter
-  const mon = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.45, 0.08), new THREE.MeshStandardMaterial({ color: 0x1E293B }));
-  mon.position.set(-0.8, 1.42, 0);
+  const mon = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.45, 0.6), new THREE.MeshStandardMaterial({ color: 0x1E293B }));
+  mon.position.set(0, 1.42, -0.8);
   counterGroup.add(mon);
 
   roomGroup.add(counterGroup);
-  roomColliders.push({ minX: cx + 5.2, maxX: cx + 9.8, minZ: cz + 3.5, maxZ: cz + 5.5 });
-
-  // 5. Wooden Book Trolley (Troli Buku)
-  const trolley = new THREE.Group();
-  trolley.position.set(cx - 3.5, 0, cz - 4.5);
-  const trolleyBody = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.2, 0.8), new THREE.MeshLambertMaterial({ color: 0xB45309 }));
-  trolleyBody.position.y = 0.7;
-  trolley.add(trolleyBody);
-  roomGroup.add(trolley);
-  roomColliders.push({ minX: cx - 4.5, maxX: cx - 2.5, minZ: cz - 5.2, maxZ: cz - 3.8 });
+  roomColliders.push({ minX: cx + 9.5, maxX: cx + 11.8, minZ: cz + 1.2, maxZ: cz + 5.8 });
 
   // 6. Central Reading Table Station (r3AssemblyStation) at (300.0, 296.0)
   const stationGroup = new THREE.Group();
@@ -194,21 +172,13 @@ export function spawnR3Scrolls(items, targetGroup) {
     scrollGroup.castShadow = true;
     itemGroup.add(scrollGroup);
 
-    // Glowing base ring
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(1.15, 0.065, 8, 24),
-      new THREE.MeshStandardMaterial({ color: item.color, emissive: item.color, emissiveIntensity: 0.85 })
-    );
-    ring.rotation.x = Math.PI / 2;
-    itemGroup.add(ring);
-
     // Glowing point light
     const light = new THREE.PointLight(item.color, 1.5, 5);
     itemGroup.add(light);
 
     item.mesh = itemGroup;
     item.gemMesh = scrollGroup;
-    item.ringMesh = ring;
+    item.ringMesh = null;
     item.pointLight = light;
     item.isPopping = false;
     item.popScale = 1.0;

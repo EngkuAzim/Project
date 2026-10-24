@@ -21,7 +21,8 @@ export function updateMasterpieceEaselTexture(dataUrl) {
 export function buildRoom4(arg1, arg2, arg3) {
   const { targetGroup: roomGroup, collidersList: roomColliders } = resolveRoomArgs(arg1, arg2, arg3);
   const cx = 400, cz = 400;
-  buildCutawayRoomShell(roomGroup, roomColliders, cx, cz, 0xB45309, 0xF8FAFC, 0xF1F5F9, 0x78350F);
+  // Warm wooden art studio floor with amber grid tiles (GridHelper at y = 0.01)
+  buildCutawayRoomShell(roomGroup, roomColliders, cx, cz, 0xD2B48C, 0xF8FAFC, 0xF1F5F9, 0x78350F, 26, 22, 0x9A3412, 0xB45309);
 
   // 1. Studio Main Banner on North Wall
   const artTex = createTextCanvasTexture(
@@ -56,59 +57,44 @@ export function buildRoom4(arg1, arg2, arg3) {
   decalMesh.position.set(cx - 5.0, 2.5, cz - 10.65);
   roomGroup.add(decalMesh);
 
-  // 3. 4 Wooden Standing Art Easels around Studio
-  const easelMat = new THREE.MeshLambertMaterial({ color: 0x92400E });
-  [
-    { x: 393.5, z: 393.5, title: 'Khat Ulat Buku' },
-    { x: 406.5, z: 393.5, title: 'Khat Anak Emas' },
-    { x: 393.5, z: 404.0, title: 'Khat Buah Hati' },
-    { x: 406.5, z: 404.0, title: 'Khat Cahaya Mata' }
-  ].forEach(({ x, z, title }) => {
-    const easelGroup = new THREE.Group();
-    easelGroup.position.set(x, 0, z);
+  // 3. Perimeter Wall Furniture: Art Supply Cabinet along West Wall
+  const supplyCabinet = new THREE.Group();
+  supplyCabinet.position.set(cx - 12.0, 0, cz + 2.0);
+  const cabBody = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.6, 3.2), new THREE.MeshLambertMaterial({ color: 0x78350F }));
+  cabBody.position.y = 1.3;
+  supplyCabinet.add(cabBody);
+  roomGroup.add(supplyCabinet);
+  roomColliders.push({ minX: cx - 12.6, maxX: cx - 11.2, minZ: cz + 0.2, maxZ: cz + 3.8 });
 
-    // Tripod Legs
-    const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 2.6, 6), easelMat);
-    leg1.position.set(-0.4, 1.25, 0.2);
-    leg1.rotation.z = 0.15;
-    easelGroup.add(leg1);
+  // 4. Perimeter Wall Furniture: Student Exhibition Shelving along North Wall Edge
+  const exhibitionShelf = new THREE.Group();
+  exhibitionShelf.position.set(cx + 7.5, 0, cz - 10.2);
+  const exBody = new THREE.Mesh(new THREE.BoxGeometry(3.6, 3.0, 0.8), new THREE.MeshLambertMaterial({ color: 0x92400E }));
+  exBody.position.y = 1.5;
+  exhibitionShelf.add(exBody);
 
-    const leg2 = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 2.6, 6), easelMat);
-    leg2.position.set(0.4, 1.25, 0.2);
-    leg2.rotation.z = -0.15;
-    easelGroup.add(leg2);
+  // Sample student artwork mounted on shelf
+  const sampleTex1 = createTextCanvasTexture('KHAT: ULAT BUKU', '#1E293B', '#FDE68A', 512, 256, 36);
+  const artPanel1 = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.7), new THREE.MeshBasicMaterial({ map: sampleTex1 }));
+  artPanel1.position.set(-0.8, 2.0, 0.42);
+  exhibitionShelf.add(artPanel1);
 
-    const leg3 = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 2.5, 6), easelMat);
-    leg3.position.set(0, 1.25, -0.4);
-    leg3.rotation.x = -0.22;
-    easelGroup.add(leg3);
+  const sampleTex2 = createTextCanvasTexture('KHAT: ANAK EMAS', '#065F46', '#FEF3C7', 512, 256, 36);
+  const artPanel2 = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.7), new THREE.MeshBasicMaterial({ map: sampleTex2 }));
+  artPanel2.position.set(0.8, 2.0, 0.42);
+  exhibitionShelf.add(artPanel2);
 
-    // Sample Framed Artwork
-    const sampleTex = createTextCanvasTexture(title, '#1E293B', '#FDE68A', 512, 384, 44);
-    const canvasSample = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.9), new THREE.MeshBasicMaterial({ map: sampleTex }));
-    canvasSample.position.set(0, 1.45, 0.18);
-    easelGroup.add(canvasSample);
+  roomGroup.add(exhibitionShelf);
+  roomColliders.push({ minX: cx + 5.5, maxX: cx + 9.5, minZ: cz - 10.8, maxZ: cz - 9.5 });
 
-    roomGroup.add(easelGroup);
-    roomColliders.push({ minX: x - 0.9, maxX: x + 0.9, minZ: z - 0.9, maxZ: z + 0.9 });
-  });
-
-  // 4. Art Worktables with Paint Palettes & Brush Pots
-  const tableMat = new THREE.MeshLambertMaterial({ color: 0x78350F });
-  const artTable = new THREE.Group();
-  artTable.position.set(cx - 8.0, 0, cz - 4.0);
-
-  const tTop = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.14, 1.6), tableMat);
-  tTop.position.y = 1.0;
-  artTable.add(tTop);
-
-  // Brush Jar
-  const jar = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.35, 12), new THREE.MeshStandardMaterial({ color: 0xCBD5E1 }));
-  jar.position.set(-0.8, 1.22, 0);
-  artTable.add(jar);
-
-  roomGroup.add(artTable);
-  roomColliders.push({ minX: cx - 9.8, maxX: cx - 6.2, minZ: cz - 5.0, maxZ: cz - 3.0 });
+  // 5. Perimeter Wall Furniture: Calligraphy Tool Storage along East Wall
+  const eastRack = new THREE.Group();
+  eastRack.position.set(cx + 12.0, 0, cz + 2.0);
+  const rackBody = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.0, 2.8), new THREE.MeshLambertMaterial({ color: 0xB45309 }));
+  rackBody.position.y = 1.0;
+  eastRack.add(rackBody);
+  roomGroup.add(eastRack);
+  roomColliders.push({ minX: cx + 11.2, maxX: cx + 12.6, minZ: cz + 0.5, maxZ: cz + 3.5 });
 
   // 5. Central Masterpiece Assembly Station (r4AssemblyStation) at (400.0, 395.5)
   const stationGroup = new THREE.Group();
@@ -255,21 +241,13 @@ export function spawnR4ArtTools(items, targetGroup) {
     toolTag.position.set(0, 1.7, 0);
     itemGroup.add(toolTag);
 
-    // Glowing base ring
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(1.15, 0.065, 8, 24),
-      new THREE.MeshStandardMaterial({ color: item.color, emissive: item.color, emissiveIntensity: 0.85 })
-    );
-    ring.rotation.x = Math.PI / 2;
-    itemGroup.add(ring);
-
     // Glowing point light
     const light = new THREE.PointLight(item.color, 1.5, 5);
     itemGroup.add(light);
 
     item.mesh = itemGroup;
     item.gemMesh = supplyGroup;
-    item.ringMesh = ring;
+    item.ringMesh = null;
     item.pointLight = light;
     item.isPopping = false;
     item.popScale = 1.0;

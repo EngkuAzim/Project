@@ -6,7 +6,8 @@ import { createTextCanvasTexture, createTextSprite, createIllustratedCardTexture
 export function buildRoom2(arg1, arg2, arg3) {
   const { targetGroup: roomGroup, collidersList: roomColliders } = resolveRoomArgs(arg1, arg2, arg3);
   const cx = 200, cz = 200;
-  buildCutawayRoomShell(roomGroup, roomColliders, cx, cz, 0xF8FAFC, 0x0284C7, 0x0369A1, 0x94A3B8);
+  // Neat light blue tile floor with slate-blue grid tiles (GridHelper at y = 0.01)
+  buildCutawayRoomShell(roomGroup, roomColliders, cx, cz, 0xE0F2FE, 0x0284C7, 0x0369A1, 0x94A3B8, 26, 22, 0x0284C7, 0x38BDF8);
 
   // 1. Front Chalkboard on North Wall
   const boardTex = createTextCanvasTexture(
@@ -45,79 +46,54 @@ export function buildRoom2(arg1, arg2, arg3) {
     roomGroup.add(chartMesh);
   });
 
-  // 4. Teacher's Front Desk
+  // 4. Perimeter Wall Furniture: Teacher's Front Desk along North Wall
   const teacherDesk = new THREE.Group();
-  teacherDesk.position.set(cx - 5.5, 0, cz - 8.2);
-  const tTop = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.14, 1.6), new THREE.MeshLambertMaterial({ color: 0x78350F }));
-  tTop.position.y = 1.0;
+  teacherDesk.position.set(cx - 6.5, 0, cz - 9.2);
+  const tTop = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.14, 1.4), new THREE.MeshLambertMaterial({ color: 0x78350F }));
+  tTop.position.y = 0.85;
   teacherDesk.add(tTop);
 
-  // Laptop
+  const tBase = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.78, 1.2), new THREE.MeshLambertMaterial({ color: 0x92400E }));
+  tBase.position.y = 0.39;
+  teacherDesk.add(tBase);
+
+  // Laptop on Teacher Desk
   const laptopBase = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.03, 0.35), new THREE.MeshStandardMaterial({ color: 0x94A3B8 }));
-  laptopBase.position.set(0, 1.09, 0);
+  laptopBase.position.set(0, 0.94, 0);
   teacherDesk.add(laptopBase);
   const laptopScreen = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.35, 0.03), new THREE.MeshStandardMaterial({ color: 0x1E293B }));
-  laptopScreen.position.set(0, 1.25, -0.16);
+  laptopScreen.position.set(0, 1.1, -0.16);
   laptopScreen.rotation.x = 0.2;
   teacherDesk.add(laptopScreen);
 
   roomGroup.add(teacherDesk);
-  roomColliders.push({ minX: cx - 7.3, maxX: cx - 3.7, minZ: cz - 9.2, maxZ: cz - 7.2 });
+  roomColliders.push({ minX: cx - 8.3, maxX: cx - 4.7, minZ: cz - 10.0, maxZ: cz - 8.3 });
 
-  // 5. Classroom Bookshelf (East Corner)
-  const shelf = new THREE.Mesh(new THREE.BoxGeometry(2.8, 3.4, 0.8), new THREE.MeshLambertMaterial({ color: 0x92400E }));
-  shelf.position.set(cx + 9.5, 1.9, cz - 9.8);
-  roomGroup.add(shelf);
-  roomColliders.push({ minX: cx + 8.0, maxX: cx + 11.0, minZ: cz - 10.4, maxZ: cz - 9.2 });
+  // 5. Perimeter Wall Furniture: Bookshelf along West Wall
+  const westShelf = new THREE.Group();
+  westShelf.position.set(cx - 11.8, 0, cz - 2.0);
+  const sFrame = new THREE.Mesh(new THREE.BoxGeometry(0.8, 3.2, 3.0), new THREE.MeshLambertMaterial({ color: 0x78350F }));
+  sFrame.position.y = 1.6;
+  westShelf.add(sFrame);
 
-  // 6. 4 Special Pedestal Desks with Glowing Display Pads (for Collectibles)
-  const deskMat = new THREE.MeshLambertMaterial({ color: 0xF1F5F9 });
-  const legMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.6 });
+  const bookMat1 = new THREE.MeshLambertMaterial({ color: 0xDC2626 });
+  const bookMat2 = new THREE.MeshLambertMaterial({ color: 0x2563EB });
+  for (let b = 0; b < 3; b++) {
+    const row = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 2.6), (b % 2 === 0) ? bookMat1 : bookMat2);
+    row.position.set(0.05, 0.75 + b * 0.9, 0);
+    westShelf.add(row);
+  }
+  roomGroup.add(westShelf);
+  roomColliders.push({ minX: cx - 12.6, maxX: cx - 11.0, minZ: cz - 3.8, maxZ: cz - 0.2 });
 
-  const PEDESTAL_POS = [
-    { x: 195.0, z: 196.0, label: 'Meja 1' },
-    { x: 205.0, z: 196.0, label: 'Meja 2' },
-    { x: 195.0, z: 202.0, label: 'Meja 3' },
-    { x: 205.0, z: 202.0, label: 'Meja 4' }
-  ];
-
-  PEDESTAL_POS.forEach(({ x, z, label }) => {
-    // Student Desk Table
-    const tableTop = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.16, 2.0), deskMat);
-    tableTop.position.set(x, 1.0, z);
-    tableTop.castShadow = true;
-    roomGroup.add(tableTop);
-
-    // Legs
-    [[-1.6, -0.8], [1.6, -0.8], [-1.6, 0.8], [1.6, 0.8]].forEach(([lx, lz]) => {
-      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.0, 8), legMat);
-      leg.position.set(x + lx, 0.5, z + lz);
-      roomGroup.add(leg);
-    });
-
-    // Special Velvet Display Pad with subtle glow on top of table
-    const pad = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.75, 0.85, 0.08, 16),
-      new THREE.MeshStandardMaterial({ color: 0x1E293B, roughness: 0.3 })
-    );
-    pad.position.set(x, 1.12, z);
-    roomGroup.add(pad);
-
-    const padRim = new THREE.Mesh(
-      new THREE.TorusGeometry(0.85, 0.04, 8, 24),
-      new THREE.MeshStandardMaterial({ color: 0xF59E0B, emissive: 0xF59E0B, emissiveIntensity: 0.7 })
-    );
-    padRim.rotation.x = Math.PI / 2;
-    padRim.position.set(x, 1.15, z);
-    roomGroup.add(padRim);
-
-    // Stool chair behind desk
-    const stool = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.6, 12), new THREE.MeshLambertMaterial({ color: 0x3B82F6 }));
-    stool.position.set(x, 0.3, z + 1.4);
-    roomGroup.add(stool);
-
-    roomColliders.push({ minX: x - 2.0, maxX: x + 2.0, minZ: z - 1.2, maxZ: z + 1.2 });
-  });
+  // 6. Perimeter Wall Furniture: Storage Cubby Lockers along East Wall
+  const eastCubby = new THREE.Group();
+  eastCubby.position.set(cx + 11.8, 0, cz + 2.0);
+  const cubbyBody = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.2, 3.2), new THREE.MeshLambertMaterial({ color: 0xB45309 }));
+  cubbyBody.position.y = 1.1;
+  eastCubby.add(cubbyBody);
+  roomGroup.add(eastCubby);
+  roomColliders.push({ minX: cx + 11.0, maxX: cx + 12.6, minZ: cz + 0.2, maxZ: cz + 3.8 });
 
   // 7. Central Interactive Assembly Station (r2AssemblyStation) at (200.0, 194.5)
   const stationGroup = new THREE.Group();
@@ -192,21 +168,13 @@ export function spawnR2PictureCards(items, targetGroup) {
     cardGroup.castShadow = true;
     itemGroup.add(cardGroup);
 
-    // Glowing base ring
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(1.15, 0.065, 8, 24),
-      new THREE.MeshStandardMaterial({ color: item.color, emissive: item.color, emissiveIntensity: 0.85 })
-    );
-    ring.rotation.x = Math.PI / 2;
-    itemGroup.add(ring);
-
     // Glowing point light
     const light = new THREE.PointLight(item.color, 1.5, 5);
     itemGroup.add(light);
 
     item.mesh = itemGroup;
     item.gemMesh = cardGroup;
-    item.ringMesh = ring;
+    item.ringMesh = null;
     item.pointLight = light;
     item.isPopping = false;
     item.popScale = 1.0;

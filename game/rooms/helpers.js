@@ -57,17 +57,27 @@ export function createTextCanvasTexture(text, bgColor = '#1E3A8A', textColor = '
   ctx.lineWidth = 4;
   ctx.strokeRect(18, 18, width - 36, height - 36);
 
-  // Text Styling
+  // Text Styling with Auto-Scaling to prevent clipping/stretching
   ctx.fillStyle = textColor;
-  ctx.font = `bold ${fontSize}px "Fredoka", "Plus Jakarta Sans", Arial, sans-serif`;
+  let currFontSize = fontSize;
+  ctx.font = `bold ${currFontSize}px "Fredoka", "Plus Jakarta Sans", Arial, sans-serif`;
+  while (ctx.measureText(text).width > width - 70 && currFontSize > 18) {
+    currFontSize -= 2;
+    ctx.font = `bold ${currFontSize}px "Fredoka", "Plus Jakarta Sans", Arial, sans-serif`;
+  }
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
   if (subtitle) {
-    ctx.fillText(text, width / 2, height / 2 - fontSize * 0.32);
+    ctx.fillText(text, width / 2, height / 2 - currFontSize * 0.32);
     ctx.fillStyle = '#FDE68A';
-    ctx.font = `600 ${Math.round(fontSize * 0.44)}px "Plus Jakarta Sans", Arial, sans-serif`;
-    ctx.fillText(subtitle, width / 2, height / 2 + fontSize * 0.52);
+    let subFontSize = Math.round(currFontSize * 0.44);
+    ctx.font = `600 ${subFontSize}px "Plus Jakarta Sans", Arial, sans-serif`;
+    while (ctx.measureText(subtitle).width > width - 70 && subFontSize > 14) {
+      subFontSize -= 2;
+      ctx.font = `600 ${subFontSize}px "Plus Jakarta Sans", Arial, sans-serif`;
+    }
+    ctx.fillText(subtitle, width / 2, height / 2 + currFontSize * 0.52);
   } else {
     ctx.fillText(text, width / 2, height / 2);
   }
@@ -445,15 +455,15 @@ export function createIllustratedCardTexture(item) {
  * Builds a cutaway diorama shell (floor + north wall + west wall) inside targetGroup
  * and registers wall colliders in roomColliders.
  */
-export function buildCutawayRoomShell(targetGroup, roomColliders, cx, cz, floorColor, northWallColor, westWallColor, trimColor = 0xA0AEC0, width = 26, depth = 22) {
+export function buildCutawayRoomShell(targetGroup, roomColliders, cx, cz, floorColor, northWallColor, westWallColor, trimColor = 0xA0AEC0, width = 26, depth = 22, gridPrimary = 0x94A3B8, gridSecondary = 0xCBD5E1) {
   const hw = width / 2;
   const hd = depth / 2;
 
-  // Floor Platform
+  // Floor Platform (Surface sits precisely at y = 0.0)
   const floorGeo = new THREE.BoxGeometry(width, 0.4, depth);
   const floorMat = new THREE.MeshLambertMaterial({ color: floorColor });
   const floorMesh = new THREE.Mesh(floorGeo, floorMat);
-  floorMesh.position.set(cx, 0.2, cz);
+  floorMesh.position.set(cx, -0.2, cz);
   floorMesh.receiveShadow = true;
   targetGroup.add(floorMesh);
 
@@ -461,14 +471,23 @@ export function buildCutawayRoomShell(targetGroup, roomColliders, cx, cz, floorC
   const baseGeo = new THREE.BoxGeometry(width + 0.8, 0.6, depth + 0.8);
   const baseMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
   const baseMesh = new THREE.Mesh(baseGeo, baseMat);
-  baseMesh.position.set(cx, -0.1, cz);
+  baseMesh.position.set(cx, -0.5, cz);
   targetGroup.add(baseMesh);
+
+  // Tiled Floor GridHelper slightly above floor at y = 0.01 for immediate textured look
+  const gridHelper = new THREE.GridHelper(Math.max(width, depth), Math.round(Math.max(width, depth)), gridPrimary, gridSecondary);
+  gridHelper.position.set(cx, 0.01, cz);
+  if (gridHelper.material) {
+    gridHelper.material.opacity = 0.35;
+    gridHelper.material.transparent = true;
+  }
+  targetGroup.add(gridHelper);
 
   // North Back Wall (z = cz - hd)
   const nWallGeo = new THREE.BoxGeometry(width, 5.5, 0.5);
   const nWallMat = new THREE.MeshLambertMaterial({ color: northWallColor });
   const nWallMesh = new THREE.Mesh(nWallGeo, nWallMat);
-  nWallMesh.position.set(cx, 2.95, cz - hd);
+  nWallMesh.position.set(cx, 2.75, cz - hd);
   nWallMesh.castShadow = true;
   nWallMesh.receiveShadow = true;
   targetGroup.add(nWallMesh);
@@ -477,18 +496,18 @@ export function buildCutawayRoomShell(targetGroup, roomColliders, cx, cz, floorC
   const wWallGeo = new THREE.BoxGeometry(0.5, 5.5, depth);
   const wWallMat = new THREE.MeshLambertMaterial({ color: westWallColor });
   const wWallMesh = new THREE.Mesh(wWallGeo, wWallMat);
-  wWallMesh.position.set(cx - hw, 2.95, cz);
+  wWallMesh.position.set(cx - hw, 2.75, cz);
   wWallMesh.castShadow = true;
   wWallMesh.receiveShadow = true;
   targetGroup.add(wWallMesh);
 
   // Wall Baseboards / Trims
   const nTrim = new THREE.Mesh(new THREE.BoxGeometry(width, 0.35, 0.55), new THREE.MeshLambertMaterial({ color: trimColor }));
-  nTrim.position.set(cx, 0.55, cz - hd);
+  nTrim.position.set(cx, 0.175, cz - hd);
   targetGroup.add(nTrim);
 
   const wTrim = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.35, depth), new THREE.MeshLambertMaterial({ color: trimColor }));
-  wTrim.position.set(cx - hw, 0.55, cz);
+  wTrim.position.set(cx - hw, 0.175, cz);
   targetGroup.add(wTrim);
 
   // Register physical collision boxes for walls

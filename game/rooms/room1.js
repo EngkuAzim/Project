@@ -9,27 +9,36 @@ export function buildRoom1(arg1, arg2, arg3) {
   const w = 36, d = 32;
   const hw = w / 2, hd = d / 2; // hw = 18, hd = 16
 
-  // 1. Lush Garden Grass Base (36x32)
+  // 1. Lush Garden Grass Base (36x32) with Surface at y = 0.0
   const baseGeo = new THREE.BoxGeometry(w, 0.4, d);
-  const baseMat = new THREE.MeshLambertMaterial({ color: 0x22C55E });
+  const baseMat = new THREE.MeshLambertMaterial({ color: 0x15803D });
   const baseMesh = new THREE.Mesh(baseGeo, baseMat);
-  baseMesh.position.set(cx, 0.2, cz);
+  baseMesh.position.set(cx, -0.2, cz);
   baseMesh.receiveShadow = true;
   roomGroup.add(baseMesh);
 
   // Outer Stone Rim
   const rimGeo = new THREE.BoxGeometry(w + 0.8, 0.6, d + 0.8);
-  const rimMat = new THREE.MeshLambertMaterial({ color: 0x475569 });
+  const rimMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
   const rimMesh = new THREE.Mesh(rimGeo, rimMat);
-  rimMesh.position.set(cx, -0.1, cz);
+  rimMesh.position.set(cx, -0.5, cz);
   roomGroup.add(rimMesh);
 
+  // Tiled Garden GridHelper slightly above floor at y = 0.01 for immediate tiled texture
+  const gridHelper = new THREE.GridHelper(Math.max(w, d), Math.round(Math.max(w, d)), 0x166534, 0x14532D);
+  gridHelper.position.set(cx, 0.01, cz);
+  if (gridHelper.material) {
+    gridHelper.material.opacity = 0.4;
+    gridHelper.material.transparent = true;
+  }
+  roomGroup.add(gridHelper);
+
   // Topiary Hedge Material
-  const hedgeMat = new THREE.MeshLambertMaterial({ color: 0x15803D });
+  const hedgeMat = new THREE.MeshLambertMaterial({ color: 0x166534 });
 
   function addHedge(hx, hz, hwid, hdep) {
     const hMesh = new THREE.Mesh(new THREE.BoxGeometry(hwid, 1.8, hdep), hedgeMat);
-    hMesh.position.set(hx, 1.1, hz);
+    hMesh.position.set(hx, 0.9, hz);
     hMesh.castShadow = true;
     hMesh.receiveShadow = true;
     roomGroup.add(hMesh);
@@ -68,45 +77,19 @@ export function buildRoom1(arg1, arg2, arg3) {
   // Wall 7: Pre-exit hedge
   addHedge(113.0, 102.0, 0.9, 14.0);
 
-  // Stone walkway pavers along the main paths
+  // Stone walkway pavers along the main paths (Clean, unobstructed walking surface)
   const stoneMat = new THREE.MeshLambertMaterial({ color: 0xE2E8F0 });
   const pathGeo1 = new THREE.PlaneGeometry(2.4, 28);
   const path1 = new THREE.Mesh(pathGeo1, stoneMat);
   path1.rotation.x = -Math.PI / 2;
-  path1.position.set(86.0, 0.22, 100.0);
+  path1.position.set(86.0, 0.02, 100.0);
   roomGroup.add(path1);
 
   const pathGeo2 = new THREE.PlaneGeometry(28, 2.4);
   const path2 = new THREE.Mesh(pathGeo2, stoneMat);
   path2.rotation.x = -Math.PI / 2;
-  path2.position.set(100.0, 0.22, 104.0);
+  path2.position.set(100.0, 0.02, 104.0);
   roomGroup.add(path2);
-
-  // Stone Garden Lanterns
-  [
-    { x: 88.0, z: 94.0 },
-    { x: 104.0, z: 112.0 },
-    { x: 110.0, z: 100.0 }
-  ].forEach(({ x, z }) => {
-    const lantern = new THREE.Group();
-    lantern.position.set(x, 0, z);
-
-    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.14, 1.4, 8), new THREE.MeshLambertMaterial({ color: 0x64748B }));
-    post.position.y = 0.7;
-    lantern.add(post);
-
-    const head = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), new THREE.MeshStandardMaterial({ color: 0xFEF08A, emissive: 0xF59E0B, emissiveIntensity: 0.6 }));
-    head.position.y = 1.45;
-    lantern.add(head);
-
-    const cap = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.25, 4), new THREE.MeshLambertMaterial({ color: 0x334155 }));
-    cap.position.y = 1.75;
-    cap.rotation.y = Math.PI / 4;
-    lantern.add(cap);
-
-    roomGroup.add(lantern);
-    roomColliders.push({ minX: x - 0.4, maxX: x + 0.4, minZ: z - 0.4, maxZ: z + 0.4 });
-  });
 
   // Garden Entrance Archway
   const archGroup = new THREE.Group();
@@ -174,33 +157,11 @@ export function buildRoom1(arg1, arg2, arg3) {
 }
 
 /**
- * Spawns 10 sequential Huruf Jawi checkpoints on stone pedestals in the hedge maze walkways.
+ * Spawns 10 sequential Huruf Jawi checkpoints as clean, floating Jawi tablets without obstacle clutter.
  */
 export function spawnR1Checkpoints(items, targetGroup) {
   items.forEach((item) => {
-    // 1. Stone pedestal in the center of the walkway
-    const pedestalGroup = new THREE.Group();
-    pedestalGroup.position.set(item.pos.x, 0, item.pos.z);
-
-    const basePed = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.5, 0.62, 0.5, 16),
-      new THREE.MeshLambertMaterial({ color: 0x475569 })
-    );
-    basePed.position.y = 0.45;
-    basePed.receiveShadow = true;
-    pedestalGroup.add(basePed);
-
-    const rimPed = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.68, 0.68, 0.12, 16),
-      new THREE.MeshLambertMaterial({ color: 0x64748B })
-    );
-    rimPed.position.y = 0.72;
-    rimPed.receiveShadow = true;
-    pedestalGroup.add(rimPed);
-
-    targetGroup.add(pedestalGroup);
-
-    // 2. Floating Checkpoint Tablet Mesh & Lights
+    // Floating Checkpoint Tablet Mesh & Lights (Unobstructed pathway)
     const itemGroup = new THREE.Group();
     itemGroup.position.set(item.pos.x, item.pos.y, item.pos.z);
 
@@ -233,21 +194,13 @@ export function spawnR1Checkpoints(items, targetGroup) {
     cGroup.castShadow = true;
     itemGroup.add(cGroup);
 
-    // Glowing base ring
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(1.15, 0.065, 8, 24),
-      new THREE.MeshStandardMaterial({ color: item.color, emissive: item.color, emissiveIntensity: 0.85 })
-    );
-    ring.rotation.x = Math.PI / 2;
-    itemGroup.add(ring);
-
     // Glowing point light
     const light = new THREE.PointLight(item.color, 1.5, 5);
     itemGroup.add(light);
 
     item.mesh = itemGroup;
     item.gemMesh = cGroup;
-    item.ringMesh = ring;
+    item.ringMesh = null;
     item.pointLight = light;
     item.isPopping = false;
     item.popScale = 1.0;

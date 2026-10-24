@@ -604,8 +604,8 @@ function animate() {
 
   activeCollectibles.forEach((item, index) => {
     if (!item.collected && item.mesh) {
-      item.gemMesh.rotation.y += 1.8 * delta;
-      item.ringMesh.rotation.z += 1.5 * delta;
+      if (item.gemMesh) item.gemMesh.rotation.y += 1.8 * delta;
+      if (item.ringMesh) item.ringMesh.rotation.z += 1.5 * delta;
       const bob = Math.sin(time * 3.0 + index) * 0.14;
       item.mesh.position.y = item.pos.y + bob;
 
@@ -614,9 +614,11 @@ function animate() {
         const isCurrentActive = (index === activeR1Index);
         if (isCurrentActive) {
           // Highlight active checkpoint with bright gold beacon pulse
-          item.ringMesh.material.color.setHex(0xF59E0B);
-          item.ringMesh.material.emissive.setHex(0xF59E0B);
-          item.ringMesh.material.emissiveIntensity = 1.0 + Math.sin(time * 6.0) * 0.4;
+          if (item.ringMesh && item.ringMesh.material) {
+            item.ringMesh.material.color.setHex(0xF59E0B);
+            item.ringMesh.material.emissive.setHex(0xF59E0B);
+            item.ringMesh.material.emissiveIntensity = 1.0 + Math.sin(time * 6.0) * 0.4;
+          }
           if (item.pointLight) item.pointLight.intensity = 2.4;
 
           const dx = playerGroup.position.x - item.mesh.position.x;
@@ -628,9 +630,11 @@ function animate() {
           }
         } else {
           // Locked checkpoint: Dimmed beacon
-          item.ringMesh.material.color.setHex(0x64748B);
-          item.ringMesh.material.emissive.setHex(0x334155);
-          item.ringMesh.material.emissiveIntensity = 0.3;
+          if (item.ringMesh && item.ringMesh.material) {
+            item.ringMesh.material.color.setHex(0x64748B);
+            item.ringMesh.material.emissive.setHex(0x334155);
+            item.ringMesh.material.emissiveIntensity = 0.3;
+          }
           if (item.pointLight) item.pointLight.intensity = 0.6;
         }
       } else {
