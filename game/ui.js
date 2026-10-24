@@ -13,6 +13,7 @@ import {
   COLLECTIBLES_R4,
   keys
 } from './state.js?v=4.4.2';
+import { saveArtworkToDB, fetchGalleryArtworks } from './db.js';
 
 let updateEaselCallback = null;
 export function registerEaselHandler(fn) {
@@ -1655,6 +1656,15 @@ export function finalizeAndExhibitArtwork() {
   gameState.room4Completed = true;
   playSuccessFanfare();
 
+  // Save to Firebase Firestore Live Gallery
+  saveArtworkToDB(studentProfile.name, studentProfile.class, dataUrl)
+    .then((docId) => {
+      showItemToast('🖼️', 'Karya berjaya disimpan ke pangkalan data!');
+    })
+    .catch((err) => {
+      console.warn('Firestore artwork save notice:', err);
+    });
+
   closeModal('room4-modal');
   showFinalPBDReport(dataUrl);
 }
@@ -1749,7 +1759,127 @@ export function restartGame() {
 }
 
 // ==========================================
-// 13. GLOBAL BINDINGS FOR HTML ONCLICK COMPATIBILITY
+// 13. LIVE ARTWORK GALLERY (Firebase Firestore)
+// ==========================================
+let cachedGalleryArtworks = [];
+
+export async function openGallerySidebar() {
+  const sidebar = document.getElementById('gallery-sidebar');
+  const backdrop = document.getElementById('gallery-sidebar-backdrop');
+  if (sidebar) sidebar.classList.add('open');
+  if (backdrop) backdrop.classList.add('open');
+
+  await refreshGalleryArtworks();
+}
+
+export function closeGallerySidebar() {
+  const sidebar = document.getElementById('gallery-sidebar');
+  const backdrop = document.getElementById('gallery-sidebar-backdrop');
+  if (sidebar) sidebar.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('open');
+}
+
+export async function refreshGalleryArtworks() {
+  const grid = document.getElementById('gallery-grid');
+  const countBadge = document.getElementById('gallery-count-badge');
+  if (!grid) return;
+
+  grid.innerHTML = `
+    <div class="gallery-loading">
+      <div class="gallery-spinner"></div>
+      <p>Memuatkan karya dari pangkalan data...</p>
+    </div>
+  `;
+
+  try {
+    const artworks = await fetchGalleryArtworks();
+    cachedGalleryArtworks = artworks;
+    if (typeof window !== 'undefined') {
+      window._cachedGalleryArtworks = artworks;
+    }
+
+    if (countBadge) {
+      countBadge.textContent = `${artworks.length} Karya Terpamer`;
+    }
+
+    if (artworks.length === 0) {
+      grid.innerHTML = `
+        <div class="gallery-empty">
+          <span style="font-size: 36px;">🎨</span>
+          <p><strong>Belum ada karya terpamer.</strong></p>
+          <p style="font-size: 12px; color: #64748B;">Selesaikan lukisan khat di Bilik 4 dan tekan <em>"Pamerkan di Galeri 3D"</em> untuk melihat hasil seni anda di sini!</p>
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = artworks.map((item, idx) => {
+      const safeName = (item.studentName || 'Murid Bestari').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const safeClass = (item.studentClass || '3 Inovatif').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      let dateStr = '';
+      if (item.timestamp && item.timestamp.toDate) {
+        dateStr = item.timestamp.toDate().toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+      } else if (item.createdAt) {
+        dateStr = new Date(item.createdAt).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+      }
+
+      return `
+        <div class="gallery-card" onclick="openGalleryPreview(${idx})" title="Klik untuk paparan skrin penuh">
+          <img src="${item.image}" alt="Karya Seni ${safeName}" class="gallery-card-thumb" loading="lazy" />
+          <div class="gallery-card-info">
+            <strong class="gallery-card-name">${safeName}</strong>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 3px;">
+              <span class="gallery-card-class">🏫 ${safeClass}</span>
+              ${dateStr ? `<span class="gallery-card-date">${dateStr}</span>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (err) {
+    console.error('Error refreshing gallery artworks:', err);
+    grid.innerHTML = `
+      <div class="gallery-error">
+        <span style="font-size: 32px;">⚠️</span>
+        <p>Gagal memuatkan galeri pameran.</p>
+        <button class="btn-secondary" onclick="refreshGalleryArtworks()" style="margin-top: 8px;">Cuba Semula</button>
+      </div>
+    `;
+  }
+}
+
+export function openGalleryPreview(indexOrData) {
+  let item = null;
+  if (typeof indexOrData === 'number') {
+    item = cachedGalleryArtworks[indexOrData] || (window._cachedGalleryArtworks ? window._cachedGalleryArtworks[indexOrData] : null);
+  } else if (typeof indexOrData === 'object') {
+    item = indexOrData;
+  }
+  if (!item) return;
+
+  const nameEl = document.getElementById('preview-student-name');
+  const classEl = document.getElementById('preview-student-class');
+  const imgEl = document.getElementById('preview-artwork-img');
+
+  if (nameEl) nameEl.textContent = item.studentName || 'Murid Bestari';
+  if (classEl) {
+    let dateStr = '';
+    if (item.timestamp && item.timestamp.toDate) {
+      dateStr = item.timestamp.toDate().toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
+    } else if (item.createdAt) {
+      dateStr = new Date(item.createdAt).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    classEl.textContent = `${item.studentClass || '3 Inovatif'}${dateStr ? ' • ' + dateStr : ''}`;
+  }
+  if (imgEl) {
+    imgEl.src = item.image || '';
+  }
+
+  openModal('gallery-preview-modal');
+}
+
+// ==========================================
+// 14. GLOBAL BINDINGS FOR HTML ONCLICK COMPATIBILITY
 // ==========================================
 if (typeof window !== 'undefined') {
   window.openIntroModal = openIntroModal;
@@ -1759,6 +1889,12 @@ if (typeof window !== 'undefined') {
   window.handleCurrentInteraction = handleCurrentInteraction;
   window.closeModal = closeModal;
   window.handleOverlayClick = handleOverlayClick;
+
+  // Live Gallery
+  window.openGallerySidebar = openGallerySidebar;
+  window.closeGallerySidebar = closeGallerySidebar;
+  window.refreshGalleryArtworks = refreshGalleryArtworks;
+  window.openGalleryPreview = openGalleryPreview;
 
   // Room 1
   window.openRoom1Modal = openRoom1Modal;

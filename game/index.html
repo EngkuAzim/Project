@@ -33,6 +33,11 @@
         </div>
       </div>
 
+      <!-- Prominent Gallery Toggle Button -->
+      <button id="btn-gallery-toggle" class="gallery-toggle-btn" onclick="openGallerySidebar()" title="Buka Galeri Pameran Jawi">
+        🖼️ <span class="gallery-btn-label">Galeri Pameran Jawi</span>
+      </button>
+
       <!-- Student Profile Pill (Clickable) -->
       <div class="profile-pill" onclick="openProfileModal()" title="Klik untuk kemaskini profil murid">
         <div class="profile-avatar">🎓</div>
@@ -112,6 +117,42 @@
       </div>
     </div>
   </div>
+
+  <!-- ==========================================
+       GALLERY SIDEBAR (Sliding Left Panel)
+       ========================================== -->
+  <div id="gallery-sidebar" class="gallery-sidebar">
+    <div class="gallery-sidebar-header">
+      <div class="gallery-header-title">
+        <span class="gallery-icon">🖼️</span>
+        <div>
+          <h3>Galeri Pameran Jawi</h3>
+          <p>Karya Murid &bull; DSKP SP 4.4.2</p>
+        </div>
+      </div>
+      <button class="gallery-sidebar-close" onclick="closeGallerySidebar()" title="Tutup Galeri">&times;</button>
+    </div>
+
+    <!-- Gallery Subheader / Refresh -->
+    <div class="gallery-sidebar-controls">
+      <span id="gallery-count-badge" class="gallery-count-badge">Memuatkan...</span>
+      <button class="gallery-refresh-btn" onclick="refreshGalleryArtworks()" title="Muat Semula Karya">
+        🔄 Segarkan
+      </button>
+    </div>
+
+    <!-- Scrollable Artworks Container -->
+    <div id="gallery-grid" class="gallery-grid">
+      <!-- Artworks dynamically populated by ui.js -->
+      <div class="gallery-loading">
+        <div class="gallery-spinner"></div>
+        <p>Memuatkan karya dari pangkalan data...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay to close sidebar when clicking outside -->
+  <div id="gallery-sidebar-backdrop" class="gallery-sidebar-backdrop" onclick="closeGallerySidebar()"></div>
 
   <!-- ==========================================
        MODAL: MANDATORY STARTUP INSTRUCTION POPUP
@@ -589,6 +630,33 @@
         </button>
         <button class="btn-primary" style="flex: 2;" onclick="printPBDReport()">
           🖨️ Cetak / Simpan Sijil PBD (PDF)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL: GALLERY ARTWORK PREVIEW
+       ========================================== -->
+  <div id="gallery-preview-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'gallery-preview-modal')">
+    <div class="modal-card gallery-preview-card" style="max-width: 760px;">
+      <button class="modal-close-btn" onclick="closeModal('gallery-preview-modal')">&times;</button>
+      <div class="gallery-preview-header">
+        <div class="gallery-preview-avatar">🎨</div>
+        <div class="gallery-preview-meta">
+          <h3 id="preview-student-name">Nama Murid</h3>
+          <p id="preview-student-class">Kelas &bull; Tarikh</p>
+        </div>
+      </div>
+      
+      <div class="gallery-preview-img-container">
+        <img id="preview-artwork-img" src="" alt="Karya Seni Khat Jawi Murid" class="gallery-preview-img" />
+      </div>
+
+      <div class="gallery-preview-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
+        <span style="font-size: 12px; color: #64748B;">✦ Standard Pembelajaran 4.4.2 Bahasa Melayu</span>
+        <button class="btn-primary" onclick="closeModal('gallery-preview-modal')">
+          ✕ Tutup Paparan
         </button>
       </div>
     </div>
