@@ -1204,6 +1204,25 @@ html, body {
   border-color: #0F172A;
 }
 
+.khat-mode-btn {
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.khat-mode-btn.active {
+  background: #10B981 !important;
+  color: #FFFFFF !important;
+  border-color: #059669 !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.45);
+}
+
+.khat-mode-btn:hover:not(.active) {
+  border-color: #10B981;
+  color: #059669;
+}
+
 .khat-tool-btn.accent {
   background: linear-gradient(135deg, #F59E0B, #D97706);
   color: white;

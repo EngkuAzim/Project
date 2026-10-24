@@ -406,6 +406,17 @@
 
         <!-- Calligraphy Toolbar -->
         <div class="khat-toolbar">
+          <!-- Drawing Tool Mode (Pen Khat vs Pemadam) -->
+          <div class="toolbar-group">
+            <span class="toolbar-label">Alatan:</span>
+            <button type="button" class="khat-tool-btn khat-mode-btn active" id="tool-pen" onclick="setKhatTool('pen')">
+              ✏️ Pen Khat
+            </button>
+            <button type="button" class="khat-tool-btn khat-mode-btn" id="tool-eraser" onclick="setKhatTool('eraser')">
+              🧽 Pemadam
+            </button>
+          </div>
+
           <!-- Brush Sizes -->
           <div class="toolbar-group">
             <span class="toolbar-label">Saiz Berus:</span>
@@ -429,7 +440,7 @@
               👁️ <span id="guide-btn-text">Sembunyi Garisan</span>
             </button>
             <button type="button" class="khat-tool-btn" onclick="clearKhatDrawing()">
-              🗑️ Padam
+              🗑️ Padam Semua
             </button>
             <button type="button" class="khat-tool-btn accent" onclick="autoCalligraphyStencil()" title="Cap tulisan khat berseni secara automatik">
               ✨ Kemaskan Khat Automatik

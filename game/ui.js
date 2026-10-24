@@ -130,11 +130,11 @@ export function speakBM(text) {
     const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/[-•—_]/g, ' ');
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'ms-MY';
-    utterance.rate = 0.95;
-    utterance.pitch = 1.05;
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
 
     const voices = window.speechSynthesis.getVoices();
-    const msVoice = voices.find(v => v.lang === 'ms-MY' || v.lang === 'ms' || v.lang.startsWith('id'));
+    const msVoice = voices.find(v => v.lang === 'ms-MY' || v.lang === 'ms_MY' || v.lang === 'ms' || v.lang.startsWith('id'));
     if (msVoice) utterance.voice = msVoice;
 
     window.speechSynthesis.speak(utterance);
@@ -291,7 +291,7 @@ export function collectItem(item, currentRoom) {
 
   if (currentRoom === 'room1') {
     showItemToast(item.char, `Pos ${item.stepIndex} Ditemui: ${item.char} (${item.name})`);
-    speakBM(`Pos ${item.stepIndex}. Kumpulan huruf Jawi: ${item.name}`);
+    speakBM(item.name);
     const count = COLLECTIBLES_R1.filter(c => c.collected).length;
     if (count === 10) {
       gameState.room1Completed = true;
@@ -555,7 +555,7 @@ export function renderJawiChartGrid() {
       if (isStepCollected) {
         card.classList.add('speaking');
         playTone(587.33, 'triangle', 0.15);
-        speakBM(`Huruf Jawi: ${item.name}. Padanan Rumi: ${item.rumi}`);
+        speakBM(item.name);
         setTimeout(() => card.classList.remove('speaking'), 800);
       } else {
         playErrorBuzzer();
@@ -1272,6 +1272,8 @@ export function proceedToRoom4() {
 let khatCanvas = null;
 let khatCtx = null;
 let isDrawing = false;
+let isEraser = false;
+let strokesCanvas = null;
 let khatBrushSize = 8;
 let khatInkColor = '#0F172A';
 let khatSelectedIdiom = 'ulat_buku';
@@ -1292,8 +1294,25 @@ const KHAT_TEMPLATES = {
   cahaya_mata: { jawi: 'چهاي مات', rumi: 'Cahaya Mata', meaning: 'Penyeri Keluarga', icons: '☀️ 👁️' }
 };
 
+export function setKhatTool(tool) {
+  isEraser = (tool === 'eraser');
+  const penBtn = document.getElementById('tool-pen');
+  const eraserBtn = document.getElementById('tool-eraser');
+  if (penBtn) penBtn.classList.toggle('active', !isEraser);
+  if (eraserBtn) eraserBtn.classList.toggle('active', isEraser);
+
+  if (khatCanvas) {
+    khatCanvas.style.cursor = isEraser ? 'cell' : 'crosshair';
+  }
+}
+
+export function setEraserMode(enabled) {
+  setKhatTool(enabled ? 'eraser' : 'pen');
+}
+
 export function openRoom4Modal() {
   openModal('room4-modal');
+  setKhatTool('pen');
   initKhatCanvas();
   const textEl = document.getElementById('guide-btn-text');
   if (textEl) textEl.textContent = khatShowGuide ? 'Sembunyi Garisan' : 'Tunjuk Garisan';
@@ -1338,7 +1357,12 @@ function getCanvasPos(e) {
 function startKhatDrawing(e) {
   isDrawing = true;
   const pos = getCanvasPos(e);
-  currentStroke = { color: khatInkColor, size: khatBrushSize, points: [pos] };
+  currentStroke = {
+    isEraser: isEraser,
+    color: khatInkColor,
+    size: isEraser ? 25 : khatBrushSize,
+    points: [pos]
+  };
   userStrokes.push(currentStroke);
   redrawKhatCanvas();
 }
@@ -1364,12 +1388,14 @@ export function setKhatBrush(size) {
   if (size === 4) document.getElementById('brush-s')?.classList.add('active');
   if (size === 8) document.getElementById('brush-m')?.classList.add('active');
   if (size === 16) document.getElementById('brush-l')?.classList.add('active');
+  setKhatTool('pen');
 }
 
 export function setKhatInk(color, btnEl) {
   khatInkColor = color;
   document.querySelectorAll('.khat-color-dot').forEach(b => b.classList.remove('active'));
   if (btnEl) btnEl.classList.add('active');
+  setKhatTool('pen');
 }
 
 export function selectKhatIdiom(idiomId) {
@@ -1377,6 +1403,10 @@ export function selectKhatIdiom(idiomId) {
   document.querySelectorAll('.khat-idiom-choice').forEach(b => b.classList.remove('active'));
   event.currentTarget.classList.add('active');
   userStrokes = []; // Clear canvas for new idiom
+  if (strokesCanvas) {
+    const sCtx = strokesCanvas.getContext('2d');
+    sCtx.clearRect(0, 0, strokesCanvas.width, strokesCanvas.height);
+  }
   redrawKhatCanvas();
 }
 
@@ -1389,6 +1419,10 @@ export function toggleTracingGuide() {
 
 export function clearKhatDrawing() {
   userStrokes = [];
+  if (strokesCanvas) {
+    const sCtx = strokesCanvas.getContext('2d');
+    sCtx.clearRect(0, 0, strokesCanvas.width, strokesCanvas.height);
+  }
   redrawKhatCanvas();
 }
 
@@ -1497,33 +1531,78 @@ export function redrawKhatCanvas() {
     khatCtx.restore();
   }
 
-  // 4. Draw User Calligraphy Strokes
+  // 4. Draw User Calligraphy Strokes (supports Pen & realistic Pemadam eraser)
+  if (!strokesCanvas) {
+    strokesCanvas = document.createElement('canvas');
+  }
+  if (strokesCanvas.width !== w || strokesCanvas.height !== h) {
+    strokesCanvas.width = w;
+    strokesCanvas.height = h;
+  }
+  const sCtx = strokesCanvas.getContext('2d');
+  sCtx.clearRect(0, 0, w, h);
+
   userStrokes.forEach(stroke => {
     if (stroke.isStencil) {
-      khatCtx.save();
-      khatCtx.font = 'bold 124px "Amiri", serif';
-      khatCtx.textAlign = 'center';
-      khatCtx.textBaseline = 'middle';
-      khatCtx.fillStyle = stroke.color;
-      khatCtx.shadowColor = 'rgba(0,0,0,0.2)';
-      khatCtx.shadowBlur = 8;
-      khatCtx.fillText(stroke.jawi, w / 2, h / 2 - 10);
-      khatCtx.restore();
-    } else if (stroke.points && stroke.points.length > 1) {
-      khatCtx.save();
-      khatCtx.strokeStyle = stroke.color;
-      khatCtx.lineWidth = stroke.size;
-      khatCtx.lineCap = 'round';
-      khatCtx.lineJoin = 'round';
-      khatCtx.beginPath();
-      khatCtx.moveTo(stroke.points[0].x, stroke.points[0].y);
-      for (let i = 1; i < stroke.points.length; i++) {
-        khatCtx.lineTo(stroke.points[i].x, stroke.points[i].y);
+      sCtx.save();
+      sCtx.globalCompositeOperation = 'source-over';
+      sCtx.font = 'bold 124px "Amiri", serif';
+      sCtx.textAlign = 'center';
+      sCtx.textBaseline = 'middle';
+      sCtx.fillStyle = stroke.color;
+      sCtx.shadowColor = 'rgba(0,0,0,0.2)';
+      sCtx.shadowBlur = 8;
+      sCtx.fillText(stroke.jawi, w / 2, h / 2 - 10);
+      sCtx.restore();
+    } else if (stroke.points && stroke.points.length > 0) {
+      sCtx.save();
+      if (stroke.isEraser) {
+        sCtx.globalCompositeOperation = 'destination-out';
+        sCtx.lineWidth = 25;
+      } else {
+        sCtx.globalCompositeOperation = 'source-over';
+        sCtx.strokeStyle = stroke.color;
+        sCtx.lineWidth = stroke.size;
       }
-      khatCtx.stroke();
-      khatCtx.restore();
+      sCtx.lineCap = 'round';
+      sCtx.lineJoin = 'round';
+
+      if (stroke.points.length === 1) {
+        sCtx.beginPath();
+        sCtx.arc(stroke.points[0].x, stroke.points[0].y, (stroke.isEraser ? 25 : stroke.size) / 2, 0, Math.PI * 2);
+        if (stroke.isEraser) {
+          sCtx.fill();
+        } else {
+          sCtx.fillStyle = stroke.color;
+          sCtx.fill();
+        }
+      } else {
+        sCtx.beginPath();
+        sCtx.moveTo(stroke.points[0].x, stroke.points[0].y);
+        for (let i = 1; i < stroke.points.length; i++) {
+          sCtx.lineTo(stroke.points[i].x, stroke.points[i].y);
+        }
+        sCtx.stroke();
+      }
+      sCtx.restore();
     }
   });
+
+  // Stamp calligraphy strokes onto the main canvas
+  khatCtx.save();
+  khatCtx.globalCompositeOperation = 'source-over';
+  khatCtx.drawImage(strokesCanvas, 0, 0);
+  khatCtx.restore();
+
+  // Set active tool operation on khatCtx
+  if (isEraser) {
+    khatCtx.globalCompositeOperation = 'destination-out';
+    khatCtx.lineWidth = 25;
+  } else {
+    khatCtx.globalCompositeOperation = 'source-over';
+    khatCtx.lineWidth = khatBrushSize;
+    khatCtx.strokeStyle = khatInkColor;
+  }
 
   // 5. Subtitle & Idiom Meaning
   khatCtx.save();
@@ -1711,6 +1790,8 @@ if (typeof window !== 'undefined') {
 
   // Room 4
   window.openRoom4Modal = openRoom4Modal;
+  window.setKhatTool = setKhatTool;
+  window.setEraserMode = setEraserMode;
   window.setKhatBrush = setKhatBrush;
   window.setKhatInk = setKhatInk;
   window.selectKhatIdiom = selectKhatIdiom;
