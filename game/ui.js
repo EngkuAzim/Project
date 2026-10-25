@@ -231,6 +231,164 @@ export function speakBM(text) {
 }
 
 // ==========================================
+// 1.2 VISUAL JUICE: MICRO CONFETTI BURST & TEACHER PRAISE
+// ==========================================
+let confettiParticles = [];
+let confettiAnimId = null;
+
+export function triggerConfetti(originX, originY, count = 50) {
+  const canvas = document.getElementById('confetti-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const startX = originX !== undefined ? originX : window.innerWidth / 2;
+  const startY = originY !== undefined ? originY : window.innerHeight * 0.42;
+
+  const colors = [
+    '#F59E0B', '#FDE047', '#10B981', '#06D6A0', '#38BDF8', '#EC4899', '#A855F7', '#FFFFFF'
+  ];
+
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 4 + Math.random() * 8.5;
+    confettiParticles.push({
+      x: startX,
+      y: startY,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 3.2,
+      size: 4 + Math.random() * 5.5,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      alpha: 1,
+      rotation: Math.random() * 360,
+      vRot: (Math.random() - 0.5) * 12,
+      shape: Math.random() > 0.45 ? 'star' : 'rect',
+      decay: 0.013 + Math.random() * 0.012
+    });
+  }
+
+  if (!confettiAnimId) {
+    animateConfetti();
+  }
+}
+
+function animateConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = confettiParticles.length - 1; i >= 0; i--) {
+    const p = confettiParticles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.22;
+    p.vx *= 0.985;
+    p.rotation += p.vRot;
+    p.alpha -= p.decay;
+
+    if (p.alpha <= 0 || p.y > canvas.height + 25) {
+      confettiParticles.splice(i, 1);
+      continue;
+    }
+
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, p.alpha);
+    ctx.translate(p.x, p.y);
+    ctx.rotate((p.rotation * Math.PI) / 180);
+    ctx.fillStyle = p.color;
+
+    if (p.shape === 'star') {
+      drawStar(ctx, 0, 0, 5, p.size, p.size * 0.45);
+    } else {
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+    }
+    ctx.restore();
+  }
+
+  if (confettiParticles.length > 0) {
+    confettiAnimId = requestAnimationFrame(animateConfetti);
+  } else {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confettiAnimId = null;
+  }
+}
+
+function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+  let rot = (Math.PI / 2) * 3;
+  let x = cx;
+  let y = cy;
+  const step = Math.PI / spikes;
+
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - outerRadius);
+  for (let i = 0; i < spikes; i++) {
+    x = cx + Math.cos(rot) * outerRadius;
+    y = cy + Math.sin(rot) * outerRadius;
+    ctx.lineTo(x, y);
+    rot += step;
+
+    x = cx + Math.cos(rot) * innerRadius;
+    y = cy + Math.sin(rot) * innerRadius;
+    ctx.lineTo(x, y);
+    rot += step;
+  }
+  ctx.lineTo(cx, cy - outerRadius);
+  ctx.closePath();
+  ctx.fill();
+}
+
+export function playTeacherPraise(context) {
+  let phrase = '';
+  if (context === 'room1') {
+    const lines = [
+      'Bagus sekali! Semua huruf Jawi berjaya kamu kenali dengan tepat!',
+      'Syabas! Kembara huruf Jawi kamu sungguh cemerlang!',
+      'Hebatnya kamu! Papan pintar 37 huruf Jawi berjaya dibuka sepenuhnya!'
+    ];
+    phrase = lines[Math.floor(Math.random() * lines.length)];
+  } else if (context === 'room2') {
+    const lines = [
+      'Syabas! Tulisan dan ejaan Jawi kamu sungguh kemas dan tepat!',
+      'Hebatnya kamu! Semua simpulan bahasa berjaya dieja dengan betul!',
+      'Tahniah! Cantuman huruf Jawi kamu sangat lancar dan membanggakan!'
+    ];
+    phrase = lines[Math.floor(Math.random() * lines.length)];
+  } else if (context === 'room3') {
+    const lines = [
+      'Hebatnya kamu! Maksud simpulan bahasa berjaya dipadankan dengan cemerlang!',
+      'Syabas! Kamu faham makna kiasan simpulan bahasa dengan sangat baik!',
+      'Tahniah! Arkib simpulan bahasa berjaya diselesaikan dengan cemerlang!'
+    ];
+    phrase = lines[Math.floor(Math.random() * lines.length)];
+  } else if (context === 'room4') {
+    const lines = [
+      'Wah, cantiknya karya seni khat kamu! Cikgu bangga dengan bakat kamu!',
+      'MasyaAllah, sungguh indah tulisan Jawi kamu! Karya yang sangat kreatif!',
+      'Syabas! Seni khat kamu layak dipamerkan di galeri sekolah!'
+    ];
+    phrase = lines[Math.floor(Math.random() * lines.length)];
+  } else if (context === 'wordCorrect') {
+    const lines = [
+      'Bagus! Ejaan kamu tepat!',
+      'Tahniah! Hebatnya kamu!',
+      'Tepat sekali! Teruskan usaha!',
+      'Syabas! Susunan huruf Jawi yang sempurna!'
+    ];
+    phrase = lines[Math.floor(Math.random() * lines.length)];
+  } else {
+    phrase = 'Syabas! Usaha kamu sangat membanggakan!';
+  }
+
+  speakBM(phrase);
+}
+
+// ==========================================
 // 2. HUD & TOAST NOTIFICATIONS
 // ==========================================
 export function showItemToast(char, text, duration = 2800) {
@@ -341,6 +499,8 @@ export function collectItem(item, currentRoom) {
     if (count === 10) {
       gameState.room1Completed = true;
       updateMissionChecklist();
+      triggerConfetti(window.innerWidth / 2, window.innerHeight * 0.4, 60);
+      playTeacherPraise('room1');
       updateMissionText('Tahniah! Semua 10 kumpulan huruf ditemui. Pergi ke Papan Pintar di hujung pagar sesat!');
     } else {
       updateMissionText(`Misi: Ikuti anak panah ke Pos ${count + 1} (${10 - count} pos lagi).`);
@@ -421,6 +581,11 @@ export function closeModal(modalId) {
   const modalEl = document.getElementById(modalId);
   if (modalEl) modalEl.classList.remove('active');
   gameState.activeModal = null;
+
+  // Show onboarding prompt bubble when closing intro or profile in lobby
+  if ((modalId === 'intro-modal' || modalId === 'profile-modal') && gameState.currentRoom === 'lobby') {
+    showOnboardingBubble();
+  }
 }
 
 export function openIntroModal() {
@@ -434,6 +599,7 @@ export function openIntroModal() {
 export function startMainGame() {
   unlockAudio();
   playCollectChime();
+  initMobileChecklistCollapse();
   const menu = document.getElementById('main-menu');
   if (menu) {
     menu.classList.add('hidden');
@@ -442,6 +608,7 @@ export function startMainGame() {
     }, 450);
   }
   openIntroModal();
+  updateMissionChecklist();
 }
 
 // ==========================================
@@ -609,30 +776,111 @@ export function confirmReturnToLobby() {
 }
 
 // ==========================================
-// 6.3 DYNAMIC MISSION CHECKLIST
+// 6.3 DYNAMIC MISSION CHECKLIST, STAR RATINGS & PORTAL PREVIEW
 // ==========================================
+
+export function getRoomStars(roomId) {
+  const cleanId = String(roomId || '').toLowerCase();
+  if (cleanId === 'r1' || cleanId === 'room1') {
+    if (!gameState.room1Completed) return 0;
+    return 3;
+  }
+  if (cleanId === 'r2' || cleanId === 'room2') {
+    if (!gameState.room2Completed) return 0;
+    const errors = gameScores.attemptsR2 || 0;
+    if (errors === 0) return 3;
+    if (errors <= 2) return 2;
+    return 1;
+  }
+  if (cleanId === 'r3' || cleanId === 'room3') {
+    if (!gameState.room3Completed) return 0;
+    const errors = gameScores.attemptsR3 || 0;
+    if (errors === 0) return 3;
+    if (errors === 1) return 2;
+    return 1;
+  }
+  if (cleanId === 'r4' || cleanId === 'room4') {
+    if (!gameState.room4Completed) return 0;
+    return 3;
+  }
+  return 0;
+}
+
+export function getStarString(starCount) {
+  if (starCount === 3) return '⭐⭐⭐';
+  if (starCount === 2) return '⭐⭐☆';
+  if (starCount === 1) return '⭐☆☆';
+  return '';
+}
+
 export function updateMissionChecklist() {
   const missions = [
-    { id: 'r1', completed: !!gameState.room1Completed },
-    { id: 'r2', completed: !!gameState.room2Completed },
-    { id: 'r3', completed: !!gameState.room3Completed },
-    { id: 'r4', completed: !!gameState.room4Completed }
+    { id: 'r1', roomKey: 'room1', completed: !!gameState.room1Completed },
+    { id: 'r2', roomKey: 'room2', completed: !!gameState.room2Completed },
+    { id: 'r3', roomKey: 'room3', completed: !!gameState.room3Completed },
+    { id: 'r4', roomKey: 'room4', completed: !!gameState.room4Completed }
   ];
 
+  const currentRoom = gameState.currentRoom || 'lobby';
+  let completedCount = 0;
+  let totalStars = 0;
+
   missions.forEach(m => {
+    if (m.completed) {
+      completedCount++;
+      totalStars += getRoomStars(m.id);
+    }
+
     const itemEl = document.getElementById(`task-${m.id}`);
     const boxEl = document.getElementById(`task-box-${m.id}`);
+    const starsEl = document.getElementById(`task-stars-${m.id}`);
+
     if (boxEl) {
       boxEl.textContent = m.completed ? '[✅]' : '[ ]';
     }
+
+    if (starsEl) {
+      starsEl.textContent = m.completed ? getStarString(getRoomStars(m.id)) : '';
+    }
+
     if (itemEl) {
       if (m.completed) {
         itemEl.classList.add('completed');
       } else {
         itemEl.classList.remove('completed');
       }
+
+      // Dynamic Focus: Active Room Glowing Accent & Dimming of Other Incomplete Rooms
+      if (currentRoom === m.roomKey) {
+        itemEl.classList.add('active-room');
+        itemEl.classList.remove('dimmed');
+      } else {
+        itemEl.classList.remove('active-room');
+        // When student is in a specific room (room1 - room4), dim other rooms
+        if (currentRoom.startsWith('room')) {
+          itemEl.classList.add('dimmed');
+        } else {
+          itemEl.classList.remove('dimmed');
+        }
+      }
     }
   });
+
+  // Overall Progress Bar Update
+  const percent = Math.round((completedCount / 4) * 100);
+  const fillEl = document.getElementById('checklist-progress-fill');
+  const textEl = document.getElementById('checklist-progress-text');
+  const starsTotalEl = document.getElementById('checklist-stars-total');
+
+  if (fillEl) {
+    fillEl.style.width = `${percent}%`;
+  }
+  if (textEl) {
+    textEl.textContent = `${percent}% Selesai (${completedCount}/4 Bilik)`;
+  }
+  if (starsTotalEl) {
+    starsTotalEl.textContent = totalStars > 0 ? `⭐ ${totalStars}/12` : '';
+  }
 }
 
 export function toggleMissionChecklist() {
@@ -642,6 +890,143 @@ export function toggleMissionChecklist() {
   bodyEl.classList.toggle('collapsed');
   if (iconEl) {
     iconEl.textContent = bodyEl.classList.contains('collapsed') ? '+' : '−';
+  }
+}
+
+export function initMobileChecklistCollapse() {
+  if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+    const bodyEl = document.getElementById('checklist-body');
+    const iconEl = document.getElementById('checklist-toggle-icon');
+    if (bodyEl && !bodyEl.classList.contains('collapsed')) {
+      bodyEl.classList.add('collapsed');
+      if (iconEl) iconEl.textContent = '+';
+    }
+  }
+}
+
+// ------------------------------------------
+// PORTAL PREVIEW BADGE CARD
+// ------------------------------------------
+const PORTAL_INFO = {
+  portalR1: {
+    room: 'Bilik 1',
+    icon: '🌿',
+    title: 'Taman Pagar Sesat (Alif - Nya)',
+    desc: 'Kutip 10 kumpulan huruf Jawi dalam laluan pagar sesat & buka Papan Pintar.',
+    isCompleted: () => !!gameState.room1Completed
+  },
+  portalR2: {
+    room: 'Bilik 2',
+    icon: '🧪',
+    title: 'Makmal Cantuman Kata Jawi',
+    desc: 'Kumpul kad bergambar & eja 4 simpulan bahasa Jawi di Meja Guru.',
+    isCompleted: () => !!gameState.room2Completed
+  },
+  portalR3: {
+    room: 'Bilik 3',
+    icon: '📜',
+    title: 'Arkib Simpulan Bahasa',
+    desc: 'Buka 4 gulungan & padankan maksud simpulan bahasa di Meja Bacaan.',
+    isCompleted: () => !!gameState.room3Completed
+  },
+  portalR4: {
+    room: 'Bilik 4',
+    icon: '🖌️',
+    title: 'Studio Persembahan Seni Khat',
+    desc: 'Kumpul alatan khat & persembahkan karya kaligrafi di Kanvas Pameran.',
+    isCompleted: () => !!gameState.room4Completed
+  },
+  returnLobby: {
+    room: 'Dataran',
+    icon: '🏫',
+    title: 'Kembali ke Dataran Sekolah',
+    desc: 'Selesaikan pengembaraan & jana Sijil Pentaksiran PBD rasmi.',
+    isCompleted: () => (!!gameState.room1Completed && !!gameState.room2Completed && !!gameState.room3Completed && !!gameState.room4Completed)
+  }
+};
+
+let currentPortalPreviewTarget = null;
+
+export function showPortalPreview(targetKey) {
+  const cardEl = document.getElementById('portal-preview-card');
+  if (!cardEl) return;
+  const info = PORTAL_INFO[targetKey];
+  if (!info) {
+    hidePortalPreview();
+    return;
+  }
+
+  if (currentPortalPreviewTarget === targetKey && cardEl.style.display !== 'none') {
+    return;
+  }
+  currentPortalPreviewTarget = targetKey;
+
+  const iconEl = document.getElementById('portal-preview-icon');
+  const roomEl = document.getElementById('portal-preview-room');
+  const statusEl = document.getElementById('portal-preview-status');
+  const titleEl = document.getElementById('portal-preview-title');
+  const descEl = document.getElementById('portal-preview-desc');
+
+  if (iconEl) iconEl.textContent = info.icon;
+  if (roomEl) roomEl.textContent = info.room;
+  if (titleEl) titleEl.textContent = info.title;
+  if (descEl) descEl.textContent = info.desc;
+
+  if (statusEl) {
+    const done = info.isCompleted();
+    if (done) {
+      statusEl.className = 'portal-preview-status done';
+      const rKey = targetKey.replace('portal', '').toLowerCase();
+      const stars = getStarString(getRoomStars(rKey));
+      statusEl.textContent = `✅ Selesai ${stars}`;
+    } else {
+      statusEl.className = 'portal-preview-status';
+      statusEl.textContent = '⏳ Belum Selesai';
+    }
+  }
+
+  cardEl.style.display = 'flex';
+}
+
+export function hidePortalPreview() {
+  const cardEl = document.getElementById('portal-preview-card');
+  if (cardEl) {
+    cardEl.style.display = 'none';
+  }
+  currentPortalPreviewTarget = null;
+}
+
+// ------------------------------------------
+// ONBOARDING WELCOME SPEECH BUBBLE (LOBBY)
+// ------------------------------------------
+let onboardingBubbleTimer = null;
+
+export function showOnboardingBubble() {
+  const bubble = document.getElementById('onboarding-welcome-bubble');
+  if (!bubble) return;
+  bubble.style.display = 'flex';
+  bubble.style.opacity = '1';
+  bubble.style.transform = 'none';
+
+  if (onboardingBubbleTimer) clearTimeout(onboardingBubbleTimer);
+  onboardingBubbleTimer = setTimeout(() => {
+    dismissOnboardingBubble();
+  }, 9000);
+}
+
+export function dismissOnboardingBubble() {
+  const bubble = document.getElementById('onboarding-welcome-bubble');
+  if (bubble && bubble.style.display !== 'none') {
+    bubble.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    bubble.style.opacity = '0';
+    bubble.style.transform = 'translateY(15px) scale(0.95)';
+    setTimeout(() => {
+      bubble.style.display = 'none';
+    }, 400);
+  }
+  if (onboardingBubbleTimer) {
+    clearTimeout(onboardingBubbleTimer);
+    onboardingBubbleTimer = null;
   }
 }
 
@@ -1047,6 +1432,7 @@ export function handleCurrentInteraction() {
   const target = gameState.nearbyTarget;
 
   if (target === 'npcTeacher') {
+    dismissOnboardingBubble();
     showItemToast('👩‍🏫', `Cikgu Asyikin: "Selamat datang, ${studentProfile.name}! Sedia meneroka keindahan seni Jawi di Sekolah Bestari?"`);
     openProfileModal();
     return;
@@ -1058,6 +1444,8 @@ export function handleCurrentInteraction() {
   }
 
   if (target === 'portalR1') {
+    dismissOnboardingBubble();
+    hidePortalPreview();
     if (teleportCallbacks.toRoom1) {
       teleportCallbacks.toRoom1();
       updateInventoryHUD();
@@ -1071,6 +1459,7 @@ export function handleCurrentInteraction() {
       showItemToast('⚠️', 'Sila selesaikan penerokaan Pagar Sesat Jawi di Papan Pintar terlebih dahulu!');
       return;
     }
+    hidePortalPreview();
     if (teleportCallbacks.toRoom2) {
       teleportCallbacks.toRoom2();
       updateInventoryHUD();
@@ -1084,6 +1473,7 @@ export function handleCurrentInteraction() {
       showItemToast('⚠️', 'Sila selesaikan ejaan 4 pasangan kata di Meja Makmal terlebih dahulu!');
       return;
     }
+    hidePortalPreview();
     if (teleportCallbacks.toRoom3) {
       teleportCallbacks.toRoom3();
       updateInventoryHUD();
@@ -1097,6 +1487,7 @@ export function handleCurrentInteraction() {
       showItemToast('⚠️', 'Sila selesaikan cantuman & padanan maksud di Meja Bacaan terlebih dahulu!');
       return;
     }
+    hidePortalPreview();
     if (teleportCallbacks.toRoom4) {
       teleportCallbacks.toRoom4();
       updateInventoryHUD();
@@ -1105,6 +1496,7 @@ export function handleCurrentInteraction() {
   }
 
   if (target === 'returnLobby') {
+    hidePortalPreview();
     showFinalPBDReport();
     return;
   }
@@ -1222,6 +1614,8 @@ export function quickCollectR1() {
   gameState.room1Completed = true;
   updateMissionChecklist();
   playSuccessFanfare();
+  triggerConfetti(window.innerWidth / 2, window.innerHeight * 0.4, 65);
+  playTeacherPraise('room1');
   renderJawiChartGrid();
   updateInventoryHUD();
   const feedback = document.getElementById('r1-feedback');
@@ -1691,8 +2085,9 @@ export function checkCurrentTabR2() {
   if (userW1 === correctW1 && userW2 === correctW2) {
     r2TabCompleted[r2ActiveTab] = true;
     playSuccessFanfare();
+    triggerConfetti(window.innerWidth / 2, window.innerHeight * 0.42, 25);
     showItemToast('🎉', `Tahniah! Ejaan ${pair.title} tepat!`);
-    speakBM(`Tahniah! Ejaan ${pair.title} tepat dan betul.`);
+    playTeacherPraise('wordCorrect');
 
     updateR2TabsBar();
 
@@ -1750,10 +2145,12 @@ export function checkCurrentTabR2() {
       if (r2TabCompleted.every(Boolean)) {
         gameState.room2Completed = true;
         updateMissionChecklist();
+        playSuccessFanfare();
+        triggerConfetti(window.innerWidth / 2, window.innerHeight * 0.38, 75);
         const proceedBtn = document.getElementById('btn-proceed-r3');
         if (proceedBtn) proceedBtn.style.display = 'block';
         showItemToast('🏆', 'Semua 4 Simpulan Bahasa Berjaya Dieja!');
-        speakBM('Syabas! Anda telah berjaya mengeja semua 4 simpulan bahasa Jawi dengan cemerlang.');
+        playTeacherPraise('room2');
         if (feedback) {
           feedback.className = 'feedback-banner success';
           feedback.textContent = `🏆 Syabas! Semua 4 simpulan bahasa berjaya dieja dengan betul!`;
@@ -1881,8 +2278,9 @@ export function checkMatchingR3() {
     gameState.room3Completed = true;
     updateMissionChecklist();
     playSuccessFanfare();
+    triggerConfetti(window.innerWidth / 2, window.innerHeight * 0.4, 75);
+    playTeacherPraise('room3');
     showItemToast('🎉', 'Tahniah! Semua padanan maksud simpulan bahasa tepat!');
-    speakBM('Tahniah! Anda berjaya memadankan semua simpulan bahasa Jawi dengan maksud yang tepat.');
     if (feedback) {
       feedback.className = 'feedback-banner success';
       feedback.textContent = '✅ Syabas! Semua 4 simpulan bahasa telah dicantum dan dipadankan dengan sempurna!';
@@ -2300,6 +2698,8 @@ export function finalizeAndExhibitArtwork() {
   gameState.room4Completed = true;
   updateMissionChecklist();
   playSuccessFanfare();
+  triggerConfetti(window.innerWidth / 2, window.innerHeight * 0.4, 85);
+  playTeacherPraise('room4');
 
   // Save to Firebase Firestore Live Gallery
   saveArtworkToDB(studentProfile.name, studentProfile.class, dataUrl)
@@ -2348,6 +2748,21 @@ export function showFinalPBDReport(dataUrl = null) {
 
   const totalScore = gameScores.total();
   if (scoreTotalEl) scoreTotalEl.textContent = `${totalScore} / 100`;
+
+  // Dynamic 3-Star Rating badges in Report Card Table
+  const starsR1El = document.getElementById('report-stars-r1');
+  const starsR2El = document.getElementById('report-stars-r2');
+  const starsR3El = document.getElementById('report-stars-r3');
+  const starsR4El = document.getElementById('report-stars-r4');
+  const starsTotEl = document.getElementById('report-stars-total');
+
+  if (starsR1El) starsR1El.textContent = getStarString(getRoomStars('r1'));
+  if (starsR2El) starsR2El.textContent = getStarString(getRoomStars('r2'));
+  if (starsR3El) starsR3El.textContent = getStarString(getRoomStars('r3'));
+  if (starsR4El) starsR4El.textContent = getStarString(getRoomStars('r4'));
+
+  const sumStars = getRoomStars('r1') + getRoomStars('r2') + getRoomStars('r3') + getRoomStars('r4');
+  if (starsTotEl) starsTotEl.textContent = `${sumStars} / 12 ⭐`;
 
   // Compute Dynamic TP Level (TP3 - TP6)
   if (badgeEl && rubricEl) {
@@ -2739,6 +3154,17 @@ if (typeof window !== 'undefined') {
   window.downloadPBDReportPDF = downloadPBDReportPDF;
   window.printPBDReport = printPBDReport;
   window.restartGame = restartGame;
+
+  // Visual Juice, Gamification, Portal Previews & Onboarding
+  window.triggerConfetti = triggerConfetti;
+  window.playTeacherPraise = playTeacherPraise;
+  window.getRoomStars = getRoomStars;
+  window.getStarString = getStarString;
+  window.showPortalPreview = showPortalPreview;
+  window.hidePortalPreview = hidePortalPreview;
+  window.showOnboardingBubble = showOnboardingBubble;
+  window.dismissOnboardingBubble = dismissOnboardingBubble;
+  window.initMobileChecklistCollapse = initMobileChecklistCollapse;
 }
 
 // ==========================================

@@ -30,8 +30,11 @@ import {
   handleCurrentInteraction,
   closeModal,
   registerEaselHandler,
-  registerR2SessionHandler
-} from './ui.js?v=4.4.2';
+  registerR2SessionHandler,
+  showPortalPreview,
+  hidePortalPreview,
+  dismissOnboardingBubble
+} from './ui.js?v=4.4.4';
 
 import { buildLobby } from './rooms/lobby.js';
 import { buildRoom1, spawnR1Checkpoints } from './rooms/room1.js';
@@ -453,6 +456,9 @@ export function teleportTo(roomId) {
 
   updateLocationBadge(targetRoom.badge, roomId !== 'lobby');
   updateInventoryHUD();
+  dismissOnboardingBubble();
+  hidePortalPreview();
+  updateMissionChecklist();
   showItemToast('✨', `Selamat Datang ke ${targetRoom.name}!`);
 
   if (roomId === 'room1') {
@@ -882,6 +888,18 @@ function animate() {
 
   gameState.nearbyTarget = foundTarget;
   updatePrompt(promptText, foundTarget !== null);
+
+  // Portal preview badge trigger
+  if (foundTarget && (foundTarget.startsWith('portal') || foundTarget === 'returnLobby')) {
+    showPortalPreview(foundTarget);
+  } else {
+    hidePortalPreview();
+  }
+
+  // Auto-dismiss onboarding bubble if player approaches Cikgu Asyikin
+  if (foundTarget === 'npcTeacher') {
+    dismissOnboardingBubble();
+  }
 
   // Sunlight and Close-Up Roblox 3rd-Person Camera Follow
   dirLight.position.set(playerGroup.position.x + 16, 32, playerGroup.position.z + 20);

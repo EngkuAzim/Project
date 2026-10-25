@@ -186,11 +186,22 @@
         </button>
       </div>
 
+      <!-- Overall Progress Bar (Dynamic Progress & Stars) -->
+      <div class="checklist-progress-wrap">
+        <div class="checklist-progress-bar">
+          <div id="checklist-progress-fill" class="checklist-progress-fill" style="width: 0%;"></div>
+        </div>
+        <div class="checklist-progress-text-row">
+          <span id="checklist-progress-text">0% Selesai (0/4 Bilik)</span>
+          <span id="checklist-stars-total" class="checklist-stars-total"></span>
+        </div>
+      </div>
+
       <div id="checklist-body" class="checklist-body">
         <div class="checklist-item" id="task-r1">
           <span class="task-box" id="task-box-r1">[ ]</span>
           <div class="task-info">
-            <span class="task-title">Bilik 1: Kutip 10 Huruf Jawi</span>
+            <span class="task-title">Bilik 1: Kutip 10 Huruf Jawi <span class="task-stars" id="task-stars-r1"></span></span>
             <span class="task-sub">Taman Pagar Sesat &bull; Alif - Nya</span>
           </div>
         </div>
@@ -198,7 +209,7 @@
         <div class="checklist-item" id="task-r2">
           <span class="task-box" id="task-box-r2">[ ]</span>
           <div class="task-info">
-            <span class="task-title">Bilik 2: Eja 4 Kata Visual</span>
+            <span class="task-title">Bilik 2: Eja 4 Kata Visual <span class="task-stars" id="task-stars-r2"></span></span>
             <span class="task-sub">Makmal Kata &bull; Meja Guru</span>
           </div>
         </div>
@@ -206,7 +217,7 @@
         <div class="checklist-item" id="task-r3">
           <span class="task-box" id="task-box-r3">[ ]</span>
           <div class="task-info">
-            <span class="task-title">Bilik 3: Padan 4 Simpulan Bahasa</span>
+            <span class="task-title">Bilik 3: Padan 4 Simpulan Bahasa <span class="task-stars" id="task-stars-r3"></span></span>
             <span class="task-sub">Arkib &bull; Meja Bacaan</span>
           </div>
         </div>
@@ -214,7 +225,7 @@
         <div class="checklist-item" id="task-r4">
           <span class="task-box" id="task-box-r4">[ ]</span>
           <div class="task-info">
-            <span class="task-title">Bilik 4: Hasilkan 1 Karya Seni Khat</span>
+            <span class="task-title">Bilik 4: Hasilkan 1 Seni Khat <span class="task-stars" id="task-stars-r4"></span></span>
             <span class="task-sub">Studio &bull; Kanvas Utama</span>
           </div>
         </div>
@@ -225,6 +236,37 @@
     <div id="interact-prompt" onclick="handleCurrentInteraction()">
       <span class="key-tag">E</span>
       <span id="prompt-label">Tekan E untuk Berinteraksi</span>
+    </div>
+
+    <!-- Portal Preview Card (Dynamic Near Portals) -->
+    <div id="portal-preview-card" class="portal-preview-card" style="display: none;">
+      <div class="portal-preview-icon-wrap" id="portal-preview-icon">🌿</div>
+      <div class="portal-preview-content">
+        <div class="portal-preview-top">
+          <span class="portal-preview-badge" id="portal-preview-room">Bilik 1</span>
+          <span class="portal-preview-status" id="portal-preview-status">Belum Selesai</span>
+        </div>
+        <div class="portal-preview-title" id="portal-preview-title">Taman Pagar Sesat Jawi</div>
+        <div class="portal-preview-desc" id="portal-preview-desc">Kutip 10 huruf Jawi (Alif - Nya) di dalam pagar sesat.</div>
+      </div>
+    </div>
+
+    <!-- Onboarding Welcome Speech Bubble (Lobby First 5-9s) -->
+    <div id="onboarding-welcome-bubble" class="onboarding-welcome-bubble" onclick="openProfileModal()">
+      <div class="onboarding-bubble-avatar">
+        <img src="./images/cikgu-asyikin-avatar.jpg" alt="Cikgu Asyikin">
+        <span class="bubble-wave-badge">👋</span>
+      </div>
+      <div class="onboarding-bubble-content">
+        <div class="onboarding-bubble-title">
+          <span>Cikgu Asyikin</span>
+          <span class="onboarding-bubble-tag">Guru BM</span>
+        </div>
+        <p class="onboarding-bubble-msg">
+          "Cikgu ada di sini! Tekan <strong>[E]</strong> di rostrum untuk menyapa Cikgu & daftar nama kamu."
+        </p>
+      </div>
+      <button class="onboarding-bubble-close" onclick="event.stopPropagation(); dismissOnboardingBubble()" title="Tutup panduan">&times;</button>
     </div>
 
     <!-- Floating Item Toast -->
@@ -864,6 +906,7 @@
             <tr>
               <th>Aktiviti Pembelajaran (Bilik)</th>
               <th>Kemahiran Standard Pembelajaran</th>
+              <th style="text-align: center;">Penarafan</th>
               <th style="text-align: right;">Markah</th>
             </tr>
           </thead>
@@ -871,25 +914,30 @@
             <tr>
               <td><strong>Bilik 1: Taman Pagar Sesat</strong></td>
               <td>Kembara 37 Huruf Jawi (Alif - Nya)</td>
+              <td style="text-align: center; color: #F59E0B; font-size: 13px;" id="report-stars-r1">⭐⭐⭐</td>
               <td style="text-align: right; color: #059669; font-weight: 700;" id="report-score-r1">Selesai (100%)</td>
             </tr>
             <tr>
               <td><strong>Bilik 2: Makmal Kata</strong></td>
               <td>Ejaan 4 Pasangan Kata Visual Jawi</td>
+              <td style="text-align: center; color: #F59E0B; font-size: 13px;" id="report-stars-r2">⭐⭐⭐</td>
               <td style="text-align: right; font-weight: 700;" id="report-score-r2">30 / 30</td>
             </tr>
             <tr>
               <td><strong>Bilik 3: Arkib Simpulan Bahasa</strong></td>
               <td>Cantuman Kata & Padanan Maksud</td>
+              <td style="text-align: center; color: #F59E0B; font-size: 13px;" id="report-stars-r3">⭐⭐⭐</td>
               <td style="text-align: right; font-weight: 700;" id="report-score-r3">30 / 30</td>
             </tr>
             <tr>
               <td><strong>Bilik 4: Studio Seni Khat</strong></td>
               <td>Persembahan Seni Tulisan Jawi</td>
+              <td style="text-align: center; color: #F59E0B; font-size: 13px;" id="report-stars-r4">⭐⭐⭐</td>
               <td style="text-align: right; font-weight: 700;" id="report-score-r4">40 / 40</td>
             </tr>
             <tr class="total-row">
               <td colspan="2">Jumlah Keseluruhan Markah:</td>
+              <td style="text-align: center; color: #F59E0B; font-weight: 800; font-size: 13px;" id="report-stars-total">12 / 12 ⭐</td>
               <td style="text-align: right; color: #059669; font-size: 15px;" id="report-score-total">100 / 100</td>
             </tr>
           </tbody>
@@ -994,5 +1042,8 @@
       if (installBtn) installBtn.style.display = 'none';
     });
   </script>
+
+  <!-- Micro Confetti Canvas Layer -->
+  <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
 </body>
 </html>

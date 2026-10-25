@@ -2694,11 +2694,333 @@ html, body {
 }
 
 
+/* ==========================================
+   18. OVERALL PROGRESS BAR IN CHECKLIST
+   ========================================== */
+.checklist-progress-wrap {
+  padding: 8px 12px;
+  background: rgba(15, 23, 42, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.checklist-progress-bar {
+  width: 100%;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.checklist-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #10B981, #06D6A0, #F59E0B);
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 10px rgba(6, 214, 160, 0.5);
+}
+
+.checklist-progress-text-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #CBD5E1;
+}
+
+.checklist-stars-total {
+  font-size: 11px;
+  color: #F59E0B;
+  letter-spacing: 1px;
+}
+
+/* ==========================================
+   19. ACTIVE ROOM GLOWING FOCUS & DIMMING
+   ========================================== */
+.checklist-item.active-room {
+  background: linear-gradient(135deg, rgba(6, 95, 70, 0.55), rgba(16, 185, 129, 0.28)) !important;
+  border-left: 4px solid #F59E0B !important;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.35), inset 0 0 10px rgba(6, 214, 160, 0.15) !important;
+  transform: scale(1.02);
+  animation: pulseActiveRoom 2.4s infinite alternate ease-in-out;
+}
+
+@keyframes pulseActiveRoom {
+  0% {
+    border-left-color: #F59E0B;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.3), inset 0 0 8px rgba(6, 214, 160, 0.15);
+  }
+  100% {
+    border-left-color: #FDE047;
+    box-shadow: 0 0 20px rgba(253, 224, 71, 0.6), inset 0 0 14px rgba(16, 185, 129, 0.25);
+  }
+}
+
+.checklist-item.active-room .task-title {
+  color: #FEF08A !important;
+  font-weight: 800;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.checklist-item.active-room .task-box {
+  color: #F59E0B !important;
+  font-weight: 900;
+}
+
+.checklist-item.dimmed {
+  opacity: 0.45;
+  filter: grayscale(0.2);
+}
+
+.checklist-item.dimmed:hover {
+  opacity: 0.85;
+  filter: none;
+}
+
+.task-stars {
+  font-size: 11px;
+  color: #FBBF24;
+  margin-left: 4px;
+  letter-spacing: 1px;
+}
+
+/* ==========================================
+   20. ONBOARDING WELCOME BUBBLE (LOBBY)
+   ========================================== */
+.onboarding-welcome-bubble {
+  position: fixed;
+  bottom: 84px;
+  left: 24px;
+  max-width: 380px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 2px solid #FDA4AF;
+  border-radius: 20px;
+  box-shadow: 0 14px 36px rgba(136, 19, 55, 0.22), 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 40;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: floatBubbleIn 0.5s ease-out, bounceBubble 3.5s infinite ease-in-out 0.5s;
+}
+
+@keyframes floatBubbleIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes bounceBubble {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.onboarding-welcome-bubble:hover {
+  transform: translateY(-3px) scale(1.02);
+  border-color: #F43F5E;
+}
+
+.onboarding-bubble-avatar {
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+}
+
+.onboarding-bubble-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #F59E0B;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.bubble-wave-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -4px;
+  font-size: 16px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  animation: waveHand 1.8s infinite ease-in-out;
+  transform-origin: 70% 70%;
+}
+
+@keyframes waveHand {
+  0%, 100% { transform: rotate(0deg); }
+  20%, 60% { transform: rotate(14deg); }
+  40%, 80% { transform: rotate(-10deg); }
+}
+
+.onboarding-bubble-content {
+  flex: 1;
+}
+
+.onboarding-bubble-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #881337;
+  font-family: var(--font-display);
+}
+
+.onboarding-bubble-tag {
+  font-size: 10px;
+  background: #881337;
+  color: #FFF;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.onboarding-bubble-msg {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.35;
+  margin: 3px 0 0 0;
+}
+
+.onboarding-bubble-msg strong {
+  color: #BE123C;
+}
+
+.onboarding-bubble-close {
+  background: rgba(0, 0, 0, 0.06);
+  border: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: #64748B;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  align-self: flex-start;
+}
+
+.onboarding-bubble-close:hover {
+  background: #FEE2E2;
+  color: #EF4444;
+}
+
+/* ==========================================
+   21. PORTAL PREVIEW BADGE CARD
+   ========================================== */
+.portal-preview-card {
+  position: fixed;
+  bottom: 126px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 35;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 2px solid #38BDF8;
+  border-radius: 18px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45), 0 0 20px rgba(56, 189, 248, 0.3);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 440px;
+  width: 90%;
+  pointer-events: none;
+  animation: popPreviewIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popPreviewIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(14px) scale(0.94); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+.portal-preview-icon-wrap {
+  font-size: 32px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1.5px solid rgba(56, 189, 248, 0.4);
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.portal-preview-content {
+  flex: 1;
+}
+
+.portal-preview-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.portal-preview-badge {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #38BDF8;
+  background: rgba(56, 189, 248, 0.16);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.portal-preview-status {
+  font-size: 11px;
+  font-weight: 700;
+  color: #FBBF24;
+}
+
+.portal-preview-status.done {
+  color: #34D399;
+}
+
+.portal-preview-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #F8FAFC;
+  font-family: var(--font-display);
+  margin-top: 2px;
+}
+
+.portal-preview-desc {
+  font-size: 12px;
+  color: #94A3B8;
+  margin: 2px 0 0 0;
+  line-height: 1.3;
+}
+
+/* ==========================================
+   22. CONFETTI CANVAS LAYER
+   ========================================== */
+.confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+}
+
 @media (max-width: 768px) {
   .mission-checklist-panel {
-    top: auto;
-    bottom: 96px;
-    right: 12px;
+    top: 76px;
+    bottom: auto;
+    right: 10px;
     width: 220px;
   }
   .hud-action-btn {
@@ -2707,6 +3029,18 @@ html, body {
   }
   .hud-btn-label {
     display: none;
+  }
+  .onboarding-welcome-bubble {
+    bottom: 120px;
+    left: 12px;
+    right: 12px;
+    max-width: none;
+  }
+  .portal-preview-card {
+    bottom: 135px;
+  }
+  .floating-kamus-btn {
+    bottom: 92px; /* Lift above mobile touch joystick/button */
   }
 }
 
