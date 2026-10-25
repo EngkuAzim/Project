@@ -274,6 +274,7 @@ export function updatePrompt(label, isVisible = true) {
 // 3. DYNAMIC INVENTORY HUD ACROSS 5 AREAS
 // ==========================================
 export function updateInventoryHUD() {
+  updateMissionChecklist();
   if (!invSlotsContainer) return;
   invSlotsContainer.innerHTML = '';
 
@@ -383,6 +384,7 @@ export function collectItem(item, currentRoom) {
     const count = COLLECTIBLES_R1.filter(c => c.collected).length;
     if (count === 10) {
       gameState.room1Completed = true;
+      updateMissionChecklist();
       updateMissionText('Tahniah! Semua 10 kumpulan huruf ditemui. Pergi ke Papan Pintar di hujung pagar sesat!');
     } else {
       updateMissionText(`Misi: Ikuti anak panah ke Pos ${count + 1} (${10 - count} pos lagi).`);
@@ -470,13 +472,529 @@ export function openIntroModal() {
   gameState.activeModal = 'intro-modal';
 }
 
+// ==========================================
+// 6.1 MAIN MENU CONTROLS
+// ==========================================
+export function startMainGame() {
+  unlockAudio();
+  playCollectChime();
+  const menu = document.getElementById('main-menu');
+  if (menu) {
+    menu.classList.add('hidden');
+    setTimeout(() => {
+      menu.style.display = 'none';
+    }, 450);
+  }
+  openIntroModal();
+}
+
+// ==========================================
+// 6.2 HOME BUTTON & ACTIVE ROOM STATE RESET
+// ==========================================
+export function resetRoomProgress(roomId) {
+  if (roomId === 'room1') {
+    gameState.room1Completed = false;
+    COLLECTIBLES_R1.forEach(c => {
+      c.collected = false;
+      c.isPopping = false;
+      c.popScale = 1.0;
+      if (c.mesh) {
+        c.mesh.visible = true;
+        c.mesh.scale.set(1, 1, 1);
+        if (c.pos) c.mesh.position.set(c.pos.x, c.pos.y, c.pos.z);
+      }
+    });
+  } else if (roomId === 'room2') {
+    gameState.room2Completed = false;
+    gameState.r2Session = 1;
+    gameState.r2Session1Completed = false;
+    COLLECTIBLES_R2.forEach(c => {
+      c.collected = false;
+      c.isPopping = false;
+      c.popScale = 1.0;
+      if (c.mesh) {
+        c.mesh.visible = true;
+        c.mesh.scale.set(1, 1, 1);
+        if (c.pos) c.mesh.position.set(c.pos.x, c.pos.y, c.pos.z);
+      }
+    });
+  } else if (roomId === 'room3') {
+    gameState.room3Completed = false;
+    COLLECTIBLES_R3.forEach(c => {
+      c.collected = false;
+      c.isPopping = false;
+      c.popScale = 1.0;
+      if (c.mesh) {
+        c.mesh.visible = true;
+        c.mesh.scale.set(1, 1, 1);
+        if (c.pos) c.mesh.position.set(c.pos.x, c.pos.y, c.pos.z);
+      }
+    });
+  } else if (roomId === 'room4') {
+    gameState.room4Completed = false;
+    COLLECTIBLES_R4.forEach(c => {
+      c.collected = false;
+      c.isPopping = false;
+      c.popScale = 1.0;
+      if (c.mesh) {
+        c.mesh.visible = true;
+        c.mesh.scale.set(1, 1, 1);
+        if (c.pos) c.mesh.position.set(c.pos.x, c.pos.y, c.pos.z);
+      }
+    });
+  }
+}
+
+export function confirmReturnToLobby() {
+  if (gameState.currentRoom === 'lobby') {
+    showItemToast('🏫', 'Anda sudah berada di Dataran Sekolah (Lobi)!');
+    return;
+  }
+
+  const ok = window.confirm('Adakah anda pasti mahu kembali ke lobi? Progress bilik ini akan diulang semula.');
+  if (!ok) return;
+
+  // Hide any active room UI / modals
+  document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+  gameState.activeModal = null;
+  if (typeof closeGallerySidebar === 'function') {
+    closeGallerySidebar();
+  }
+
+  // Reset active room state
+  resetRoomProgress(gameState.currentRoom);
+
+  // Reset player 3D coordinates to Lobby starting position
+  if (teleportCallbacks.toLobby) {
+    teleportCallbacks.toLobby();
+  }
+
+  updateInventoryHUD();
+  updateMissionChecklist();
+  showItemToast('🏠', 'Kembali ke Dataran Lobi.');
+}
+
+// ==========================================
+// 6.3 DYNAMIC MISSION CHECKLIST
+// ==========================================
+export function updateMissionChecklist() {
+  const missions = [
+    { id: 'r1', completed: !!gameState.room1Completed },
+    { id: 'r2', completed: !!gameState.room2Completed },
+    { id: 'r3', completed: !!gameState.room3Completed },
+    { id: 'r4', completed: !!gameState.room4Completed }
+  ];
+
+  missions.forEach(m => {
+    const itemEl = document.getElementById(`task-${m.id}`);
+    const boxEl = document.getElementById(`task-box-${m.id}`);
+    if (boxEl) {
+      boxEl.textContent = m.completed ? '[✅]' : '[ ]';
+    }
+    if (itemEl) {
+      if (m.completed) {
+        itemEl.classList.add('completed');
+      } else {
+        itemEl.classList.remove('completed');
+      }
+    }
+  });
+}
+
+export function toggleMissionChecklist() {
+  const bodyEl = document.getElementById('checklist-body');
+  const iconEl = document.getElementById('checklist-toggle-icon');
+  if (!bodyEl) return;
+  bodyEl.classList.toggle('collapsed');
+  if (iconEl) {
+    iconEl.textContent = bodyEl.classList.contains('collapsed') ? '+' : '−';
+  }
+}
+
+// ==========================================
+// 6.4 KAMUS RUMI KE JAWI (DSKP SP 4.4.2 & 66K TSV DATASET)
+// ==========================================
+
+// Global high-speed Map object for instant O(1) translation lookup
+if (typeof window !== 'undefined') {
+  window.kamusDB = window.kamusDB || new Map();
+}
+
+// Core Simpulan Bahasa (DSKP SP 4.4.2)
+export const CORE_SIMPULAN_BAHASA = {
+  'ulat buku': 'اولت بوکو',
+  'anak emas': 'انق امس',
+  'buah hati': 'بواه هاتي',
+  'cahaya mata': 'چهاي مات'
+};
+
+// Seed core idioms into Map immediately
+if (typeof window !== 'undefined' && window.kamusDB) {
+  Object.entries(CORE_SIMPULAN_BAHASA).forEach(([k, v]) => window.kamusDB.set(k, v));
+}
+
+// Hardcoded essential vocabulary fallback
+export const KAMUS_DICTIONARY = {
+  ...CORE_SIMPULAN_BAHASA,
+  'ulatbuku': 'اولت بوکو',
+  'anakemas': 'انق امس',
+  'buahhati': 'بواه هاتي',
+  'cahayamata': 'چهاي مات',
+  'ulat': 'اولت',
+  'buku': 'بوکو',
+  'anak': 'انق',
+  'emas': 'امس',
+  'buah': 'بواه',
+  'hati': 'هاتي',
+  'cahaya': 'چهاي',
+  'mata': 'مات',
+  'jawi': 'جاوي',
+  'bahasa': 'بهاس',
+  'melayu': 'ملايو',
+  'sekolah': 'سکوله',
+  'bestari': 'بستاري',
+  'cikgu': 'چيقݢو',
+  'guru': 'ݢورو',
+  'murid': 'موريد',
+  'khat': 'خط',
+  'seni': 'سني',
+  'karya': 'کريا',
+  'arkib': 'ارکيب',
+  'makmal': 'معمل',
+  'pagar': 'ڤاݢر',
+  'sesat': 'سست',
+  'taman': 'تامن'
+};
+
+const JAWI_DIGRAPHS = {
+  'ng': 'ڠ',
+  'ny': 'ڽ',
+  'sy': 'ش',
+  'kh': 'خ',
+  'gh': 'غ',
+  'ch': 'چ'
+};
+
+const JAWI_CHAR_MAP = {
+  'a': 'ا',
+  'b': 'ب',
+  'c': 'چ',
+  'd': 'د',
+  'e': 'ي',
+  'f': 'ف',
+  'g': 'ݢ',
+  'h': 'ه',
+  'i': 'ي',
+  'j': 'ج',
+  'k': 'ک',
+  'l': 'ل',
+  'm': 'م',
+  'n': 'ن',
+  'o': 'و',
+  'p': 'ڤ',
+  'q': 'ق',
+  'r': 'ر',
+  's': 'س',
+  't': 'ت',
+  'u': 'و',
+  'v': 'ۏ',
+  'w': 'و',
+  'x': 'ک س',
+  'y': 'ي',
+  'z': 'ز'
+};
+
+let isKamusLoading = false;
+let isKamusReady = false;
+
+/**
+ * 1. Data Fetching & Parsing:
+ * Loads the 66,000 Rumi-to-Jawi dataset from rumi-jawi.tsv and parses into window.kamusDB Map.
+ */
+export async function loadKamusData() {
+  if (isKamusReady || isKamusLoading) return;
+  isKamusLoading = true;
+
+  const statusEl = document.getElementById('kamus-status-indicator');
+  if (statusEl) {
+    statusEl.textContent = 'Status Kamus: Memuatkan pangkalan data...';
+    statusEl.classList.remove('ready');
+  }
+
+  try {
+    const response = await fetch('rumi-jawi.tsv');
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const text = await response.text();
+    const lines = text.split(/\r?\n/);
+    let count = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+
+      // Ignore TSV header line
+      if (i === 0 && line.toLowerCase().startsWith('rumi')) {
+        continue;
+      }
+
+      const tabIndex = line.indexOf('\t');
+      if (tabIndex === -1) continue;
+
+      const rumi = line.slice(0, tabIndex).trim().toLowerCase();
+      const jawi = line.slice(tabIndex + 1).trim();
+
+      if (rumi && jawi) {
+        if (!window.kamusDB.has(rumi)) {
+          window.kamusDB.set(rumi, jawi);
+        }
+        count++;
+      }
+    }
+
+    // Ensure core Simpulan Bahasa remain 100% accurate
+    Object.entries(CORE_SIMPULAN_BAHASA).forEach(([k, v]) => window.kamusDB.set(k, v));
+
+    isKamusReady = true;
+    isKamusLoading = false;
+
+    if (statusEl) {
+      statusEl.textContent = 'Status Kamus: Sedia (66k Perkataan)';
+      statusEl.classList.add('ready');
+    }
+
+    console.log(`[Kamus] Pangkalan data Rumi-Jawi berjaya dimuat (${count} pasangan perkataan).`);
+
+    // If there is an active input in Kamus modal, refresh translation immediately
+    const inputEl = document.getElementById('kamus-rumi-input');
+    if (inputEl && inputEl.value) {
+      transliterateRumiToJawi(inputEl.value);
+    }
+  } catch (err) {
+    console.warn('[Kamus] Ralat memuatkan rumi-jawi.tsv, menggunakan enjin sandaran:', err);
+    isKamusLoading = false;
+    if (statusEl) {
+      statusEl.textContent = 'Status Kamus: Sedia (Enjin Sandaran)';
+      statusEl.classList.add('ready');
+    }
+  }
+}
+
+/**
+ * Fallback character & digraph transliteration for words not in the 66k dataset
+ */
+export function fallbackTransliterate(word) {
+  const w = word.toLowerCase();
+  let result = '';
+  let i = 0;
+  const len = w.length;
+
+  while (i < len) {
+    // Check 2-letter digraphs first
+    if (i + 1 < len) {
+      const two = w.slice(i, i + 2);
+      if (JAWI_DIGRAPHS[two]) {
+        result += JAWI_DIGRAPHS[two];
+        i += 2;
+        continue;
+      }
+    }
+
+    const ch = w[i];
+    // Special initial vowel handling for clean Malay Jawi
+    if (i === 0) {
+      if (ch === 'a') {
+        result += 'ا';
+        i++;
+        continue;
+      } else if (ch === 'i' || ch === 'e') {
+        result += 'اي';
+        i++;
+        continue;
+      } else if (ch === 'u' || ch === 'o') {
+        result += 'او';
+        i++;
+        continue;
+      }
+    }
+
+    // Special ending 'k' in Malay is often 'ق' (Qaf)
+    if (ch === 'k' && i === len - 1 && len > 2) {
+      result += 'ق';
+      i++;
+      continue;
+    }
+
+    if (JAWI_CHAR_MAP[ch]) {
+      result += JAWI_CHAR_MAP[ch];
+    } else {
+      result += ch;
+    }
+    i++;
+  }
+
+  return result;
+}
+
+/**
+ * Translates a single word using Map -> Dictionary -> Fallback
+ */
+export function transliterateWord(rawWord) {
+  const w = rawWord.toLowerCase();
+
+  // 1. Search 66,000 dataset in Map
+  if (window.kamusDB && window.kamusDB.has(w)) {
+    return window.kamusDB.get(w);
+  }
+
+  // 2. Check hardcoded dictionary
+  if (KAMUS_DICTIONARY[w]) {
+    return KAMUS_DICTIONARY[w];
+  }
+
+  // 3. Fallback character/digraph algorithm for typos or names
+  return fallbackTransliterate(w);
+}
+
+/**
+ * 2. Smart Lookup Logic:
+ * Converts input to lowercase, searches Map, handles multi-word phrases, with fallback safety net.
+ */
+export function transliterateRumiToJawi(rawInput) {
+  const outputEl = document.getElementById('kamus-jawi-output');
+  const badgeEl = document.getElementById('kamus-exact-badge');
+  if (!outputEl) return '';
+
+  const trimmed = (rawInput || '').trim();
+  if (!trimmed) {
+    outputEl.textContent = '...';
+    if (badgeEl) badgeEl.style.display = 'none';
+    return '';
+  }
+
+  const normalized = trimmed.toLowerCase().replace(/\s+/g, ' ');
+
+  // 1. Direct exact match in window.kamusDB (Full input string, e.g. 'ulat buku' or 'makan')
+  if (window.kamusDB && window.kamusDB.has(normalized)) {
+    const jawiText = window.kamusDB.get(normalized);
+    outputEl.textContent = jawiText;
+    const isCoreIdiom = !!CORE_SIMPULAN_BAHASA[normalized];
+    if (badgeEl) badgeEl.style.display = isCoreIdiom ? 'inline-block' : 'none';
+    return jawiText;
+  }
+
+  // Check hardcoded dictionary for exact phrase
+  if (KAMUS_DICTIONARY[normalized]) {
+    const jawiText = KAMUS_DICTIONARY[normalized];
+    outputEl.textContent = jawiText;
+    const isCoreIdiom = !!CORE_SIMPULAN_BAHASA[normalized];
+    if (badgeEl) badgeEl.style.display = isCoreIdiom ? 'inline-block' : 'none';
+    return jawiText;
+  }
+
+  // 2. Multi-word phrase: split by spaces, translate each word individually, join back together
+  const words = normalized.split(' ');
+  const transliteratedWords = words.map(w => transliterateWord(w));
+  const finalJawi = transliteratedWords.join(' ');
+
+  outputEl.textContent = finalJawi;
+
+  const containsCoreIdiom = Object.keys(CORE_SIMPULAN_BAHASA).some(ci => normalized.includes(ci));
+  if (badgeEl) badgeEl.style.display = containsCoreIdiom ? 'inline-block' : 'none';
+
+  return finalJawi;
+}
+
+export function openKamusModal() {
+  openModal('kamus-modal');
+  if (!isKamusReady && !isKamusLoading) {
+    loadKamusData();
+  }
+  const inputEl = document.getElementById('kamus-rumi-input');
+  if (inputEl) {
+    setTimeout(() => {
+      inputEl.focus();
+    }, 150);
+    if (inputEl.value) {
+      transliterateRumiToJawi(inputEl.value);
+    }
+  }
+}
+
+export function insertKamusPrompt(phrase) {
+  const inputEl = document.getElementById('kamus-rumi-input');
+  if (inputEl) {
+    inputEl.value = phrase;
+    transliterateRumiToJawi(phrase);
+    inputEl.focus();
+  }
+}
+
+export function clearKamusInput() {
+  const inputEl = document.getElementById('kamus-rumi-input');
+  const outputEl = document.getElementById('kamus-jawi-output');
+  const badgeEl = document.getElementById('kamus-exact-badge');
+  if (inputEl) {
+    inputEl.value = '';
+    inputEl.focus();
+  }
+  if (outputEl) outputEl.textContent = '...';
+  if (badgeEl) badgeEl.style.display = 'none';
+}
+
+export function copyKamusJawi() {
+  const outputEl = document.getElementById('kamus-jawi-output');
+  const text = outputEl ? outputEl.textContent.trim() : '';
+  if (!text || text === '...') {
+    showItemToast('⚠️', 'Sila tulis perkataan Rumi terlebih dahulu!');
+    return;
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showItemToast('📋', `Teks Jawi berjaya disalin: ${text}`);
+      playTone(880, 'sine', 0.15);
+    }).catch(() => {
+      showItemToast('📋', text);
+    });
+  } else {
+    showItemToast('📋', text);
+  }
+}
+
+export function speakKamusJawi() {
+  const inputEl = document.getElementById('kamus-rumi-input');
+  const outputEl = document.getElementById('kamus-jawi-output');
+  const rumi = inputEl ? inputEl.value.trim() : '';
+  const jawi = outputEl ? outputEl.textContent.trim() : '';
+  if (!rumi || jawi === '...') {
+    showItemToast('⚠️', 'Sila masukkan perkataan untuk didengari.');
+    return;
+  }
+  speakBM(`${rumi}. Ejaan Jawi: ${jawi}`, 0.9);
+}
+
+export function initKamus() {
+  const inputEl = document.getElementById('kamus-rumi-input');
+  if (inputEl) {
+    inputEl.addEventListener('input', (e) => {
+      transliterateRumiToJawi(e.target.value);
+    });
+  }
+  loadKamusData();
+}
+
 if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      openIntroModal();
+      initKamus();
+      updateMissionChecklist();
     });
   } else {
-    setTimeout(openIntroModal, 50);
+    setTimeout(() => {
+      initKamus();
+      updateMissionChecklist();
+    }, 50);
   }
 }
 
@@ -666,6 +1184,7 @@ export function quickCollectR1() {
     if (c.mesh) c.mesh.visible = true;
   });
   gameState.room1Completed = true;
+  updateMissionChecklist();
   playSuccessFanfare();
   renderJawiChartGrid();
   updateInventoryHUD();
@@ -1199,6 +1718,7 @@ export function checkCurrentTabR2() {
     if (r2ActiveTab === 3) {
       if (r2TabCompleted.every(Boolean)) {
         gameState.room2Completed = true;
+        updateMissionChecklist();
         const proceedBtn = document.getElementById('btn-proceed-r3');
         if (proceedBtn) proceedBtn.style.display = 'block';
         showItemToast('🏆', 'Semua 4 Simpulan Bahasa Berjaya Dieja!');
@@ -1328,6 +1848,7 @@ export function checkMatchingR3() {
 
   if (allCorrect) {
     gameState.room3Completed = true;
+    updateMissionChecklist();
     playSuccessFanfare();
     showItemToast('🎉', 'Tahniah! Semua padanan maksud simpulan bahasa tepat!');
     speakBM('Tahniah! Anda berjaya memadankan semua simpulan bahasa Jawi dengan maksud yang tepat.');
@@ -1746,6 +2267,7 @@ export function finalizeAndExhibitArtwork() {
   // Award 40 Marks for Room 4
   gameScores.room4 = 40;
   gameState.room4Completed = true;
+  updateMissionChecklist();
   playSuccessFanfare();
 
   // Save to Firebase Firestore Live Gallery
@@ -2106,6 +2628,19 @@ export function openGalleryPreview(indexOrData) {
 // 14. GLOBAL BINDINGS FOR HTML ONCLICK COMPATIBILITY
 // ==========================================
 if (typeof window !== 'undefined') {
+  // Main Menu, Home & Kamus Controls
+  window.startMainGame = startMainGame;
+  window.confirmReturnToLobby = confirmReturnToLobby;
+  window.openKamusModal = openKamusModal;
+  window.insertKamusPrompt = insertKamusPrompt;
+  window.clearKamusInput = clearKamusInput;
+  window.copyKamusJawi = copyKamusJawi;
+  window.speakKamusJawi = speakKamusJawi;
+  window.transliterateRumiToJawi = transliterateRumiToJawi;
+  window.toggleMissionChecklist = toggleMissionChecklist;
+  window.updateMissionChecklist = updateMissionChecklist;
+  window.loadKamusData = loadKamusData;
+
   window.openIntroModal = openIntroModal;
   window.openProfileModal = openProfileModal;
   window.saveProfile = saveProfile;

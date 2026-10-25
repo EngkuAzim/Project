@@ -20,6 +20,7 @@ const CORE_ASSETS = [
   './rooms/room3.js',
   './rooms/room4.js',
   './manifest.json',
+  './rumi-jawi.tsv',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon.svg'

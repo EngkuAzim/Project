@@ -26,6 +26,7 @@ import {
   updateMissionText,
   updatePrompt,
   updateInventoryHUD,
+  updateMissionChecklist,
   handleCurrentInteraction,
   closeModal,
   registerEaselHandler,
@@ -516,7 +517,8 @@ window.addEventListener('keydown', (e) => {
   if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
   if (keys.hasOwnProperty(key)) keys[key] = true;
 
-  if ((e.key === 'e' || e.key === 'E') && !gameState.activeModal) {
+  const isMenuOpen = document.getElementById('main-menu') && !document.getElementById('main-menu').classList.contains('hidden');
+  if ((e.key === 'e' || e.key === 'E') && !gameState.activeModal && !isMenuOpen) {
     handleCurrentInteraction();
   }
 
@@ -658,7 +660,8 @@ function animate() {
   });
 
   // Player Movement (Roblox 3rd-Person Front View Axes & Mobile Virtual Joystick)
-  if (!gameState.activeModal) {
+  const isMenuOpen = document.getElementById('main-menu') && !document.getElementById('main-menu').classList.contains('hidden');
+  if (!gameState.activeModal && !isMenuOpen) {
     let inputX = 0;
     let inputZ = 0;
 
@@ -899,8 +902,9 @@ Object.keys(roomGroups).forEach((key) => {
   roomGroups[key].visible = (key === 'lobby');
 });
 
-// Initialize dynamic HUD
+// Initialize dynamic HUD & Mission Checklist
 updateInventoryHUD();
+updateMissionChecklist();
 
 // Start Game Loop
 animate();

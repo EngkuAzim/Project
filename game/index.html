@@ -29,6 +29,66 @@
 </head>
 <body>
 
+  <!-- ==========================================
+       1. FULLSCREEN MAIN MENU OVERLAY
+       ========================================== -->
+  <div id="main-menu" class="main-menu-overlay">
+    <div class="main-menu-card">
+      <div class="main-menu-badge">
+        <span class="badge-school-icon">🏫</span>
+        <span>Kementerian Pendidikan Malaysia &bull; DSKP SP 4.4.2</span>
+      </div>
+
+      <h1 class="main-menu-title">Jejak Jawi Bestari</h1>
+      <p class="main-menu-subtitle">
+        Inovasi Gamifikasi 3D PdP Seni Tulisan Jawi &bull; Tahun 4 Inovatif SK Bestari
+      </p>
+
+      <div class="main-menu-highlights">
+        <div class="menu-highlight-pill">
+          <span class="pill-icon">🌿</span>
+          <div class="pill-text">
+            <strong>Bilik 1</strong>
+            <span>Taman Maze (37 Huruf)</span>
+          </div>
+        </div>
+        <div class="menu-highlight-pill">
+          <span class="pill-icon">🧪</span>
+          <div class="pill-text">
+            <strong>Bilik 2</strong>
+            <span>Makmal Kata (4 Ejaan)</span>
+          </div>
+        </div>
+        <div class="menu-highlight-pill">
+          <span class="pill-icon">📚</span>
+          <div class="pill-text">
+            <strong>Bilik 3</strong>
+            <span>Arkib Simpulan Bahasa</span>
+          </div>
+        </div>
+        <div class="menu-highlight-pill">
+          <span class="pill-icon">🎨</span>
+          <div class="pill-text">
+            <strong>Bilik 4</strong>
+            <span>Studio Seni Khat</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-menu-action">
+        <button id="btn-start-game" class="btn-main-menu-pulse" onclick="startMainGame()">
+          🎮 Mula Permainan
+        </button>
+      </div>
+
+      <div class="main-menu-footer">
+        <span>👩‍🏫 Guru Pembimbing: <strong>Cikgu Asyikin</strong></span>
+        <span>&bull;</span>
+        <span>🎓 Sijil Pentaksiran Bilik Darjah (PBD)</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Three.js Canvas Container -->
   <div id="canvas-container"></div>
 
@@ -43,6 +103,16 @@
           <p><span id="location-badge" class="badge-area">Dataran Sekolah</span> DSKP SP 4.4.2</p>
         </div>
       </div>
+
+      <!-- Home Button: Kembali ke Lobi -->
+      <button id="btn-home-lobby" class="hud-action-btn btn-home" onclick="confirmReturnToLobby()" title="Kembali ke Dataran Sekolah (Lobi)">
+        🏠 <span class="hud-btn-label">Kembali ke Lobi</span>
+      </button>
+
+      <!-- Kamus Rumi ke Jawi Button -->
+      <button id="btn-kamus-toggle" class="hud-action-btn btn-kamus" onclick="openKamusModal()" title="Buka Kamus Rumi ke Jawi">
+        📖 <span class="hud-btn-label">Kamus Rumi ke Jawi</span>
+      </button>
 
       <!-- Prominent Gallery Toggle Button -->
       <button id="btn-gallery-toggle" class="gallery-toggle-btn" onclick="openGallerySidebar()" title="Buka Galeri Pameran Jawi">
@@ -76,6 +146,53 @@
         </div>
         <div class="inventory-slots" id="inventory-slots-container">
           <!-- Dynamically populated by ui.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Mission Checklist Panel (Pinned Right) -->
+    <div id="mission-checklist" class="mission-checklist-panel">
+      <div class="checklist-header" onclick="toggleMissionChecklist()">
+        <div class="checklist-title">
+          <span class="checklist-icon">📋</span>
+          <strong>Senarai Tugas</strong>
+        </div>
+        <button id="btn-toggle-checklist" class="checklist-toggle-btn" type="button" title="Kecilkan / Besarkan Senarai">
+          <span id="checklist-toggle-icon">−</span>
+        </button>
+      </div>
+
+      <div id="checklist-body" class="checklist-body">
+        <div class="checklist-item" id="task-r1">
+          <span class="task-box" id="task-box-r1">[ ]</span>
+          <div class="task-info">
+            <span class="task-title">Bilik 1: Kutip 10 Huruf Jawi</span>
+            <span class="task-sub">Taman Pagar Sesat &bull; Alif - Nya</span>
+          </div>
+        </div>
+
+        <div class="checklist-item" id="task-r2">
+          <span class="task-box" id="task-box-r2">[ ]</span>
+          <div class="task-info">
+            <span class="task-title">Bilik 2: Eja 4 Kata Visual</span>
+            <span class="task-sub">Makmal Kata &bull; Meja Guru</span>
+          </div>
+        </div>
+
+        <div class="checklist-item" id="task-r3">
+          <span class="task-box" id="task-box-r3">[ ]</span>
+          <div class="task-info">
+            <span class="task-title">Bilik 3: Padan 4 Simpulan Bahasa</span>
+            <span class="task-sub">Arkib &bull; Meja Bacaan</span>
+          </div>
+        </div>
+
+        <div class="checklist-item" id="task-r4">
+          <span class="task-box" id="task-box-r4">[ ]</span>
+          <div class="task-info">
+            <span class="task-title">Bilik 4: Hasilkan 1 Karya Seni Khat</span>
+            <span class="task-sub">Studio &bull; Kanvas Utama SP 4.4.2</span>
+          </div>
         </div>
       </div>
     </div>
@@ -184,9 +301,59 @@
   <div id="gallery-sidebar-backdrop" class="gallery-sidebar-backdrop" onclick="closeGallerySidebar()"></div>
 
   <!-- ==========================================
+       MODAL: KAMUS RUMI KE JAWI
+       ========================================== -->
+  <div id="kamus-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'kamus-modal')">
+    <div class="modal-card kamus-modal-card" style="max-width: 580px;">
+      <button class="modal-close-btn" onclick="closeModal('kamus-modal')">&times;</button>
+      <div class="modal-hero-icon" style="background: linear-gradient(135deg, #4361EE, #3A0CA3);">📖</div>
+      <h2>Kamus Rumi ke Jawi Bestari</h2>
+      <div class="trialogic-tag">✦ Bantuan Ejaan Segera &bull; DSKP SP 4.4.2</div>
+      <div id="kamus-status-indicator" class="kamus-status-tag">Status Kamus: Memuatkan pangkalan data...</div>
+
+      <!-- Quick Suggestion Pills -->
+      <div class="kamus-quick-row">
+        <span class="kamus-quick-label">Cadangan Simpulan Bahasa:</span>
+        <div class="kamus-pills-list">
+          <button type="button" class="kamus-pill" onclick="insertKamusPrompt('ulat buku')">🐛 Ulat Buku</button>
+          <button type="button" class="kamus-pill" onclick="insertKamusPrompt('anak emas')">⭐ Anak Emas</button>
+          <button type="button" class="kamus-pill" onclick="insertKamusPrompt('buah hati')">💖 Buah Hati</button>
+          <button type="button" class="kamus-pill" onclick="insertKamusPrompt('cahaya mata')">👁️ Cahaya Mata</button>
+        </div>
+      </div>
+
+      <div class="kamus-body">
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="kamus-rumi-input">Tulis Perkataan / Simpulan Bahasa (Rumi):</label>
+          <div class="kamus-input-container">
+            <input type="text" id="kamus-rumi-input" class="form-input kamus-rumi-field" placeholder="Contoh: ulat buku, anak emas, buah hati..." autocomplete="off">
+            <button id="btn-kamus-clear" class="kamus-clear-btn" type="button" onclick="clearKamusInput()" title="Kosongkan Teks">&times;</button>
+          </div>
+        </div>
+
+        <div class="kamus-output-section" style="text-align: left; margin-top: 14px;">
+          <label class="form-label">Padanan Tulisan Jawi:</label>
+          <div id="kamus-jawi-container" class="kamus-jawi-box">
+            <div id="kamus-jawi-output" class="kamus-jawi-text">...</div>
+            <div id="kamus-exact-badge" class="kamus-exact-badge" style="display: none;">
+              ✨ Padanan Tepat Simpulan Bahasa (DSKP SP 4.4.2)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kamus-actions-row" style="display: flex; gap: 10px; margin-top: 18px;">
+        <button class="btn-secondary" style="flex: 1;" onclick="speakKamusJawi()">🔊 Dengar Sebutan</button>
+        <button class="btn-secondary" style="flex: 1;" onclick="copyKamusJawi()">📋 Salin Teks</button>
+        <button class="btn-primary" style="flex: 1.2;" onclick="closeModal('kamus-modal')">Faham &amp; Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
        MODAL: MANDATORY STARTUP INSTRUCTION POPUP
        ========================================== -->
-  <div id="intro-modal" class="modal-overlay active">
+  <div id="intro-modal" class="modal-overlay">
     <div class="modal-card" style="max-width: 580px;">
       <button class="modal-close-btn" onclick="closeModal('intro-modal')">&times;</button>
       <div class="modal-hero-icon" style="background: linear-gradient(135deg, #10B981, #059669);">📜</div>
