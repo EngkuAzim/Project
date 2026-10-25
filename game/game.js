@@ -851,9 +851,9 @@ function animate() {
   } else if (gameState.currentRoom === 'room2') {
     const dTable = playerGroup.position.distanceTo(r2AssemblyStation.group.position);
     const dPortal = playerGroup.position.distanceTo(portals.portalR3.group.position);
-    if (dTable <= 3.2) {
+    if (dTable <= 3.8) {
       foundTarget = 'tableR2';
-      promptText = 'Tekan E untuk Buka Meja Cantuman Kata Jawi';
+      promptText = 'Tekan E untuk Buka Meja Guru (Cantuman Kata Jawi)';
     } else if (dPortal <= 2.6) {
       foundTarget = 'portalR3';
       promptText = 'Tekan E untuk Masuk ke Bilik 3 (Arkib Simpulan Bahasa)';
