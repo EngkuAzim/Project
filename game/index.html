@@ -111,52 +111,56 @@
   <!-- HUD Overlay Layer -->
   <div id="hud-layer">
     <div class="top-bar">
-      <!-- Brand & Room Status -->
-      <div class="brand-card">
-        <div class="brand-icon">🏫</div>
-        <div class="brand-text">
-          <h1>Jejak Jawi Bestari</h1>
-          <p><span id="location-badge" class="badge-area">Dataran Sekolah</span> Sekolah Bestari</p>
+      <!-- Left Group: Brand & Return Home Button (Only in Rooms) -->
+      <div class="top-bar-left">
+        <div class="brand-card">
+          <div class="brand-icon">🏫</div>
+          <div class="brand-text">
+            <h1>Jejak Jawi Bestari</h1>
+            <p><span id="location-badge" class="badge-area">Dataran Sekolah</span> Sekolah Bestari</p>
+          </div>
         </div>
+
+        <!-- Home Button: Hidden in Lobby, only visible inside Rooms 1-4 -->
+        <button id="btn-home-lobby" class="hud-action-btn btn-home" style="display: none;" onclick="confirmReturnToLobby()" title="Kembali ke Dataran Sekolah (Lobi)">
+          🏠 <span class="hud-btn-label">Kembali ke Lobi</span>
+        </button>
       </div>
 
-      <!-- Home Button: Kembali ke Lobi -->
-      <button id="btn-home-lobby" class="hud-action-btn btn-home" onclick="confirmReturnToLobby()" title="Kembali ke Dataran Sekolah (Lobi)">
-        🏠 <span class="hud-btn-label">Kembali ke Lobi</span>
-      </button>
+      <!-- Right Group: Compact Toolbar Actions & Profile -->
+      <div class="top-bar-right">
+        <!-- Gallery Toggle Button -->
+        <button id="btn-gallery-toggle" class="gallery-toggle-btn compact-btn" onclick="openGallerySidebar()" title="Buka Galeri Pameran Jawi">
+          🖼️ <span class="gallery-btn-label">Galeri</span>
+        </button>
 
-      <!-- Prominent Gallery Toggle Button -->
-      <button id="btn-gallery-toggle" class="gallery-toggle-btn" onclick="openGallerySidebar()" title="Buka Galeri Pameran Jawi">
-        🖼️ <span class="gallery-btn-label">Galeri Pameran Jawi</span>
-      </button>
+        <!-- PWA Install Button (Prompted automatically on supported tablets/phones) -->
+        <button id="btn-pwa-install" class="gallery-toggle-btn compact-btn" style="display: none; background: linear-gradient(135deg, #059669, #10B981); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);" onclick="installPWA()" title="Pasang Aplikasi pada Tablet / Telefon">
+          📲 <span class="gallery-btn-label">Pasang App</span>
+        </button>
 
-      <!-- PWA Install Button (Prompted automatically on supported tablets/phones) -->
-      <button id="btn-pwa-install" class="gallery-toggle-btn" style="display: none; background: linear-gradient(135deg, #059669, #10B981); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);" onclick="installPWA()" title="Pasang Aplikasi pada Tablet / Telefon">
-        📲 <span class="gallery-btn-label">Pasang Aplikasi</span>
-      </button>
+        <!-- Voiceover Sound Toggle Button -->
+        <button id="voice-toggle-btn" class="voice-toggle-pill compact-icon-btn" onclick="toggleVoiceover()" title="Buka / Tutup Suara Bahasa Melayu">
+          🔊 <span id="voice-toggle-label" class="sr-only">Suara: Hidup</span>
+        </button>
 
-      <!-- Student Profile Pill (Clickable) -->
-      <div class="profile-pill" onclick="openProfileModal()" title="Klik untuk kemaskini profil murid">
-        <div class="profile-avatar">🎓</div>
-        <div class="profile-info">
-          <strong id="hud-student-name">Penjelajah Bestari</strong>
-          <span id="hud-student-class">4 Inovatif</span>
+        <!-- Student Profile Pill (Clickable) -->
+        <div class="profile-pill" onclick="openProfileModal()" title="Klik untuk kemaskini profil murid">
+          <div class="profile-avatar">🎓</div>
+          <div class="profile-info">
+            <strong id="hud-student-name">Penjelajah Bestari</strong>
+            <span id="hud-student-class">4 Inovatif</span>
+          </div>
         </div>
-        <span style="font-size: 11px; color: #94A3B8; margin-left: 4px;">✎ Ubah</span>
-      </div>
 
-      <!-- Voiceover Sound Toggle Button -->
-      <button id="voice-toggle-btn" class="voice-toggle-pill" onclick="toggleVoiceover()" title="Buka / Tutup Suara Bahasa Melayu">
-        🔊 <span id="voice-toggle-label">Suara: Hidup</span>
-      </button>
-
-      <!-- Dynamic Inventory HUD Card -->
-      <div class="inventory-card">
-        <div class="inventory-title">
-          <span id="inventory-title-text">Dataran Sekolah</span> <span id="inventory-count">Bersedia</span>
-        </div>
-        <div class="inventory-slots" id="inventory-slots-container">
-          <!-- Dynamically populated by ui.js -->
+        <!-- Dynamic Inventory HUD Card (Hidden in Lobby, only visible in Rooms 1-4) -->
+        <div class="inventory-card" style="display: none;">
+          <div class="inventory-title">
+            <span id="inventory-title-text">Dataran Sekolah</span> <span id="inventory-count">Bersedia</span>
+          </div>
+          <div class="inventory-slots" id="inventory-slots-container">
+            <!-- Dynamically populated by ui.js -->
+          </div>
         </div>
       </div>
     </div>

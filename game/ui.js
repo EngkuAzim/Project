@@ -280,15 +280,19 @@ export function updateInventoryHUD() {
 
   const room = gameState.currentRoom;
 
+  // Toggle Home Button visibility: only show when inside Rooms 1-4, hide in lobby
+  const homeBtn = document.getElementById('btn-home-lobby');
+  if (homeBtn) {
+    homeBtn.style.display = (room === 'lobby') ? 'none' : 'inline-flex';
+  }
+
+  // Toggle Inventory Card visibility: hide dummy card in lobby, only show in rooms
+  const invCard = document.querySelector('.inventory-card');
+  if (invCard) {
+    invCard.style.display = (room === 'lobby') ? 'none' : 'flex';
+  }
+
   if (room === 'lobby') {
-    if (invTitleTextEl) invTitleTextEl.textContent = 'Dataran Sekolah';
-    if (invCountEl) invCountEl.textContent = 'Bersedia';
-    invSlotsContainer.innerHTML = `
-      <div class="slot-item unlocked" style="width: auto; padding: 0 12px; gap: 4px;">
-        <span class="slot-char">🏫</span>
-        <span class="slot-label">Sedia Meneroka</span>
-      </div>
-    `;
     return;
   }
 
@@ -989,11 +993,13 @@ if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', () => {
       initKamus();
       updateMissionChecklist();
+      updateInventoryHUD();
     });
   } else {
     setTimeout(() => {
       initKamus();
       updateMissionChecklist();
+      updateInventoryHUD();
     }, 50);
   }
 }
