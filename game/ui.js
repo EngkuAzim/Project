@@ -495,10 +495,19 @@ export function startMainGame() {
 // ==========================================
 // 6.2 HOME BUTTON & ACTIVE ROOM STATE RESET
 // ==========================================
+// Room 2 Tab & Tray State Variables (accessible across ui.js)
+export let r2ActiveTab = 0;
+export let r2TabCompleted = [false, false, false, false];
+export let r2Trays = [null, null, null, null];
+export let r2UserSlots = [null, null, null, null];
+export let r2DragData = null;
+export let r2JustDragged = false;
+
 export function resetRoomProgress(roomId) {
   if (roomId === 'room1') {
     gameState.room1Completed = false;
-    COLLECTIBLES_R1.forEach(c => {
+    gameState.currentR1Step = 1;
+    COLLECTIBLES_R1.forEach((c, idx) => {
       c.collected = false;
       c.isPopping = false;
       c.popScale = 1.0;
@@ -507,23 +516,60 @@ export function resetRoomProgress(roomId) {
         c.mesh.scale.set(1, 1, 1);
         if (c.pos) c.mesh.position.set(c.pos.x, c.pos.y, c.pos.z);
       }
+      if (c.ringMesh && c.ringMesh.material) {
+        if (idx === 0) {
+          c.ringMesh.material.color.setHex(0xF59E0B);
+          c.ringMesh.material.emissive.setHex(0xF59E0B);
+          c.ringMesh.material.emissiveIntensity = 1.0;
+        } else {
+          c.ringMesh.material.color.setHex(0x64748B);
+          c.ringMesh.material.emissive.setHex(0x334155);
+          c.ringMesh.material.emissiveIntensity = 0.3;
+        }
+      }
+      if (c.pointLight) {
+        c.pointLight.intensity = (idx === 0) ? 2.4 : 0.6;
+      }
     });
+    if (typeof renderJawiChartGrid === 'function') {
+      renderJawiChartGrid();
+    }
+    const feedback = document.getElementById('r1-feedback');
+    if (feedback) {
+      feedback.className = 'feedback-banner info';
+      feedback.style.display = 'none';
+      feedback.textContent = '';
+    }
   } else if (roomId === 'room2') {
     gameState.room2Completed = false;
     gameState.r2Session = 1;
     gameState.r2Session1Completed = false;
+    gameState.puzzleR2Placed = [null, null];
+    r2ActiveTab = 0;
+    r2TabCompleted = [false, false, false, false];
+    r2Trays = [null, null, null, null];
+    r2UserSlots = [null, null, null, null];
     COLLECTIBLES_R2.forEach(c => {
       c.collected = false;
       c.isPopping = false;
       c.popScale = 1.0;
       if (c.mesh) {
-        c.mesh.visible = true;
+        // Show Session 1 items; hide Session 2 items until Session 1 completes
+        c.mesh.visible = (c.session === 1);
         c.mesh.scale.set(1, 1, 1);
         if (c.pos) c.mesh.position.set(c.pos.x, c.pos.y, c.pos.z);
       }
     });
+    const proceedR3Btn = document.getElementById('btn-proceed-r3');
+    if (proceedR3Btn) proceedR3Btn.style.display = 'none';
+    const r2Feedback = document.getElementById('r2-feedback');
+    if (r2Feedback) {
+      r2Feedback.style.display = 'none';
+      r2Feedback.textContent = '';
+    }
   } else if (roomId === 'room3') {
     gameState.room3Completed = false;
+    gameState.puzzleR3Pairs = {};
     COLLECTIBLES_R3.forEach(c => {
       c.collected = false;
       c.isPopping = false;
@@ -534,6 +580,13 @@ export function resetRoomProgress(roomId) {
         if (c.pos) c.mesh.position.set(c.pos.x, c.pos.y, c.pos.z);
       }
     });
+    const proceedR4Btn = document.getElementById('btn-proceed-r4');
+    if (proceedR4Btn) proceedR4Btn.style.display = 'none';
+    const r3Feedback = document.getElementById('r3-feedback');
+    if (r3Feedback) {
+      r3Feedback.style.display = 'none';
+      r3Feedback.textContent = '';
+    }
   } else if (roomId === 'room4') {
     gameState.room4Completed = false;
     COLLECTIBLES_R4.forEach(c => {
@@ -549,13 +602,26 @@ export function resetRoomProgress(roomId) {
   }
 }
 
+export function replayRoom1() {
+  resetRoomProgress('room1');
+  gameScores.attemptsR1 = 0;
+  if (typeof renderJawiChartGrid === 'function') {
+    renderJawiChartGrid();
+  }
+  updateInventoryHUD();
+  updateMissionChecklist();
+  closeModal('room1-modal');
+  showItemToast('🔄', 'Labirin Bilik 1 diulang semula! Sila kutip huruf bermula dari Pos 1 (Alif).');
+  speakBM('Labirin Bilik satu diulang semula. Sila kutip huruf bermula dari Pos satu.');
+}
+
 export function confirmReturnToLobby() {
   if (gameState.currentRoom === 'lobby') {
     showItemToast('🏫', 'Anda sudah berada di Dataran Sekolah (Lobi)!');
     return;
   }
 
-  const ok = window.confirm('Adakah anda pasti mahu kembali ke lobi? Progress bilik ini akan diulang semula.');
+  const ok = window.confirm('Adakah anda pasti mahu kembali ke lobi? Semua progress bilik akan diulang semula dari awal.');
   if (!ok) return;
 
   // Hide any active room UI / modals
@@ -565,8 +631,20 @@ export function confirmReturnToLobby() {
     closeGallerySidebar();
   }
 
-  // Reset active room state
-  resetRoomProgress(gameState.currentRoom);
+  // Reset ALL room states from scratch
+  resetRoomProgress('room1');
+  resetRoomProgress('room2');
+  resetRoomProgress('room3');
+  resetRoomProgress('room4');
+
+  // Reset all scores & attempts
+  gameScores.room2 = 30;
+  gameScores.room3 = 30;
+  gameScores.room4 = 40;
+  gameScores.attemptsR1 = 0;
+  gameScores.attemptsR2 = 0;
+  gameScores.attemptsR3 = 0;
+  gameScores.attemptsR4 = 0;
 
   // Reset player 3D coordinates to Lobby starting position
   if (teleportCallbacks.toLobby) {
@@ -575,7 +653,7 @@ export function confirmReturnToLobby() {
 
   updateInventoryHUD();
   updateMissionChecklist();
-  showItemToast('🏠', 'Kembali ke Dataran Lobi.');
+  showItemToast('🏠', 'Kembali ke Dataran Lobi. Semua bilik telah diulang semula.');
 }
 
 // ==========================================
@@ -1257,12 +1335,7 @@ function fisherYatesShuffle(arr) {
   return shuffled;
 }
 
-let r2ActiveTab = 0;
-let r2TabCompleted = [false, false, false, false];
-let r2Trays = [null, null, null, null];
-let r2UserSlots = [null, null, null, null];
-let r2DragData = null;
-let r2JustDragged = false;
+// Note: r2ActiveTab, r2TabCompleted, r2Trays, r2UserSlots, r2DragData, r2JustDragged are declared above for room reset access
 
 // Initialize tray with scrambled letters and empty slots
 function initR2TabTray(tabIdx) {
@@ -2664,6 +2737,7 @@ if (typeof window !== 'undefined') {
   // Room 1
   window.openRoom1Modal = openRoom1Modal;
   window.quickCollectR1 = quickCollectR1;
+  window.replayRoom1 = replayRoom1;
   window.proceedToRoom2 = proceedToRoom2;
 
   // Room 2

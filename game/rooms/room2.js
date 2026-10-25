@@ -9,7 +9,41 @@ export function buildRoom2(arg1, arg2, arg3) {
   // Neat light blue tile floor with slate-blue grid tiles (GridHelper at y = 0.01)
   buildCutawayRoomShell(roomGroup, roomColliders, cx, cz, 0xE0F2FE, 0x0284C7, 0x0369A1, 0x94A3B8, 26, 22, 0x0284C7, 0x38BDF8);
 
-  // 1. Front Chalkboard on North Wall
+  // 1. Flooring Zoning: Center Aisle Runner Carpet & Front Teacher Stage
+  // A. Front Teacher Stage (Elevated wooden/slate blue platform at North wall)
+  const stageMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(16.0, 0.08, 3.8),
+    new THREE.MeshLambertMaterial({ color: 0x0369A1 })
+  );
+  stageMesh.position.set(cx, 0.04, cz - 9.0);
+  roomGroup.add(stageMesh);
+
+  // Front stage gold trim strip
+  const stageTrim = new THREE.Mesh(
+    new THREE.BoxGeometry(16.0, 0.09, 0.1),
+    new THREE.MeshLambertMaterial({ color: 0xF59E0B })
+  );
+  stageTrim.position.set(cx, 0.045, cz - 7.05);
+  roomGroup.add(stageTrim);
+
+  // B. Center Aisle Runner Carpet leading from entrance door to teacher area
+  const carpetBorder = new THREE.Mesh(
+    new THREE.PlaneGeometry(3.8, 15.5),
+    new THREE.MeshLambertMaterial({ color: 0xF59E0B, side: THREE.DoubleSide })
+  );
+  carpetBorder.rotation.x = -Math.PI / 2;
+  carpetBorder.position.set(cx, 0.015, cz + 1.2);
+  roomGroup.add(carpetBorder);
+
+  const carpetRunner = new THREE.Mesh(
+    new THREE.PlaneGeometry(3.4, 15.3),
+    new THREE.MeshLambertMaterial({ color: 0x0284C7, side: THREE.DoubleSide })
+  );
+  carpetRunner.rotation.x = -Math.PI / 2;
+  carpetRunner.position.set(cx, 0.02, cz + 1.2);
+  roomGroup.add(carpetRunner);
+
+  // 2. Front Chalkboard on North Wall
   const boardTex = createTextCanvasTexture(
     'MAKMAL KATA VISUAL JAWI',
     '#065F46',
@@ -26,7 +60,38 @@ export function buildRoom2(arg1, arg2, arg3) {
   boardMesh.position.set(cx, 3.4, cz - 10.7);
   roomGroup.add(boardMesh);
 
-  // 2. Classroom Wall Clock on North Wall
+  // Chalkboard wooden frame rim
+  const boardRim = new THREE.Mesh(
+    new THREE.BoxGeometry(14.3, 3.4, 0.1),
+    new THREE.MeshLambertMaterial({ color: 0x78350F })
+  );
+  boardRim.position.set(cx, 3.4, cz - 10.76);
+  roomGroup.add(boardRim);
+
+  // Chalk ledge at bottom of board
+  const chalkLedge = new THREE.Mesh(
+    new THREE.BoxGeometry(14.2, 0.08, 0.25),
+    new THREE.MeshLambertMaterial({ color: 0x92400E })
+  );
+  chalkLedge.position.set(cx, 1.76, cz - 10.65);
+  roomGroup.add(chalkLedge);
+
+  // White chalkboard eraser and colored chalk sticks
+  const eraser = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.06, 0.12), new THREE.MeshLambertMaterial({ color: 0x334155 }));
+  eraser.position.set(cx - 2.5, 1.83, cz - 10.65);
+  roomGroup.add(eraser);
+
+  const chalk1 = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.14, 6), new THREE.MeshLambertMaterial({ color: 0xFFFFFF }));
+  chalk1.rotation.z = Math.PI / 2;
+  chalk1.position.set(cx - 1.8, 1.82, cz - 10.65);
+  roomGroup.add(chalk1);
+
+  const chalk2 = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.14, 6), new THREE.MeshLambertMaterial({ color: 0xFDE047 }));
+  chalk2.rotation.z = Math.PI / 2;
+  chalk2.position.set(cx - 1.6, 1.82, cz - 10.65);
+  roomGroup.add(chalk2);
+
+  // 3. Classroom Wall Clock on North Wall
   const clockGroup = new THREE.Group();
   clockGroup.position.set(cx + 8.5, 4.2, cz - 10.65);
   const clockRim = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.08, 24), new THREE.MeshStandardMaterial({ color: 0x1E293B }));
@@ -37,18 +102,74 @@ export function buildRoom2(arg1, arg2, arg3) {
   clockGroup.add(clockFace);
   roomGroup.add(clockGroup);
 
-  // 3. Wall Language Charts on West Wall
-  [-3.5, 3.5].forEach((wz) => {
-    const chartTex = createTextCanvasTexture('PANDUAN EJAAN JAWI', '#1E40AF', '#FEF3C7', 512, 384, 40, 'Huruf Tunggal & Bersambung');
-    const chartMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.8), new THREE.MeshBasicMaterial({ map: chartTex }));
-    chartMesh.position.set(cx - 12.7, 3.0, cz + wz);
-    chartMesh.rotation.y = Math.PI / 2;
-    roomGroup.add(chartMesh);
-  });
+  // 4. Windows on West Wall (Sunlight & Outdoor View Simulation)
+  function buildWindow(width, height) {
+    const winGroup = new THREE.Group();
+    // Wooden Outer Frame
+    const frameMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(width + 0.2, height + 0.2, 0.12),
+      new THREE.MeshLambertMaterial({ color: 0x78350F })
+    );
+    winGroup.add(frameMesh);
 
-  // 4. Perimeter Wall Furniture: Teacher's Front Desk along North Wall
+    // Light Blue Sky Glass Pane
+    const glassMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(width, height),
+      new THREE.MeshBasicMaterial({ color: 0xBAE6FD, transparent: true, opacity: 0.85, side: THREE.DoubleSide })
+    );
+    glassMesh.position.z = 0.02;
+    winGroup.add(glassMesh);
+
+    // Wooden Crossbars (Vertical & Horizontal Louvers)
+    const vertBar = new THREE.Mesh(
+      new THREE.BoxGeometry(0.08, height, 0.08),
+      new THREE.MeshLambertMaterial({ color: 0x92400E })
+    );
+    vertBar.position.z = 0.04;
+    winGroup.add(vertBar);
+
+    [-height * 0.25, height * 0.25].forEach((ly) => {
+      const hBar = new THREE.Mesh(
+        new THREE.BoxGeometry(width, 0.06, 0.08),
+        new THREE.MeshLambertMaterial({ color: 0x92400E })
+      );
+      hBar.position.set(0, ly, 0.04);
+      winGroup.add(hBar);
+    });
+
+    // Window Sill
+    const sill = new THREE.Mesh(
+      new THREE.BoxGeometry(width + 0.35, 0.1, 0.25),
+      new THREE.MeshLambertMaterial({ color: 0x592911 })
+    );
+    sill.position.set(0, -height / 2 - 0.05, 0.08);
+    winGroup.add(sill);
+
+    return winGroup;
+  }
+
+  // Two Windows on West Wall
+  const winWestNorth = buildWindow(2.4, 2.1);
+  winWestNorth.rotation.y = Math.PI / 2;
+  winWestNorth.position.set(cx - 12.7, 3.3, cz - 7.0);
+  roomGroup.add(winWestNorth);
+
+  const winWestSouth = buildWindow(2.4, 2.1);
+  winWestSouth.rotation.y = Math.PI / 2;
+  winWestSouth.position.set(cx - 12.7, 3.3, cz + 7.0);
+  roomGroup.add(winWestSouth);
+
+  // Wall Language Charts on West Wall (between windows and bookshelf)
+  const chartTex = createTextCanvasTexture('PANDUAN EJAAN JAWI', '#1E40AF', '#FEF3C7', 512, 384, 40, 'Huruf Tunggal & Bersambung');
+  const chartMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.8), new THREE.MeshBasicMaterial({ map: chartTex }));
+  chartMesh.position.set(cx - 12.7, 3.0, cz + 3.2);
+  chartMesh.rotation.y = Math.PI / 2;
+  roomGroup.add(chartMesh);
+
+  // 5. Perimeter Furniture: Teacher's Desk, Office Chair, Laptop & Tumbler
   const teacherDesk = new THREE.Group();
   teacherDesk.position.set(cx - 6.5, 0, cz - 9.2);
+
   const tTop = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.14, 1.4), new THREE.MeshLambertMaterial({ color: 0x78350F }));
   tTop.position.y = 0.85;
   teacherDesk.add(tTop);
@@ -59,17 +180,56 @@ export function buildRoom2(arg1, arg2, arg3) {
 
   // Laptop on Teacher Desk
   const laptopBase = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.03, 0.35), new THREE.MeshStandardMaterial({ color: 0x94A3B8 }));
-  laptopBase.position.set(0, 0.94, 0);
+  laptopBase.position.set(-0.5, 0.94, 0);
   teacherDesk.add(laptopBase);
   const laptopScreen = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.35, 0.03), new THREE.MeshStandardMaterial({ color: 0x1E293B }));
-  laptopScreen.position.set(0, 1.1, -0.16);
+  laptopScreen.position.set(-0.5, 1.1, -0.16);
   laptopScreen.rotation.x = 0.2;
   teacherDesk.add(laptopScreen);
 
-  roomGroup.add(teacherDesk);
-  roomColliders.push({ minX: cx - 8.3, maxX: cx - 4.7, minZ: cz - 10.0, maxZ: cz - 8.3 });
+  // Stack of marked student exercise books on Teacher Desk
+  const bookColors = [0xEF4444, 0x3B82F6, 0x10B981];
+  bookColors.forEach((bColor, bIdx) => {
+    const bookMesh = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.035, 0.32), new THREE.MeshLambertMaterial({ color: bColor }));
+    bookMesh.position.set(0.65, 0.94 + bIdx * 0.038, -0.05);
+    bookMesh.rotation.y = (bIdx - 1) * 0.08;
+    teacherDesk.add(bookMesh);
+  });
 
-  // 5. Perimeter Wall Furniture: Bookshelf along West Wall
+  // Teacher's blue water tumbler / flask
+  const tumbler = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.26, 12), new THREE.MeshLambertMaterial({ color: 0x0284C7 }));
+  tumbler.position.set(1.15, 1.05, 0.2);
+  teacherDesk.add(tumbler);
+  const tumblerCap = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.06, 12), new THREE.MeshLambertMaterial({ color: 0x0F172A }));
+  tumblerCap.position.set(1.15, 1.2, 0.2);
+  teacherDesk.add(tumblerCap);
+
+  // Teacher's Ergonomic Office Swivel Chair behind Teacher Desk
+  const chairGroup = new THREE.Group();
+  chairGroup.position.set(0, 0, -0.85);
+
+  const tChairSeat = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.1, 0.7), new THREE.MeshLambertMaterial({ color: 0x1E293B }));
+  tChairSeat.position.y = 0.52;
+  chairGroup.add(tChairSeat);
+
+  const tChairBack = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.72, 0.1), new THREE.MeshLambertMaterial({ color: 0x1E293B }));
+  tChairBack.position.set(0, 0.92, -0.32);
+  tChairBack.rotation.x = 0.08;
+  chairGroup.add(tChairBack);
+
+  const tChairStem = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.46, 10), new THREE.MeshLambertMaterial({ color: 0x64748B }));
+  tChairStem.position.y = 0.25;
+  chairGroup.add(tChairStem);
+
+  const tChairBase = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.05, 5), new THREE.MeshLambertMaterial({ color: 0x334155 }));
+  tChairBase.position.y = 0.05;
+  chairGroup.add(tChairBase);
+
+  teacherDesk.add(chairGroup);
+  roomGroup.add(teacherDesk);
+  roomColliders.push({ minX: cx - 8.3, maxX: cx - 4.7, minZ: cz - 10.4, maxZ: cz - 8.3 });
+
+  // 6. Perimeter Furniture: Bookshelf along West Wall
   const westShelf = new THREE.Group();
   westShelf.position.set(cx - 11.8, 0, cz - 2.0);
   const sFrame = new THREE.Mesh(new THREE.BoxGeometry(0.8, 3.2, 3.0), new THREE.MeshLambertMaterial({ color: 0x78350F }));
@@ -86,7 +246,7 @@ export function buildRoom2(arg1, arg2, arg3) {
   roomGroup.add(westShelf);
   roomColliders.push({ minX: cx - 12.6, maxX: cx - 11.0, minZ: cz - 3.8, maxZ: cz - 0.2 });
 
-  // 6. Perimeter Wall Furniture: Storage Cubby Lockers along East Wall
+  // 7. Perimeter Furniture: Storage Cubby Lockers along East Wall
   const eastCubby = new THREE.Group();
   eastCubby.position.set(cx + 11.8, 0, cz + 2.0);
   const cubbyBody = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.2, 3.2), new THREE.MeshLambertMaterial({ color: 0xB45309 }));
@@ -95,7 +255,55 @@ export function buildRoom2(arg1, arg2, arg3) {
   roomGroup.add(eastCubby);
   roomColliders.push({ minX: cx + 11.0, maxX: cx + 12.6, minZ: cz + 0.2, maxZ: cz + 3.8 });
 
-  // 7. Central Interactive Assembly Station (r2AssemblyStation) at (200.0, 194.5)
+  // 8. East Wall Student Work Showcase Corkboard ("Sudut Hasil Kerja Murid")
+  const showcaseGroup = new THREE.Group();
+  showcaseGroup.position.set(cx + 12.65, 3.2, cz - 0.8);
+  showcaseGroup.rotation.y = -Math.PI / 2;
+
+  // Rich wooden corkboard frame
+  const boardFrame = new THREE.Mesh(
+    new THREE.BoxGeometry(5.2, 2.4, 0.1),
+    new THREE.MeshLambertMaterial({ color: 0x78350F })
+  );
+  showcaseGroup.add(boardFrame);
+
+  // Warm corkboard backing surface
+  const corkSurface = new THREE.Mesh(
+    new THREE.BoxGeometry(5.0, 2.2, 0.11),
+    new THREE.MeshLambertMaterial({ color: 0xD97706 })
+  );
+  showcaseGroup.add(corkSurface);
+
+  // Top banner label: "SUDUT KARYA CEMERLANG 4 INOVATIF"
+  const bannerTex = createTextCanvasTexture('SUDUT KARYA CEMERLANG 4 INOVATIF', '#0F172A', '#FEF08A', 512, 128, 34, 'Tulisan Jawi & Simpulan Bahasa');
+  const bannerMesh = new THREE.Mesh(new THREE.PlaneGeometry(4.7, 0.48), new THREE.MeshBasicMaterial({ map: bannerTex }));
+  bannerMesh.position.set(0, 0.82, 0.07);
+  showcaseGroup.add(bannerMesh);
+
+  // 4 Pinned Student Project Cards
+  const studentWorks = [
+    { name: 'Karya: Aminah', text: 'اولت بوکو ⭐⭐⭐', bg: '#ECFDF5', fg: '#065F46', pinColor: 0xEF4444, xPos: -1.75 },
+    { name: 'Karya: Harith', text: 'انق امس ⭐⭐⭐', bg: '#FEF3C7', fg: '#78350F', pinColor: 0x3B82F6, xPos: -0.58 },
+    { name: 'Karya: Siti', text: 'بواه هاتي ⭐⭐⭐', bg: '#EFF6FF', fg: '#1E40AF', pinColor: 0x10B981, xPos: 0.58 },
+    { name: 'Karya: Ziyad', text: 'چهاي مات ⭐⭐⭐', bg: '#FDF2F8', fg: '#831843', pinColor: 0xF59E0B, xPos: 1.75 }
+  ];
+
+  studentWorks.forEach(w => {
+    const cardTex = createTextCanvasTexture(w.name, w.bg, w.fg, 256, 256, 28, w.text);
+    const cardMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.15), new THREE.MeshBasicMaterial({ map: cardTex }));
+    cardMesh.position.set(w.xPos, -0.15, 0.07);
+    showcaseGroup.add(cardMesh);
+
+    // Colored push-pin stud on top of the card
+    const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.06, 8), new THREE.MeshLambertMaterial({ color: w.pinColor }));
+    pin.rotation.x = Math.PI / 2;
+    pin.position.set(w.xPos, 0.42, 0.1);
+    showcaseGroup.add(pin);
+  });
+
+  roomGroup.add(showcaseGroup);
+
+  // 9. Interactive Central Assembly Station (r2AssemblyStation) at (200.0, 194.5)
   const stationGroup = new THREE.Group();
   stationGroup.position.set(200.0, 0, 194.5);
 
@@ -118,7 +326,7 @@ export function buildRoom2(arg1, arg2, arg3) {
   bLight.position.set(0, 2.3, 0);
   stationGroup.add(bLight);
 
-  // 8. Student Desks & Chairs (4 Sets in Left and Right Center Space)
+  // 10. Student Desks & Chairs (4 Sets in Left and Right Center Space)
   const ceilingFans = [];
 
   function createStudentDeskSet(dx, dz, rotY = 0) {
@@ -222,7 +430,7 @@ export function buildRoom2(arg1, arg2, arg3) {
   createStudentDeskSet(cx + 7.5, cz - 2.5); // Right Front Desk
   createStudentDeskSet(cx + 7.5, cz + 3.5); // Right Back Desk
 
-  // 9. Educational Wall Posters (Yellow, Cyan, Light Green)
+  // 11. Educational Wall Posters
   // Poster 1: "JADUAL BERTUGAS" (East Wall)
   const poster1Tex = createTextCanvasTexture(
     'JADUAL BERTUGAS 4 INOVATIF',
@@ -234,7 +442,7 @@ export function buildRoom2(arg1, arg2, arg3) {
     'Kebersihan • Disiplin • Papan Tulis'
   );
   const poster1 = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.9), new THREE.MeshBasicMaterial({ map: poster1Tex }));
-  poster1.position.set(cx + 12.7, 3.2, cz - 4.0);
+  poster1.position.set(cx + 12.7, 3.2, cz - 4.5);
   poster1.rotation.y = -Math.PI / 2;
   roomGroup.add(poster1);
 
@@ -267,7 +475,111 @@ export function buildRoom2(arg1, arg2, arg3) {
   poster3.position.set(cx - 10.0, 3.2, cz - 10.7);
   roomGroup.add(poster3);
 
-  // 10. Ceiling Fans: 2 fans hanging from top
+  // 12. Corner Indoor Potted Classroom Plants
+  function createPottedPlant(px, pz) {
+    const plantGroup = new THREE.Group();
+    plantGroup.position.set(px, 0, pz);
+
+    // Ceramic White Pot
+    const pot = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.42, 0.3, 0.75, 14),
+      new THREE.MeshLambertMaterial({ color: 0xF8FAFC })
+    );
+    pot.position.y = 0.375;
+    pot.castShadow = true;
+    plantGroup.add(pot);
+
+    // Pot Rim
+    const potRim = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.45, 0.45, 0.08, 14),
+      new THREE.MeshLambertMaterial({ color: 0xE2E8F0 })
+    );
+    potRim.position.y = 0.75;
+    plantGroup.add(potRim);
+
+    // Soil
+    const soil = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.4, 0.4, 0.06, 12),
+      new THREE.MeshLambertMaterial({ color: 0x451A03 })
+    );
+    soil.position.y = 0.74;
+    plantGroup.add(soil);
+
+    // Foliage Spheres
+    const foliageMat1 = new THREE.MeshLambertMaterial({ color: 0x15803D });
+    const foliageMat2 = new THREE.MeshLambertMaterial({ color: 0x16A34A });
+    const foliageMat3 = new THREE.MeshLambertMaterial({ color: 0x22C55E });
+
+    const centerBush = new THREE.Mesh(new THREE.SphereGeometry(0.48, 8, 8), foliageMat1);
+    centerBush.position.y = 1.05;
+    plantGroup.add(centerBush);
+
+    const bushClusters = [
+      { x: 0.22, y: 1.15, z: 0.12, r: 0.32, mat: foliageMat2 },
+      { x: -0.22, y: 1.18, z: -0.14, r: 0.34, mat: foliageMat3 },
+      { x: 0.12, y: 1.25, z: -0.22, r: 0.30, mat: foliageMat1 },
+      { x: -0.15, y: 1.32, z: 0.18, r: 0.28, mat: foliageMat2 }
+    ];
+
+    bushClusters.forEach((c) => {
+      const b = new THREE.Mesh(new THREE.SphereGeometry(c.r, 8, 8), c.mat);
+      b.position.set(c.x, c.y, c.z);
+      plantGroup.add(b);
+    });
+
+    roomGroup.add(plantGroup);
+    roomColliders.push({ minX: px - 0.55, maxX: px + 0.55, minZ: pz - 0.55, maxZ: pz + 0.55 });
+  }
+
+  // 2 Potted Plants (North-East corner and South-West corner)
+  createPottedPlant(cx + 11.2, cz - 9.2); // NE Corner near clock
+  createPottedPlant(cx - 11.2, cz + 8.8); // SW Corner near entrance
+
+  // 13. Ceiling Pendant Lamps (4 Warm Hanging Spheres)
+  const pendantCoords = [
+    [-6.0, -4.5],
+    [6.0, -4.5],
+    [-6.0, 4.5],
+    [6.0, 4.5]
+  ];
+
+  pendantCoords.forEach(([lx, lz]) => {
+    const lampGroup = new THREE.Group();
+    lampGroup.position.set(cx + lx, 0, cz + lz);
+
+    // Suspension cord
+    const cord = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.015, 0.015, 1.2, 8),
+      new THREE.MeshLambertMaterial({ color: 0x334155 })
+    );
+    cord.position.y = 4.9;
+    lampGroup.add(cord);
+
+    // Bronze conical lampshade
+    const shade = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.08, 0.34, 0.22, 16),
+      new THREE.MeshLambertMaterial({ color: 0x78350F })
+    );
+    shade.position.y = 4.3;
+    lampGroup.add(shade);
+
+    // Glowing warm bulb
+    const bulb = new THREE.Mesh(
+      new THREE.SphereGeometry(0.15, 12, 12),
+      new THREE.MeshBasicMaterial({ color: 0xFFFBEB })
+    );
+    bulb.position.y = 4.18;
+    lampGroup.add(bulb);
+
+    // Soft warm point light
+    const lampLight = new THREE.PointLight(0xFFEDD5, 0.85, 7.5);
+    lampLight.position.y = 4.15;
+    lampGroup.add(lampLight);
+
+    roomGroup.add(lampGroup);
+  });
+
+  // 14. Ceiling Fans: 2 fans hanging from top
   function createCeilingFan(fx, fz) {
     const fanGroup = new THREE.Group();
     fanGroup.position.set(fx, 0, fz);
@@ -315,7 +627,7 @@ export function buildRoom2(arg1, arg2, arg3) {
   createCeilingFan(cx - 5.0, cz); // Left Ceiling Fan
   createCeilingFan(cx + 5.0, cz); // Right Ceiling Fan
 
-  // 11. Recycling Bins (Blue: Paper, Brown: Glass, Orange: Plastic) Near Entrance
+  // 15. Recycling Bins (Blue: Paper, Brown: Glass, Orange: Plastic) Near Entrance
   const binColors = [
     { name: 'Kertas (Paper)', color: 0x2563EB, rimColor: 0x1D4ED8, xOffset: 206.0 },
     { name: 'Kaca (Glass)', color: 0x92400E, rimColor: 0x78350F, xOffset: 207.0 },
