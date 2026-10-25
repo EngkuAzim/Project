@@ -141,7 +141,7 @@ export function createNoticeboardTexture() {
   // Subtitle
   ctx.fillStyle = '#FFFFFF';
   ctx.font = '700 20px "Plus Jakarta Sans", Arial, sans-serif';
-  ctx.fillText('Kembara Bahasa Tahun 4 Inovatif • DSKP SP 4.4.2 (Seni Tulisan Jawi)', 512, 118);
+  ctx.fillText('Jejak Jawi Bestari • Tahun 4 Inovatif (Seni Tulisan Jawi)', 512, 118);
 
   // 3. Grid of 4 Pinned Activity Notice Cards
   const cards = [
@@ -169,9 +169,9 @@ export function createNoticeboardTexture() {
     {
       num: 'BILIK 4',
       title: 'Studio Seni Khat',
-      desc: 'Hasilkan kaligrafi seni Jawi indah (SP 4.4.2).',
+      desc: 'Hasilkan kaligrafi seni Jawi indah & kreatif.',
       color: '#D97706',
-      tag: '40 Markah (SP 4.4.2)'
+      tag: '40 Markah'
     }
   ];
 

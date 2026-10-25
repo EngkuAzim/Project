@@ -1,7 +1,7 @@
 {
-  "name": "Kembara Bahasa Sekolah Bestari",
-  "short_name": "Kembara Jawi",
-  "description": "Permainan Penerokaan Seni Tulisan Jawi Sekolah Bestari DSKP SP 4.4.2",
+  "name": "Jejak Jawi Bestari",
+  "short_name": "Jejak Jawi",
+  "description": "Permainan Penerokaan Seni Tulisan Jawi Sekolah Bestari",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

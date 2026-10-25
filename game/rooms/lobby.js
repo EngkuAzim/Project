@@ -11,13 +11,13 @@ export function buildLobby(arg1, arg2, arg3) {
 
   // 1. School Hall Arch & Facade Banner on North Wall (Perfect 4:1 Aspect Ratio without clipping)
   const bannerTex = createTextCanvasTexture(
-    'KEMBARA BAHASA SEKOLAH BESTARI',
+    'JEJAK JAWI BESTARI',
     '#1E3A8A',
     '#FFFFFF',
     1280,
     320,
-    44,
-    'Inovasi Digital PdP Bahasa Melayu • Standard Pembelajaran 4.4.2'
+    52,
+    'Inovasi Digital PdP Seni Tulisan Jawi • Sekolah Bestari'
   );
 
   // Backing wooden board frame

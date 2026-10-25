@@ -17,7 +17,7 @@ export function buildRoom2(arg1, arg2, arg3) {
     1024,
     256,
     52,
-    'Eja & Padankan 4 Pasangan Kata Menjadi Simpulan Bahasa (DSKP SP 4.4.2)'
+    'Eja & Padankan 4 Pasangan Kata Menjadi Simpulan Bahasa'
   );
   const boardMesh = new THREE.Mesh(
     new THREE.PlaneGeometry(14.0, 3.2),

@@ -1,5 +1,5 @@
 // ==========================================
-// GAME.JS - Three.js Campus Engine & Modular Room Architecture (DSKP SP 4.4.2)
+// GAME.JS - Three.js Campus Engine & Modular Room Architecture (Jejak Jawi Bestari)
 // ==========================================
 import {
   PLAYER_SPEED,
@@ -463,7 +463,7 @@ export function teleportTo(roomId) {
   } else if (roomId === 'room3') {
     updateMissionText('Misi: Cari 4 gulungan simpulan bahasa di Arkib & padankan dengan maksudnya di Meja Bacaan.');
   } else if (roomId === 'room4') {
-    updateMissionText('Misi: Kumpul 3 alatan seni khat & persembahkan karya kaligrafi di Kanvas Utama (SP 4.4.2).');
+    updateMissionText('Misi: Kumpul 3 alatan seni khat & persembahkan karya kaligrafi di Kanvas Utama.');
   } else {
     updateMissionText('Misi: Terokai dataran & dekati portal bercahaya untuk ke Bilik 1.');
   }

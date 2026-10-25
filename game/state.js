@@ -1,5 +1,5 @@
 // ==========================================
-// STATE.JS - Campus Constants, Data & Game State (DSKP SP 4.4.2 Architecture)
+// STATE.JS - Campus Constants, Data & Game State (Jejak Jawi Bestari)
 // ==========================================
 
 export const PLAYER_SPEED = 0.13;
@@ -42,7 +42,7 @@ export const ROOM_CONFIG = {
   },
   room4: {
     id: 'room4',
-    name: 'Studio Persembahan Seni Khat (Lukisan & Hiasan SP 4.4.2)',
+    name: 'Studio Persembahan Seni Khat (Lukisan & Hiasan)',
     badge: 'Bilik 4: Studio Seni Khat',
     center: { x: 400, z: 400 },
     bounds: { minX: 387, maxX: 413, minZ: 389, maxZ: 411 },
@@ -75,7 +75,7 @@ export const gameScores = {
   room1: 100, // Kembara Huruf Jawi (100% completed)
   room2: 30,  // Makmal Ejaan 4 Pasangan Kata (Max 30)
   room3: 30,  // Cantuman 4 Simpulan Bahasa (Max 30)
-  room4: 40,  // Persembahan Seni Khat SP 4.4.2 (Max 40)
+  room4: 40,  // Persembahan Seni Khat Jawi (Max 40)
   attemptsR1: 0,
   attemptsR2: 0,
   attemptsR3: 0,
@@ -103,7 +103,7 @@ export const gameState = {
   puzzleR1Placed: [null, null, null, null],
   puzzleR2Placed: [null, null],
   puzzleR3Pairs: {},
-  // Room 4 Calligraphy Customization State (SP 4.4.2)
+  // Room 4 Calligraphy Customization State
   artworkR4: {
     bg: 'batik',       // 'batik' | 'songket' | 'vellum'
     textColor: 'gold',  // 'black' | 'gold' | 'indigo'
@@ -116,7 +116,7 @@ export const gameState = {
   }
 };
 
-// 4 Simpulan Bahasa Core DSKP 4.4.2 Data
+// 4 Simpulan Bahasa Core Data
 export const IDIOM_DATA = [
   {
     id: 'ulat_buku',

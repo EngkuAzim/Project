@@ -1,5 +1,5 @@
 // ==========================================
-// ROOMS/ROOM4.JS - Studio Persembahan Seni Khat (Art Studio at 400, 400 - SP 4.4.2)
+// ROOMS/ROOM4.JS - Studio Persembahan Seni Khat (Art Studio at 400, 400)
 // ==========================================
 import { createTextCanvasTexture, createTextSprite, buildCutawayRoomShell, resolveRoomArgs } from './helpers.js';
 
@@ -32,7 +32,7 @@ export function buildRoom4(arg1, arg2, arg3) {
     1024,
     256,
     48,
-    'Standard Pembelajaran 4.4.2 • Mempersembahkan Keindahan Seni Tulisan Jawi'
+    'Galeri Karya Kreatif • Mempersembahkan Keindahan Seni Tulisan Jawi'
   );
   const bannerMesh = new THREE.Mesh(new THREE.PlaneGeometry(14.0, 3.2), new THREE.MeshBasicMaterial({ map: artTex }));
   bannerMesh.position.set(cx, 3.4, cz - 10.7);

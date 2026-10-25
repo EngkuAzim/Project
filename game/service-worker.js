@@ -1,9 +1,9 @@
 // ==========================================
-// SERVICE WORKER - Kembara Bahasa Sekolah Bestari (PWA)
+// SERVICE WORKER - Jejak Jawi Bestari (PWA)
 // Caches core 3D assets, scripts, stylesheets, and CDN libraries for offline / fast school WiFi access.
 // ==========================================
 
-const CACHE_NAME = 'kembara-jawi-pwa-v1';
+const CACHE_NAME = 'jejak-jawi-bestari-pwa-v2';
 
 const CORE_ASSETS = [
   './',

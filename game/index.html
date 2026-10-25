@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kembara Bahasa Sekolah Bestari - Inovasi Digital PdP Bahasa Melayu (DSKP SP 4.4.2)</title>
+  <title>Jejak Jawi Bestari - Inovasi Digital PdP Seni Tulisan Jawi</title>
   
-  <!-- Google Fonts: Fredoka, Plus Jakarta Sans & Amiri for authentic Jawi typography -->
+  <!-- Google Fonts: Baloo 2, Fredoka, Plus Jakarta Sans & Amiri for authentic Jawi typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Fredoka:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 
   <!-- External Stylesheet with Cache-Buster -->
   <link rel="stylesheet" href="./style.css?v=4.4.2">
 
   <!-- PWA Manifest & Mobile App Meta Tags -->
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#4361EE">
+  <meta name="theme-color" content="#38BDF8">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Kembara Jawi">
+  <meta name="apple-mobile-web-app-title" content="Jejak Jawi">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
   <!-- Three.js CDN -->
@@ -30,43 +30,53 @@
 <body>
 
   <!-- ==========================================
-       1. FULLSCREEN MAIN MENU OVERLAY
+       1. FULLSCREEN CARTOON MAIN MENU OVERLAY
        ========================================== -->
   <div id="main-menu" class="main-menu-overlay">
+    <!-- Playful Floating Sky Decor (Clouds, Sun & Sparkles) -->
+    <div class="cartoon-sky-decor" aria-hidden="true">
+      <div class="cartoon-sun">☀️</div>
+      <div class="cartoon-cloud cloud-1">☁️</div>
+      <div class="cartoon-cloud cloud-2">☁️</div>
+      <div class="cartoon-cloud cloud-3">☁️</div>
+      <div class="cartoon-star star-1">✨</div>
+      <div class="cartoon-star star-2">⭐</div>
+    </div>
+
     <div class="main-menu-card">
       <div class="main-menu-badge">
         <span class="badge-school-icon">🏫</span>
-        <span>Kementerian Pendidikan Malaysia &bull; DSKP SP 4.4.2</span>
+        <span>Sekolah Kebangsaan Bestari &bull; Tahun 4 Inovatif</span>
       </div>
 
       <h1 class="main-menu-title">Jejak Jawi Bestari</h1>
       <p class="main-menu-subtitle">
-        Inovasi Gamifikasi 3D PdP Seni Tulisan Jawi &bull; Tahun 4 Inovatif SK Bestari
+        Jom Terokai Keindahan Seni Tulisan Jawi Bersama Cikgu Asyikin!
       </p>
 
       <div class="main-menu-highlights">
-        <div class="menu-highlight-pill">
+        <div class="menu-highlight-pill pill-r1">
           <span class="pill-icon">🌿</span>
           <div class="pill-text">
             <strong>Bilik 1</strong>
             <span>Taman Maze (37 Huruf)</span>
           </div>
         </div>
-        <div class="menu-highlight-pill">
+        <div class="menu-highlight-pill pill-r2">
           <span class="pill-icon">🧪</span>
           <div class="pill-text">
             <strong>Bilik 2</strong>
             <span>Makmal Kata (4 Ejaan)</span>
           </div>
         </div>
-        <div class="menu-highlight-pill">
+        <div class="menu-highlight-pill pill-r3">
           <span class="pill-icon">📚</span>
           <div class="pill-text">
             <strong>Bilik 3</strong>
             <span>Arkib Simpulan Bahasa</span>
           </div>
         </div>
-        <div class="menu-highlight-pill">
+        <div class="menu-highlight-pill pill-r4">
           <span class="pill-icon">🎨</span>
           <div class="pill-text">
             <strong>Bilik 4</strong>
@@ -75,9 +85,15 @@
         </div>
       </div>
 
+      <!-- Bubbly 3D Cartoon Action Buttons -->
       <div class="main-menu-action">
-        <button id="btn-start-game" class="btn-main-menu-pulse" onclick="startMainGame()">
-          🎮 Mula Permainan
+        <button id="btn-start-game" class="btn-cartoon-bubble btn-start-bubble" onclick="startMainGame()">
+          <span class="bubble-icon">🎮</span>
+          <span>Mula Permainan</span>
+        </button>
+        <button id="btn-menu-kamus" class="btn-cartoon-bubble btn-kamus-bubble" onclick="openKamusModal()">
+          <span class="bubble-icon">📖</span>
+          <span>Kamus Rumi ke Jawi</span>
         </button>
       </div>
 
@@ -99,19 +115,14 @@
       <div class="brand-card">
         <div class="brand-icon">🏫</div>
         <div class="brand-text">
-          <h1>Kembara Bahasa Sekolah Bestari</h1>
-          <p><span id="location-badge" class="badge-area">Dataran Sekolah</span> DSKP SP 4.4.2</p>
+          <h1>Jejak Jawi Bestari</h1>
+          <p><span id="location-badge" class="badge-area">Dataran Sekolah</span> Sekolah Bestari</p>
         </div>
       </div>
 
       <!-- Home Button: Kembali ke Lobi -->
       <button id="btn-home-lobby" class="hud-action-btn btn-home" onclick="confirmReturnToLobby()" title="Kembali ke Dataran Sekolah (Lobi)">
         🏠 <span class="hud-btn-label">Kembali ke Lobi</span>
-      </button>
-
-      <!-- Kamus Rumi ke Jawi Button -->
-      <button id="btn-kamus-toggle" class="hud-action-btn btn-kamus" onclick="openKamusModal()" title="Buka Kamus Rumi ke Jawi">
-        📖 <span class="hud-btn-label">Kamus Rumi ke Jawi</span>
       </button>
 
       <!-- Prominent Gallery Toggle Button -->
@@ -191,7 +202,7 @@
           <span class="task-box" id="task-box-r4">[ ]</span>
           <div class="task-info">
             <span class="task-title">Bilik 4: Hasilkan 1 Karya Seni Khat</span>
-            <span class="task-sub">Studio &bull; Kanvas Utama SP 4.4.2</span>
+            <span class="task-sub">Studio &bull; Kanvas Utama</span>
           </div>
         </div>
       </div>
@@ -252,6 +263,12 @@
         <span id="mission-text">Misi: Terokai dataran & dekati portal bercahaya untuk ke Bilik 1.</span>
       </div>
     </div>
+
+    <!-- Floating In-game Kamus Button (Fixed Bottom-Right Corner) -->
+    <button id="btn-floating-kamus" class="floating-kamus-btn" onclick="openKamusModal()" title="Buka Kamus Rumi ke Jawi">
+      <span class="floating-kamus-icon">📖</span>
+      <span class="floating-kamus-label">Kamus Jawi</span>
+    </button>
   </div>
 
   <!-- ==========================================
@@ -263,7 +280,7 @@
         <span class="gallery-icon">🖼️</span>
         <div>
           <h3>Galeri Pameran Jawi</h3>
-          <p>Karya Murid &bull; DSKP SP 4.4.2</p>
+          <p>Karya Seni Murid &bull; Pameran Jawi</p>
         </div>
       </div>
       <button class="gallery-sidebar-close" onclick="closeGallerySidebar()" title="Tutup Galeri">&times;</button>
@@ -308,7 +325,7 @@
       <button class="modal-close-btn" onclick="closeModal('kamus-modal')">&times;</button>
       <div class="modal-hero-icon" style="background: linear-gradient(135deg, #4361EE, #3A0CA3);">📖</div>
       <h2>Kamus Rumi ke Jawi Bestari</h2>
-      <div class="trialogic-tag">✦ Bantuan Ejaan Segera &bull; DSKP SP 4.4.2</div>
+      <div class="trialogic-tag">✦ Bantuan Ejaan Segera &bull; Rumi ke Jawi</div>
       <div id="kamus-status-indicator" class="kamus-status-tag">Status Kamus: Memuatkan pangkalan data...</div>
 
       <!-- Quick Suggestion Pills -->
@@ -336,7 +353,7 @@
           <div id="kamus-jawi-container" class="kamus-jawi-box">
             <div id="kamus-jawi-output" class="kamus-jawi-text">...</div>
             <div id="kamus-exact-badge" class="kamus-exact-badge" style="display: none;">
-              ✨ Padanan Tepat Simpulan Bahasa (DSKP SP 4.4.2)
+              ✨ Padanan Tepat Simpulan Bahasa
             </div>
           </div>
         </div>
@@ -358,7 +375,7 @@
       <button class="modal-close-btn" onclick="closeModal('intro-modal')">&times;</button>
       <div class="modal-hero-icon" style="background: linear-gradient(135deg, #10B981, #059669);">📜</div>
       <h2>Panduan Kembara Jawi Bestari</h2>
-      <div class="trialogic-tag">✦ Standard Pembelajaran 4.4.2 DSKP Bahasa Melayu</div>
+      <div class="trialogic-tag">✦ Misi Pengembaraan Seni Tulisan Jawi</div>
       
       <div class="intro-steps-list" style="margin: 16px 0; text-align: left; display: flex; flex-direction: column; gap: 10px;">
         <div class="intro-step-item" style="display: flex; gap: 12px; align-items: flex-start; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 14px;">
@@ -411,11 +428,11 @@
       <button class="modal-close-btn" onclick="closeModal('noticeboard-modal')">&times;</button>
       <div class="modal-hero-icon" style="background: linear-gradient(135deg, #059669, #047857);">📌</div>
       <h2>Papan Kenyataan Bahasa Melayu</h2>
-      <div class="trialogic-tag">Sekolah Kebangsaan Bestari &bull; DSKP SP 4.4.2</div>
+      <div class="trialogic-tag">Sekolah Kebangsaan Bestari &bull; Tahun 4 Inovatif</div>
 
       <div style="background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 14px; padding: 14px; margin: 16px 0; text-align: left;">
         <h4 style="color: #78350F; margin-bottom: 6px; font-family: var(--font-display); font-size: 16px;">
-          📢 Pengumuman Kembara Bahasa (Tahun 4 Inovatif)
+          📢 Pengumuman Jejak Jawi Bestari (Tahun 4 Inovatif)
         </h4>
         <p style="font-size: 13px; color: #92400E; margin: 0; line-height: 1.5;">
           Selamat datang murid-murid Tahun 4 Inovatif! Sila selesaikan 4 fasa penerokaan pembelajaran seni tulisan Jawi mengikut urutan bilik:
@@ -437,7 +454,7 @@
         </div>
         <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-left: 5px solid #D97706; border-radius: 10px; padding: 10px 12px;">
           <strong style="color: #D97706; font-size: 13px;">Bilik 4: Studio Seni Khat</strong>
-          <p style="font-size: 12px; color: #475569; margin: 4px 0 0 0;">Lukis seni khat & hiasan corak persembahan SP 4.4.2 (40 Markah).</p>
+          <p style="font-size: 12px; color: #475569; margin: 4px 0 0 0;">Lukis seni khat & hiasan corak persembahan (40 Markah).</p>
         </div>
       </div>
 
@@ -629,7 +646,7 @@
   </div>
 
   <!-- ==========================================
-       MODAL 4: ROOM 4 - STUDIO PERSEMBAHAN SENI TULISAN JAWI (40 Marks • SP 4.4.2)
+       MODAL 4: ROOM 4 - STUDIO PERSEMBAHAN SENI TULISAN JAWI (40 Marks)
        ========================================== -->
   <div id="room4-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'room4-modal')">
     <div class="modal-card" style="max-width: 740px;">
@@ -637,7 +654,7 @@
 
       <div class="modal-hero-icon" style="background: linear-gradient(135deg, #B45309, #D97706);">🎨</div>
       <h2>Bilik 4: Studio Persembahan Seni Khat Jawi</h2>
-      <div class="trialogic-tag">✦ Standard Pembelajaran 4.4.2 (40 Markah)</div>
+      <div class="trialogic-tag">✦ Studio Persembahan Kreatif (40 Markah)</div>
 
       <div class="target-word-badge" style="background: #FFFBEB; color: #9A3412; margin-bottom: 12px;">
         Mempersembahkan Keindahan Seni Tulisan Jawi Melalui Simpulan Bahasa
@@ -794,7 +811,7 @@
           <div class="report-emblem">ج</div>
           <div class="report-header-text">
             <h3>Sijil Pentaksiran Bilik Darjah (PBD)</h3>
-            <p>Bahasa Melayu Tahun 4 • Standard Pembelajaran 4.4.2</p>
+            <p>Bahasa Melayu Tahun 4 • Standard Pembelajaran 4.4.1 dan 4.4.2</p>
           </div>
           <div id="report-tp-badge" class="tp-badge-large tp6">Tahap Penguasaan 6</div>
         </div>
@@ -843,7 +860,7 @@
             </tr>
             <tr>
               <td><strong>Bilik 4: Studio Seni Khat</strong></td>
-              <td>Persembahan Seni Tulisan Jawi (SP 4.4.2)</td>
+              <td>Persembahan Seni Tulisan Jawi</td>
               <td style="text-align: right; font-weight: 700;" id="report-score-r4">40 / 40</td>
             </tr>
             <tr class="total-row">
@@ -855,12 +872,12 @@
 
         <!-- Rubric Statement Description -->
         <div class="rubric-text" id="report-rubric-desc">
-          <strong>Tahap Penguasaan 6 (Cemerlang):</strong> Murid berupaya menulis simpulan bahasa dalam Jawi dengan ejaan tepat dan mempersembahkan keindahan seni tulisan Jawi menggunakan corak dan bingkai yang sangat kreatif mengikut Standard Pembelajaran 4.4.2.
+          <strong>Tahap Penguasaan 6 (Cemerlang):</strong> Murid berupaya menulis simpulan bahasa dalam Jawi dengan ejaan tepat dan mempersembahkan keindahan seni tulisan Jawi menggunakan corak dan bingkai yang sangat kreatif mengikut Standard Pembelajaran 4.4.1 dan 4.4.2.
         </div>
 
         <!-- Explanation of Scoring -->
         <div style="font-size: 11px; color: #64748B; line-height: 1.4; border-top: 1px dashed #CBD5E1; padding-top: 8px;">
-          <em>* Kaedah Pengiraan Markah: Bilik 2 (30 markah ejaan, tolak 5 setiap percubaan salah, min 10). Bilik 3 (30 markah cantuman & maksud, tolak 5 setiap percubaan salah, min 10). Bilik 4 (40 markah persembahan kaligrafi & hiasan seni SP 4.4.2). Jumlah Maksimum: 100 Markah.</em>
+          <em>* Kaedah Pengiraan Markah: Bilik 2 (30 markah ejaan, tolak 5 setiap percubaan salah, min 10). Bilik 3 (30 markah cantuman & maksud, tolak 5 setiap percubaan salah, min 10). Bilik 4 (40 markah persembahan kaligrafi & hiasan seni). Jumlah Maksimum: 100 Markah.</em>
         </div>
       </div>
 
@@ -898,7 +915,7 @@
       </div>
 
       <div class="gallery-preview-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
-        <span style="font-size: 12px; color: #64748B;">✦ Standard Pembelajaran 4.4.2 Bahasa Melayu</span>
+        <span style="font-size: 12px; color: #64748B;">✦ Galeri Pameran Karya Jawi</span>
         <button class="btn-primary" onclick="closeModal('gallery-preview-modal')">
           ✕ Tutup Paparan
         </button>
@@ -947,7 +964,7 @@
     };
 
     window.addEventListener('appinstalled', () => {
-      console.log('[PWA] Kembara Bahasa Sekolah Bestari berjaya dipasang ke peranti!');
+      console.log('[PWA] Jejak Jawi Bestari berjaya dipasang ke peranti!');
       const installBtn = document.getElementById('btn-pwa-install');
       if (installBtn) installBtn.style.display = 'none';
     });

@@ -1,5 +1,5 @@
 // ==========================================
-// UI.JS - DOM Manipulations, Audio, Trialogical Modals & PBD Report (DSKP SP 4.4.2)
+// UI.JS - DOM Manipulations, Audio, Trialogical Modals & PBD Report (Jejak Jawi Bestari)
 // ==========================================
 import {
   ROOM_CONFIG,
@@ -612,7 +612,7 @@ export function toggleMissionChecklist() {
 }
 
 // ==========================================
-// 6.4 KAMUS RUMI KE JAWI (DSKP SP 4.4.2 & 66K TSV DATASET)
+// 6.4 KAMUS RUMI KE JAWI (66K TSV DATASET)
 // ==========================================
 
 // Global high-speed Map object for instant O(1) translation lookup
@@ -620,7 +620,7 @@ if (typeof window !== 'undefined') {
   window.kamusDB = window.kamusDB || new Map();
 }
 
-// Core Simpulan Bahasa (DSKP SP 4.4.2)
+// Core Simpulan Bahasa
 export const CORE_SIMPULAN_BAHASA = {
   'ulat buku': 'اولت بوکو',
   'anak emas': 'انق امس',
@@ -1881,7 +1881,7 @@ export function proceedToRoom4() {
 }
 
 // ==========================================
-// 11. ROOM 4 MODAL: STUDIO PERSEMBAHAN SENI TULISAN JAWI (40 Marks • SP 4.4.2)
+// 11. ROOM 4 MODAL: STUDIO PERSEMBAHAN SENI TULISAN JAWI (40 Marks)
 // ==========================================
 let khatCanvas = null;
 let khatCtx = null;
@@ -2324,19 +2324,19 @@ export function showFinalPBDReport(dataUrl = null) {
     if (totalScore >= 85) {
       badgeEl.classList.add('tp6');
       badgeEl.textContent = 'Tahap Penguasaan 6 (Cemerlang)';
-      rubricEl.innerHTML = `<strong>Tahap Penguasaan 6 (Cemerlang):</strong> Murid berupaya menulis simpulan bahasa dalam Jawi dengan ejaan tepat dan mempersembahkan keindahan seni tulisan Jawi menggunakan corak dan bingkai yang sangat kreatif mengikut Standard Pembelajaran 4.4.2.`;
+      rubricEl.innerHTML = `<strong>Tahap Penguasaan 6 (Cemerlang):</strong> Murid berupaya menulis simpulan bahasa dalam Jawi dengan ejaan tepat dan mempersembahkan keindahan seni tulisan Jawi menggunakan corak dan bingkai yang sangat kreatif mengikut Standard Pembelajaran 4.4.1 dan 4.4.2.`;
     } else if (totalScore >= 70) {
       badgeEl.classList.add('tp5');
       badgeEl.textContent = 'Tahap Penguasaan 5 (Sangat Baik)';
-      rubricEl.innerHTML = `<strong>Tahap Penguasaan 5 (Sangat Baik):</strong> Murid berupaya mengeja perkataan Jawi, mencantum simpulan bahasa, dan mempersembahkan seni khat dengan kemas dan teratur mengikut Standard Pembelajaran 4.4.2.`;
+      rubricEl.innerHTML = `<strong>Tahap Penguasaan 5 (Sangat Baik):</strong> Murid berupaya mengeja perkataan Jawi, mencantum simpulan bahasa, dan mempersembahkan seni khat dengan kemas dan teratur mengikut Standard Pembelajaran 4.4.1 dan 4.4.2.`;
     } else if (totalScore >= 50) {
       badgeEl.classList.add('tp4');
       badgeEl.textContent = 'Tahap Penguasaan 4 (Baik)';
-      rubricEl.innerHTML = `<strong>Tahap Penguasaan 4 (Baik):</strong> Murid menguasai asas ejaan dan cantuman simpulan bahasa serta melukis kaligrafi dengan bimbingan minimum mengikut Standard Pembelajaran 4.4.2.`;
+      rubricEl.innerHTML = `<strong>Tahap Penguasaan 4 (Baik):</strong> Murid menguasai asas ejaan dan cantuman simpulan bahasa serta melukis kaligrafi dengan bimbingan minimum mengikut Standard Pembelajaran 4.4.1 dan 4.4.2.`;
     } else {
       badgeEl.classList.add('tp3');
       badgeEl.textContent = 'Tahap Penguasaan 3 (Memuaskan)';
-      rubricEl.innerHTML = `<strong>Tahap Penguasaan 3 (Memuaskan):</strong> Murid berupaya mengeja dan mempersembahkan seni Jawi pada tahap memuaskan mengikut Standard Pembelajaran 4.4.2.`;
+      rubricEl.innerHTML = `<strong>Tahap Penguasaan 3 (Memuaskan):</strong> Murid berupaya mengeja dan mempersembahkan seni Jawi pada tahap memuaskan mengikut Standard Pembelajaran 4.4.1 dan 4.4.2.`;
     }
   }
 
