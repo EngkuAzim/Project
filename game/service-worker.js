@@ -3,13 +3,14 @@
 // Caches core 3D assets, scripts, stylesheets, and CDN libraries for offline / fast school WiFi access.
 // ==========================================
 
-const CACHE_NAME = 'jejak-jawi-bestari-pwa-v2';
+const CACHE_NAME = 'jejak-jawi-bestari-pwa-v3';
 
 const CORE_ASSETS = [
   './',
   './index.html',
-  './style.css?v=4.4.2',
-  './game.js?v=4.4.2',
+  './favicon.ico',
+  './style.css?v=4.4.3',
+  './game.js?v=4.4.3',
   './ui.js',
   './state.js',
   './db.js',

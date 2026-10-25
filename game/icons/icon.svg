@@ -40,9 +40,9 @@
   <!-- Authentic Jawi Letter Jim "ج" -->
   <text x="256" y="295" font-family="'Amiri', 'Traditional Arabic', 'Times New Roman', serif" font-size="190" font-weight="bold" text-anchor="middle" fill="url(#goldGrad)" filter="url(#shadow)">ج</text>
 
-  <!-- Ribbon Pill Bottom: "KEMBARA JAWI" -->
+  <!-- Ribbon Pill Bottom: "JEJAK JAWI" -->
   <g transform="translate(256, 420)">
     <rect x="-140" y="-24" width="280" height="48" rx="24" fill="url(#goldGrad)" filter="url(#shadow)"/>
-    <text x="0" y="7" font-family="'Plus Jakarta Sans', 'Arial', sans-serif" font-size="20" font-weight="800" text-anchor="middle" fill="#1E1B4B" letter-spacing="1.5">KEMBARA JAWI</text>
+    <text x="0" y="7" font-family="'Plus Jakarta Sans', 'Arial', sans-serif" font-size="20" font-weight="800" text-anchor="middle" fill="#1E1B4B" letter-spacing="1.5">JEJAK JAWI</text>
   </g>
 </svg>
