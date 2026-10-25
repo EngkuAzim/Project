@@ -239,96 +239,107 @@ export function buildLobby(arg1, arg2, arg3) {
   const teacherHead = new THREE.Group();
   teacherHead.position.set(0, 1.95, 0);
 
-  // 1. Kubah Tudung Bulat (Hijab Crown)
-  const tudungCrown = new THREE.Mesh(
-    new THREE.SphereGeometry(0.38, 20, 16),
+  // 1. Muka Kulit Berseri (Face Block - Warm Caramel/Peach Skin)
+  const faceMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(0.34, 0.32, 0.24),
+    new THREE.MeshLambertMaterial({ color: 0xF7CE9E }) // Warm Natural Skin
+  );
+  faceMesh.position.set(0, 0.02, 0.12);
+  teacherHead.add(faceMesh);
+
+  // 2. Tudung Belakang & Kepala Atas (Hijab Back & Crown - Positif Z belakang)
+  const tudungBack = new THREE.Mesh(
+    new THREE.SphereGeometry(0.32, 18, 16),
     tudungMat
   );
-  teacherHead.add(tudungCrown);
+  tudungBack.position.set(0, 0.04, -0.12);
+  teacherHead.add(tudungBack);
 
-  // 2. Awning Tudung Bawal Berbentuk Lipatan Kemas di Dahi
+  // Kubah Atas Tudung (Top of Hijab)
+  const tudungTop = new THREE.Mesh(
+    new THREE.BoxGeometry(0.38, 0.10, 0.32),
+    tudungMat
+  );
+  tudungTop.position.set(0, 0.19, 0.02);
+  teacherHead.add(tudungTop);
+
+  // 3. Awning Tudung Bawal Kemas di Dahi (Hijab Awning / Peak above eyebrows)
   const awning = new THREE.Mesh(
-    new THREE.BoxGeometry(0.30, 0.05, 0.12),
+    new THREE.BoxGeometry(0.36, 0.05, 0.12),
     tudungTrimMat
   );
-  awning.position.set(0, 0.19, 0.23);
+  awning.position.set(0, 0.18, 0.24);
   awning.rotation.x = 0.22;
   teacherHead.add(awning);
 
-  // Lipatan tepi tudung membingkai pipi
-  const cheekL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.26, 0.14), tudungTrimMat);
-  cheekL.position.set(-0.19, -0.05, 0.20);
+  // Lipatan Tudung di Sisi Pipi Kiri & Kanan (Hijab Side Cheek Wraps)
+  const cheekL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 0.22), tudungMat);
+  cheekL.position.set(-0.19, 0.02, 0.13);
   teacherHead.add(cheekL);
 
-  const cheekR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.26, 0.14), tudungTrimMat);
-  cheekR.position.set(0.19, -0.05, 0.20);
+  const cheekR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 0.22), tudungMat);
+  cheekR.position.set(0.19, 0.02, 0.13);
   teacherHead.add(cheekR);
 
-  // Pelapik Dagu Tudung (Chin Cover)
+  // Pelapik Dagu Tudung (Under-Chin Hijab Wrap below smile)
   const tudungChin = new THREE.Mesh(
-    new THREE.BoxGeometry(0.24, 0.08, 0.10),
+    new THREE.BoxGeometry(0.36, 0.08, 0.20),
     tudungMat
   );
-  tudungChin.position.set(0, -0.16, 0.24);
+  tudungChin.position.set(0, -0.15, 0.14);
   teacherHead.add(tudungChin);
 
-  // 3. Muka Lembut di Dalam Bukaan Tudung (Face Mesh)
-  const faceMesh = new THREE.Mesh(
-    new THREE.BoxGeometry(0.30, 0.28, 0.14),
-    new THREE.MeshLambertMaterial({ color: 0xF7CE9E }) // Warm Natural Skin
-  );
-  faceMesh.position.set(0, 0.02, 0.21);
-  teacherHead.add(faceMesh);
-
-  // 4. Mata Murid Cikgu (Smiling Pupils with Twinkle)
-  const eyeMat = new THREE.MeshBasicMaterial({ color: 0x1E293B });
+  // 4. Mata Murid Cikgu (Cute Expressive Teacher Eyes with Sparkles)
+  const eyeMat = new THREE.MeshBasicMaterial({ color: 0x0F172A });
   const sparkleMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
 
-  const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.05, 0.02), eyeMat);
-  eyeL.position.set(-0.09, 0.04, 0.29);
+  // Mata Kiri
+  const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.055, 0.02), eyeMat);
+  eyeL.position.set(-0.09, 0.04, 0.245);
   teacherHead.add(eyeL);
 
-  const eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.05, 0.02), eyeMat);
-  eyeR.position.set(0.09, 0.04, 0.29);
-  teacherHead.add(eyeR);
-
-  const spL = new THREE.Mesh(new THREE.BoxGeometry(0.016, 0.016, 0.025), sparkleMat);
-  spL.position.set(-0.08, 0.055, 0.295);
+  const spL = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.018, 0.025), sparkleMat);
+  spL.position.set(-0.08, 0.055, 0.25);
   teacherHead.add(spL);
 
-  const spR = new THREE.Mesh(new THREE.BoxGeometry(0.016, 0.016, 0.025), sparkleMat);
-  spR.position.set(0.10, 0.055, 0.295);
+  // Mata Kanan
+  const eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.055, 0.02), eyeMat);
+  eyeR.position.set(0.09, 0.04, 0.245);
+  teacherHead.add(eyeR);
+
+  const spR = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.018, 0.025), sparkleMat);
+  spR.position.set(0.10, 0.055, 0.25);
   teacherHead.add(spR);
 
-  // Kening Bersahaja (Gentle Eyebrows)
-  const browMat = new THREE.MeshLambertMaterial({ color: 0x475569 });
+  // Kening Lembut (Gentle Eyebrows)
+  const browMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
   const browL = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.018, 0.02), browMat);
-  browL.position.set(-0.09, 0.11, 0.29);
+  browL.position.set(-0.09, 0.11, 0.245);
   browL.rotation.z = 0.08;
   teacherHead.add(browL);
 
   const browR = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.018, 0.02), browMat);
-  browR.position.set(0.09, 0.11, 0.29);
+  browR.position.set(0.09, 0.11, 0.245);
   browR.rotation.z = -0.08;
   teacherHead.add(browR);
 
-  // Pipi Merah Jambu Lembut (Blush)
+  // Pipi Merah Jambu Comel (Rosy Blush)
   const blushMat = new THREE.MeshBasicMaterial({ color: 0xFB7185, side: THREE.DoubleSide });
-  const blushL = new THREE.Mesh(new THREE.PlaneGeometry(0.05, 0.028), blushMat);
-  blushL.position.set(-0.13, -0.03, 0.29);
+  const blushL = new THREE.Mesh(new THREE.PlaneGeometry(0.055, 0.03), blushMat);
+  blushL.position.set(-0.13, -0.03, 0.245);
   teacherHead.add(blushL);
 
-  const blushR = new THREE.Mesh(new THREE.PlaneGeometry(0.05, 0.028), blushMat);
-  blushR.position.set(0.13, -0.03, 0.29);
+  const blushR = new THREE.Mesh(new THREE.PlaneGeometry(0.055, 0.03), blushMat);
+  blushR.position.set(0.13, -0.03, 0.245);
   teacherHead.add(blushR);
 
-  // Senyuman Mesra Guru (Warm Gentle Smile)
+  // Senyuman Mesra Cikgu Asyikin (Warm Teacher Smile)
   const smile = new THREE.Mesh(
-    new THREE.TorusGeometry(0.038, 0.010, 6, 12, Math.PI),
+    new THREE.TorusGeometry(0.042, 0.012, 6, 12, Math.PI),
     new THREE.MeshBasicMaterial({ color: 0xE11D48 })
   );
-  smile.position.set(0, -0.065, 0.285);
-  smile.rotation.z = Math.PI;
+  smile.position.set(0, -0.065, 0.245);
+  smile.rotation.z = Math.PI; // Inverted so it curves upward into a happy smile
   teacherHead.add(smile);
 
   // 5. CERMIN MATA / SPEK GURU (Smart Teacher Spectacles)
@@ -341,40 +352,40 @@ export function buildLobby(arg1, arg2, arg3) {
   const lensMat = new THREE.MeshBasicMaterial({
     color: 0xBAE6FD,
     transparent: true,
-    opacity: 0.38,
+    opacity: 0.40,
     side: THREE.DoubleSide
   });
 
-  // Bingkai Kiri
-  const rimL = new THREE.Mesh(new THREE.TorusGeometry(0.062, 0.012, 8, 20), glassFrameMat);
-  rimL.position.set(-0.09, 0.04, 0.31);
+  // Bingkai Kiri (Left Rim)
+  const rimL = new THREE.Mesh(new THREE.TorusGeometry(0.065, 0.014, 8, 20), glassFrameMat);
+  rimL.position.set(-0.09, 0.04, 0.265);
   teacherHead.add(rimL);
 
-  const lensL = new THREE.Mesh(new THREE.CircleGeometry(0.055, 16), lensMat);
-  lensL.position.set(-0.09, 0.04, 0.305);
+  const lensL = new THREE.Mesh(new THREE.CircleGeometry(0.058, 16), lensMat);
+  lensL.position.set(-0.09, 0.04, 0.26);
   teacherHead.add(lensL);
 
-  // Bingkai Kanan
-  const rimR = new THREE.Mesh(new THREE.TorusGeometry(0.062, 0.012, 8, 20), glassFrameMat);
-  rimR.position.set(0.09, 0.04, 0.31);
+  // Bingkai Kanan (Right Rim)
+  const rimR = new THREE.Mesh(new THREE.TorusGeometry(0.065, 0.014, 8, 20), glassFrameMat);
+  rimR.position.set(0.09, 0.04, 0.265);
   teacherHead.add(rimR);
 
-  const lensR = new THREE.Mesh(new THREE.CircleGeometry(0.055, 16), lensMat);
-  lensR.position.set(0.09, 0.04, 0.305);
+  const lensR = new THREE.Mesh(new THREE.CircleGeometry(0.058, 16), lensMat);
+  lensR.position.set(0.09, 0.04, 0.26);
   teacherHead.add(lensR);
 
-  // Jambatan Cermin Mata di Hidung (Nose Bridge)
-  const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.014, 0.014), glassFrameMat);
-  bridge.position.set(0, 0.04, 0.31);
+  // Jambatan Spek di Atas Batang Hidung (Nose Bridge)
+  const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.015, 0.015), glassFrameMat);
+  bridge.position.set(0, 0.04, 0.265);
   teacherHead.add(bridge);
 
   // Tangkai Spek Masuk ke Sisi Tudung (Temples)
-  const templeL = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.012, 0.16), glassFrameMat);
-  templeL.position.set(-0.16, 0.04, 0.22);
+  const templeL = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.014, 0.16), glassFrameMat);
+  templeL.position.set(-0.16, 0.04, 0.18);
   teacherHead.add(templeL);
 
-  const templeR = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.012, 0.16), glassFrameMat);
-  templeR.position.set(0.16, 0.04, 0.22);
+  const templeR = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.014, 0.16), glassFrameMat);
+  templeR.position.set(0.16, 0.04, 0.18);
   teacherHead.add(templeR);
 
   teacherGroup.add(teacherHead);
