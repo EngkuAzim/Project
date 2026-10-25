@@ -286,10 +286,10 @@ export function updateInventoryHUD() {
     homeBtn.style.display = (room === 'lobby') ? 'none' : 'inline-flex';
   }
 
-  // Toggle Inventory Card visibility: hide dummy card in lobby, only show in rooms
+  // Toggle Inventory Card visibility: hide in lobby, show compact chip in rooms
   const invCard = document.querySelector('.inventory-card');
   if (invCard) {
-    invCard.style.display = (room === 'lobby') ? 'none' : 'flex';
+    invCard.style.display = (room === 'lobby') ? 'none' : 'inline-flex';
   }
 
   if (room === 'lobby') {
@@ -300,57 +300,20 @@ export function updateInventoryHUD() {
     const collected = COLLECTIBLES_R1.filter(c => c.collected).length;
     if (invTitleTextEl) invTitleTextEl.textContent = 'Pagar Sesat Jawi';
     if (invCountEl) invCountEl.textContent = `${collected} / 10 Pos`;
-
-    COLLECTIBLES_R1.forEach(item => {
-      const slot = document.createElement('div');
-      slot.className = `slot-item jawi-char ${item.collected ? 'unlocked' : ''}`;
-      slot.id = `inv-${item.id}`;
-      slot.title = `Pos ${item.stepIndex}: ${item.char}`;
-      slot.innerHTML = `
-        <span class="slot-char">${item.collected ? item.stepIndex : '?'}</span>
-        <span class="slot-label">${item.collected ? 'Ditemui' : 'Pos ' + item.stepIndex}</span>
-      `;
-      invSlotsContainer.appendChild(slot);
-    });
     return;
   }
 
   if (room === 'room2') {
     const collected = COLLECTIBLES_R2.filter(c => c.collected).length;
-    const sessionLabel = gameState.r2Session === 1 ? 'Sesi 1 (Ulat Buku & Anak Emas)' : 'Sesi 2 (Buah Hati & Cahaya Mata)';
-    if (invTitleTextEl) invTitleTextEl.textContent = `Makmal Kata • ${sessionLabel}`;
+    if (invTitleTextEl) invTitleTextEl.textContent = 'Makmal Kata';
     if (invCountEl) invCountEl.textContent = `${collected} / 8 Jubin`;
-
-    COLLECTIBLES_R2.forEach(item => {
-      const slot = document.createElement('div');
-      slot.className = `slot-item jawi-char ${item.collected ? 'unlocked' : ''}`;
-      slot.id = `inv-${item.id}`;
-      slot.title = `Jubin: ${item.name} (${item.jawi})`;
-      slot.innerHTML = `
-        <span class="slot-char">${item.collected ? item.char : '?'}</span>
-        <span class="slot-label">${item.rumi}</span>
-      `;
-      invSlotsContainer.appendChild(slot);
-    });
     return;
   }
 
   if (room === 'room3') {
     const collected = COLLECTIBLES_R3.filter(c => c.collected).length;
-    if (invTitleTextEl) invTitleTextEl.textContent = 'Arkib Simpulan Bahasa';
-    if (invCountEl) invCountEl.textContent = `${collected} / 4 Gulungan`;
-
-    COLLECTIBLES_R3.forEach(item => {
-      const slot = document.createElement('div');
-      slot.className = `slot-item ${item.collected ? 'unlocked' : ''}`;
-      slot.id = `inv-${item.id}`;
-      slot.title = `${item.label} (${item.jawi})`;
-      slot.innerHTML = `
-        <span class="slot-char">${item.collected ? '📜' : '?'}</span>
-        <span class="slot-label">${item.label}</span>
-      `;
-      invSlotsContainer.appendChild(slot);
-    });
+    if (invTitleTextEl) invTitleTextEl.textContent = 'Arkib Simpulan';
+    if (invCountEl) invCountEl.textContent = `${collected} / 4 Gulung`;
     return;
   }
 
@@ -358,18 +321,7 @@ export function updateInventoryHUD() {
     const collected = COLLECTIBLES_R4.filter(c => c.collected).length;
     if (invTitleTextEl) invTitleTextEl.textContent = 'Studio Seni Khat';
     if (invCountEl) invCountEl.textContent = `${collected} / 3 Alatan`;
-
-    COLLECTIBLES_R4.forEach(item => {
-      const slot = document.createElement('div');
-      slot.className = `slot-item ${item.collected ? 'unlocked' : ''}`;
-      slot.id = `inv-${item.id}`;
-      slot.title = `${item.label}: ${item.desc}`;
-      slot.innerHTML = `
-        <span class="slot-char">${item.collected ? item.char : '?'}</span>
-        <span class="slot-label">${item.label}</span>
-      `;
-      invSlotsContainer.appendChild(slot);
-    });
+    return;
   }
 }
 

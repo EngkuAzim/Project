@@ -255,36 +255,48 @@ html, body {
   background: #F1F5F9;
 }
 
-/* Dynamic Inventory Card */
+/* Dynamic Inventory Card - Sleek Compact Pill (Uncluttered & Spacious like Lobby) */
 .inventory-card {
   pointer-events: auto;
   background: var(--card-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  padding: 8px 16px;
-  border-radius: 18px;
+  padding: 6px 14px;
+  border-radius: 999px;
   border: 2px solid var(--glass-border);
   box-shadow: var(--shadow-soft);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 220px;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  box-sizing: border-box;
 }
 
 .inventory-title {
-  display: flex;
-  justify-content: space-between;
+  display: inline-flex;
   align-items: center;
+  gap: 6px;
   font-size: 11px;
   font-weight: 800;
-  color: #475569;
+  color: #334155;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+#inventory-count {
+  background: linear-gradient(135deg, #0284C7, #0369A1);
+  color: #FFFFFF;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
 }
 
 .inventory-slots {
-  display: flex;
-  gap: 8px;
+  display: none !important;
 }
 
 .slot-item {
