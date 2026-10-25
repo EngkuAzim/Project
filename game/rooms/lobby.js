@@ -90,12 +90,12 @@ export function buildLobby(arg1, arg2, arg3) {
   roomGroup.add(noticeboard);
   roomColliders.push({ minX: -10.5, maxX: -7.8, minZ: -3.2, maxZ: 1.2 });
 
-  // 5. NPC Cikgu Asyikin (Guru Bahasa Melayu) - Bertudung Bawal & Berkaca Mata
+  // 5. NPC Cikgu Asyikin (Guru Bahasa Melayu) - Direplikasi Mengikut Foto Sebenar
   const teacherGroup = new THREE.Group();
   teacherGroup.position.set(2.0, 0, -3.2);
 
   // A. Kasut Hitam Wanita (Black Court Shoes)
-  const shoeMat = new THREE.MeshLambertMaterial({ color: 0x111827 });
+  const shoeMat = new THREE.MeshLambertMaterial({ color: 0x0F172A });
   const shoeL = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.07, 0.22), shoeMat);
   shoeL.position.set(-0.15, 0.035, 0.05);
   teacherGroup.add(shoeL);
@@ -103,193 +103,241 @@ export function buildLobby(arg1, arg2, arg3) {
   shoeR.position.set(0.15, 0.035, 0.05);
   teacherGroup.add(shoeR);
 
-  // B. Kain / Skirt Labuh Baju Kurung (Emerald Green)
+  // B. Kain / Skirt Labuh Baju Kurung (Royal Indigo Purple dengan Jalur Tenunan Batik Tembaga)
+  const kurungIndigoMat = new THREE.MeshLambertMaterial({ color: 0x2E1065 }); // Ungu Nila Pekat
+  const batikCopperMat = new THREE.MeshLambertMaterial({ color: 0xD97706 });  // Tembaga Keemasan
+  const batikLilacMat = new THREE.MeshLambertMaterial({ color: 0xA855F7 });   // Jalur Lavender Halus
+
   const skirt = new THREE.Mesh(
     new THREE.CylinderGeometry(0.32, 0.52, 0.95, 16),
-    new THREE.MeshLambertMaterial({ color: 0x047857 })
+    kurungIndigoMat
   );
   skirt.position.y = 0.52;
   teacherGroup.add(skirt);
 
-  // Jalur Emas Hujung Kain
+  // Jalur Corak Batik Tembaga di Bahagian Tengah Kain
+  const skirtMidBatik = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.40, 0.43, 0.08, 16),
+    batikCopperMat
+  );
+  skirtMidBatik.position.y = 0.35;
+  teacherGroup.add(skirtMidBatik);
+
+  // Jalur Tenunan Bawah Kain
   const skirtTrim = new THREE.Mesh(
     new THREE.CylinderGeometry(0.51, 0.525, 0.04, 16),
-    new THREE.MeshLambertMaterial({ color: 0xF59E0B })
+    batikCopperMat
   );
   skirtTrim.position.y = 0.06;
   teacherGroup.add(skirtTrim);
 
-  // C. Baju Kurung Moden (Emerald Green Kurung Blouse)
+  // C. Baju Kurung Moden (Royal Indigo Purple Blouse dengan Corak Geometri Batik)
   const bajuKurung = new THREE.Mesh(
     new THREE.BoxGeometry(0.70, 0.68, 0.44),
-    new THREE.MeshLambertMaterial({ color: 0x059669 })
+    kurungIndigoMat
   );
   bajuKurung.position.y = 1.30;
   teacherGroup.add(bajuKurung);
 
-  // Renda / Jalur Emas Hujung Baju
+  // Kelim Tenunan Batik Tembaga di Hujung Labuh Baju Kurung
   const bajuTrim = new THREE.Mesh(
-    new THREE.BoxGeometry(0.72, 0.035, 0.46),
-    new THREE.MeshLambertMaterial({ color: 0xF59E0B })
+    new THREE.BoxGeometry(0.72, 0.04, 0.46),
+    batikCopperMat
   );
   bajuTrim.position.y = 0.98;
   teacherGroup.add(bajuTrim);
 
-  // Tanda Nama Rasmi Guru (Name Badge "CIKGU ASYIKIN")
-  const badgePlate = new THREE.Mesh(
-    new THREE.BoxGeometry(0.16, 0.05, 0.02),
-    new THREE.MeshLambertMaterial({ color: 0x0F172A })
+  const bajuLilacStripe = new THREE.Mesh(
+    new THREE.BoxGeometry(0.71, 0.02, 0.45),
+    batikLilacMat
   );
-  badgePlate.position.set(-0.18, 1.44, 0.23);
-  teacherGroup.add(badgePlate);
+  bajuLilacStripe.position.y = 1.14;
+  teacherGroup.add(bajuLilacStripe);
 
-  const badgeTextLine = new THREE.Mesh(
-    new THREE.BoxGeometry(0.12, 0.015, 0.025),
-    new THREE.MeshLambertMaterial({ color: 0xFFFFFF })
-  );
-  badgeTextLine.position.set(-0.18, 1.44, 0.23);
-  teacherGroup.add(badgeTextLine);
-
-  // D. Labuh Tudung Bahu & Dada (Hijab Drape / Shawl over Shoulders)
-  const tudungMat = new THREE.MeshLambertMaterial({ color: 0xFFFBEB }); // Soft Vanilla Cream
-  const tudungTrimMat = new THREE.MeshLambertMaterial({ color: 0xFDE68A }); // Warm Gold Accent
+  // D. Labuh Tudung Bawal Marun di Bahu & Dada (Deep Maroon Hijab)
+  const tudungMaroonMat = new THREE.MeshLambertMaterial({ color: 0x881337 }); // Merah Hati / Maroon Pekat
+  const tudungCrimsonMat = new THREE.MeshLambertMaterial({ color: 0x9F1239 }); // Crimson Accent
 
   const tudungCowl = new THREE.Mesh(
     new THREE.CylinderGeometry(0.36, 0.58, 0.44, 16),
-    tudungMat
+    tudungMaroonMat
   );
   tudungCowl.position.y = 1.58;
   teacherGroup.add(tudungCowl);
 
-  // Lipatan V-Shape di Dada
+  // Labuh Tudung Melepasi Dada (Curved Front Hijab Drape seperti foto sebenar)
   const frontDrape = new THREE.Mesh(
-    new THREE.BoxGeometry(0.30, 0.34, 0.06),
-    tudungTrimMat
+    new THREE.BoxGeometry(0.32, 0.48, 0.08),
+    tudungMaroonMat
   );
-  frontDrape.position.set(0, 1.50, 0.23);
-  frontDrape.rotation.x = -0.1;
+  frontDrape.position.set(0, 1.42, 0.23);
+  frontDrape.rotation.x = -0.06;
   teacherGroup.add(frontDrape);
 
-  // Kerongsang Emas (Gold Brooch Pin)
-  const brooch = new THREE.Mesh(
-    new THREE.OctahedronGeometry(0.04, 0),
-    new THREE.MeshLambertMaterial({ color: 0xF59E0B })
-  );
-  brooch.position.set(0, 1.64, 0.26);
-  teacherGroup.add(brooch);
+  // E. TALI LANYARD BIRU RASMI & KAD PAS ID GURU (Signature Detail dari Foto Sebenar!)
+  const lanyardMat = new THREE.MeshLambertMaterial({ color: 0x2563EB }); // Royal Blue Lanyard
+  const lanyardL = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.36, 0.012), lanyardMat);
+  lanyardL.position.set(-0.055, 1.46, 0.275);
+  lanyardL.rotation.z = -0.16;
+  teacherGroup.add(lanyardL);
 
-  // E. Lengan Kanan Memegang Pen Merah Cikgu
+  const lanyardR = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.36, 0.012), lanyardMat);
+  lanyardR.position.set(0.055, 1.46, 0.275);
+  lanyardR.rotation.z = 0.16;
+  teacherGroup.add(lanyardR);
+
+  // Klip Logam Pas
+  const idClip = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.02, 0.02), new THREE.MeshStandardMaterial({ color: 0x94A3B8, metalness: 0.8 }));
+  idClip.position.set(0, 1.28, 0.28);
+  teacherGroup.add(idClip);
+
+  // Kad Pas ID Guru (White & Blue Official Pass)
+  const idCard = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.15, 0.012), new THREE.MeshLambertMaterial({ color: 0xFFFFFF }));
+  idCard.position.set(0, 1.20, 0.28);
+  teacherGroup.add(idCard);
+
+  const idHeader = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.035, 0.015), new THREE.MeshLambertMaterial({ color: 0x0284C7 }));
+  idHeader.position.set(0, 1.25, 0.28);
+  teacherGroup.add(idHeader);
+
+  const idPhoto = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.05, 0.016), new THREE.MeshLambertMaterial({ color: 0x334155 }));
+  idPhoto.position.set(-0.022, 1.185, 0.28);
+  teacherGroup.add(idPhoto);
+
+  // Tanda Nama Rasmi Guru ("CIKGU ASYIKIN" di dada atas)
+  const badgePlate = new THREE.Mesh(
+    new THREE.BoxGeometry(0.14, 0.042, 0.02),
+    new THREE.MeshLambertMaterial({ color: 0x0F172A })
+  );
+  badgePlate.position.set(0.12, 1.44, 0.275);
+  teacherGroup.add(badgePlate);
+
+  const badgeTextLine = new THREE.Mesh(
+    new THREE.BoxGeometry(0.10, 0.012, 0.024),
+    new THREE.MeshLambertMaterial({ color: 0xFFFFFF })
+  );
+  badgeTextLine.position.set(0.12, 1.44, 0.275);
+  teacherGroup.add(badgeTextLine);
+
+  // F. Lengan Baju Kurung Bercorak Ungu & Tembaga
   const armR = new THREE.Group();
   armR.position.set(0.40, 1.55, 0.05);
 
   const sleeveR = new THREE.Mesh(
     new THREE.BoxGeometry(0.16, 0.48, 0.16),
-    new THREE.MeshLambertMaterial({ color: 0x059669 })
+    kurungIndigoMat
   );
   sleeveR.position.set(0, -0.20, 0.08);
   sleeveR.rotation.x = -0.32;
   armR.add(sleeveR);
 
+  const cuffR = new THREE.Mesh(
+    new THREE.BoxGeometry(0.17, 0.04, 0.17),
+    batikCopperMat
+  );
+  cuffR.position.set(0, -0.40, 0.14);
+  cuffR.rotation.x = -0.32;
+  armR.add(cuffR);
+
   const handR = new THREE.Mesh(
     new THREE.BoxGeometry(0.10, 0.12, 0.10),
-    new THREE.MeshLambertMaterial({ color: 0xF7CE9E })
+    new THREE.MeshLambertMaterial({ color: 0xF9D5A7 })
   );
-  handR.position.set(0, -0.42, 0.18);
+  handR.position.set(0, -0.44, 0.20);
   armR.add(handR);
 
-  // Pen Merah Memeriksa Latihan
+  // Pen Merah Memeriksa Latihan di Tangan Kanan
   const penMerah = new THREE.Mesh(
     new THREE.CylinderGeometry(0.015, 0.015, 0.22, 6),
     new THREE.MeshLambertMaterial({ color: 0xDC2626 })
   );
-  penMerah.position.set(0.03, -0.38, 0.24);
+  penMerah.position.set(0.03, -0.40, 0.26);
   penMerah.rotation.x = -0.4;
   armR.add(penMerah);
 
   teacherGroup.add(armR);
 
-  // F. Lengan Kiri Melambai Mesra (Waving Arm)
+  // Lengan Kiri Melambai Mesra
   const armL = new THREE.Group();
   armL.position.set(-0.42, 1.56, 0);
 
   const sleeveL = new THREE.Mesh(
     new THREE.BoxGeometry(0.16, 0.46, 0.16),
-    new THREE.MeshLambertMaterial({ color: 0x059669 })
+    kurungIndigoMat
   );
   sleeveL.position.y = -0.20;
   armL.add(sleeveL);
 
   const cuffL = new THREE.Mesh(
-    new THREE.BoxGeometry(0.17, 0.03, 0.17),
-    new THREE.MeshLambertMaterial({ color: 0xF59E0B })
+    new THREE.BoxGeometry(0.17, 0.04, 0.17),
+    batikCopperMat
   );
   cuffL.position.y = -0.42;
   armL.add(cuffL);
 
   const handL = new THREE.Mesh(
     new THREE.BoxGeometry(0.10, 0.12, 0.06),
-    new THREE.MeshLambertMaterial({ color: 0xF7CE9E })
+    new THREE.MeshLambertMaterial({ color: 0xF9D5A7 })
   );
   handL.position.y = -0.48;
   armL.add(handL);
 
   teacherGroup.add(armL);
 
-  // G. Kepala dengan Tudung Bawal & Spek (Teacher Head Group)
+  // G. Kepala Tudung Marun & Cermin Mata Hitam Petak-Bulat (Head Group)
   const teacherHead = new THREE.Group();
   teacherHead.position.set(0, 1.95, 0);
 
-  // 1. Muka Kulit Berseri (Face Block - Warm Caramel/Peach Skin)
+  // 1. Muka Kulit Cerah Berseri
   const faceMesh = new THREE.Mesh(
     new THREE.BoxGeometry(0.34, 0.32, 0.24),
-    new THREE.MeshLambertMaterial({ color: 0xF7CE9E }) // Warm Natural Skin
+    new THREE.MeshLambertMaterial({ color: 0xF9D5A7 }) // Fair Warm Skin
   );
   faceMesh.position.set(0, 0.02, 0.12);
   teacherHead.add(faceMesh);
 
-  // 2. Tudung Belakang & Kepala Atas (Hijab Back & Crown - Positif Z belakang)
+  // 2. Tudung Marun Belakang & Kubah Atas
   const tudungBack = new THREE.Mesh(
     new THREE.SphereGeometry(0.32, 18, 16),
-    tudungMat
+    tudungMaroonMat
   );
   tudungBack.position.set(0, 0.04, -0.12);
   teacherHead.add(tudungBack);
 
-  // Kubah Atas Tudung (Top of Hijab)
   const tudungTop = new THREE.Mesh(
     new THREE.BoxGeometry(0.38, 0.10, 0.32),
-    tudungMat
+    tudungMaroonMat
   );
   tudungTop.position.set(0, 0.19, 0.02);
   teacherHead.add(tudungTop);
 
-  // 3. Awning Tudung Bawal Kemas di Dahi (Hijab Awning / Peak above eyebrows)
+  // 3. Awning Tudung Bawal Marun Kemas di Dahi
   const awning = new THREE.Mesh(
     new THREE.BoxGeometry(0.36, 0.05, 0.12),
-    tudungTrimMat
+    tudungCrimsonMat
   );
   awning.position.set(0, 0.18, 0.24);
   awning.rotation.x = 0.22;
   teacherHead.add(awning);
 
-  // Lipatan Tudung di Sisi Pipi Kiri & Kanan (Hijab Side Cheek Wraps)
-  const cheekL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 0.22), tudungMat);
+  // Sisi Tudung Membingkai Pipi
+  const cheekL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 0.22), tudungMaroonMat);
   cheekL.position.set(-0.19, 0.02, 0.13);
   teacherHead.add(cheekL);
 
-  const cheekR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 0.22), tudungMat);
+  const cheekR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 0.22), tudungMaroonMat);
   cheekR.position.set(0.19, 0.02, 0.13);
   teacherHead.add(cheekR);
 
-  // Pelapik Dagu Tudung (Under-Chin Hijab Wrap below smile)
+  // Pelapik Dagu Tudung Marun
   const tudungChin = new THREE.Mesh(
     new THREE.BoxGeometry(0.36, 0.08, 0.20),
-    tudungMat
+    tudungMaroonMat
   );
   tudungChin.position.set(0, -0.15, 0.14);
   teacherHead.add(tudungChin);
 
-  // 4. Mata Murid Cikgu (Cute Expressive Teacher Eyes with Sparkles)
+  // 4. Mata Tenang Bersinar & Solekan Manis Cikgu Asyikin
   const eyeMat = new THREE.MeshBasicMaterial({ color: 0x0F172A });
   const sparkleMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
 
@@ -311,7 +359,7 @@ export function buildLobby(arg1, arg2, arg3) {
   spR.position.set(0.10, 0.055, 0.25);
   teacherHead.add(spR);
 
-  // Kening Lembut (Gentle Eyebrows)
+  // Kening Lembut Melengkung
   const browMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
   const browL = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.018, 0.02), browMat);
   browL.position.set(-0.09, 0.11, 0.245);
@@ -323,7 +371,7 @@ export function buildLobby(arg1, arg2, arg3) {
   browR.rotation.z = -0.08;
   teacherHead.add(browR);
 
-  // Pipi Merah Jambu Comel (Rosy Blush)
+  // Pipi Merah Jambu Lembut (Blush)
   const blushMat = new THREE.MeshBasicMaterial({ color: 0xFB7185, side: THREE.DoubleSide });
   const blushL = new THREE.Mesh(new THREE.PlaneGeometry(0.055, 0.03), blushMat);
   blushL.position.set(-0.13, -0.03, 0.245);
@@ -333,18 +381,18 @@ export function buildLobby(arg1, arg2, arg3) {
   blushR.position.set(0.13, -0.03, 0.245);
   teacherHead.add(blushR);
 
-  // Senyuman Mesra Cikgu Asyikin (Warm Teacher Smile)
+  // Senyuman Manis Merah Ros Cikgu Asyikin (Rosy Lipstick Smile)
   const smile = new THREE.Mesh(
     new THREE.TorusGeometry(0.042, 0.012, 6, 12, Math.PI),
-    new THREE.MeshBasicMaterial({ color: 0xE11D48 })
+    new THREE.MeshBasicMaterial({ color: 0xBE123C }) // Gincu Ros Menawan
   );
   smile.position.set(0, -0.065, 0.245);
-  smile.rotation.z = Math.PI; // Inverted so it curves upward into a happy smile
+  smile.rotation.z = Math.PI;
   teacherHead.add(smile);
 
-  // 5. CERMIN MATA / SPEK GURU (Smart Teacher Spectacles)
+  // 5. CERMIN MATA HITAM PETAK-BULAT OVERSIZED (Oversized Rounded-Square Glasses dari Foto)
   const glassFrameMat = new THREE.MeshStandardMaterial({
-    color: 0x1E293B, // Smart Midnight Dark Rim
+    color: 0x0F172A, // Hitam Pekat Elegan
     metalness: 0.6,
     roughness: 0.3
   });
@@ -352,46 +400,50 @@ export function buildLobby(arg1, arg2, arg3) {
   const lensMat = new THREE.MeshBasicMaterial({
     color: 0xBAE6FD,
     transparent: true,
-    opacity: 0.40,
+    opacity: 0.36,
     side: THREE.DoubleSide
   });
 
-  // Bingkai Kiri (Left Rim)
-  const rimL = new THREE.Mesh(new THREE.TorusGeometry(0.065, 0.014, 8, 20), glassFrameMat);
-  rimL.position.set(-0.09, 0.04, 0.265);
+  // Bingkai Kiri (Rounded-Square Rim)
+  const rimL = new THREE.Mesh(new THREE.TorusGeometry(0.068, 0.014, 8, 20), glassFrameMat);
+  rimL.position.set(-0.092, 0.04, 0.265);
+  rimL.scale.set(1.08, 0.94, 1);
   teacherHead.add(rimL);
 
-  const lensL = new THREE.Mesh(new THREE.CircleGeometry(0.058, 16), lensMat);
-  lensL.position.set(-0.09, 0.04, 0.26);
+  const lensL = new THREE.Mesh(new THREE.CircleGeometry(0.060, 16), lensMat);
+  lensL.position.set(-0.092, 0.04, 0.26);
+  lensL.scale.set(1.08, 0.94, 1);
   teacherHead.add(lensL);
 
-  // Bingkai Kanan (Right Rim)
-  const rimR = new THREE.Mesh(new THREE.TorusGeometry(0.065, 0.014, 8, 20), glassFrameMat);
-  rimR.position.set(0.09, 0.04, 0.265);
+  // Bingkai Kanan (Rounded-Square Rim)
+  const rimR = new THREE.Mesh(new THREE.TorusGeometry(0.068, 0.014, 8, 20), glassFrameMat);
+  rimR.position.set(0.092, 0.04, 0.265);
+  rimR.scale.set(1.08, 0.94, 1);
   teacherHead.add(rimR);
 
-  const lensR = new THREE.Mesh(new THREE.CircleGeometry(0.058, 16), lensMat);
-  lensR.position.set(0.09, 0.04, 0.26);
+  const lensR = new THREE.Mesh(new THREE.CircleGeometry(0.060, 16), lensMat);
+  lensR.position.set(0.092, 0.04, 0.26);
+  lensR.scale.set(1.08, 0.94, 1);
   teacherHead.add(lensR);
 
   // Jambatan Spek di Atas Batang Hidung (Nose Bridge)
-  const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.015, 0.015), glassFrameMat);
-  bridge.position.set(0, 0.04, 0.265);
+  const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.015, 0.015), glassFrameMat);
+  bridge.position.set(0, 0.045, 0.265);
   teacherHead.add(bridge);
 
-  // Tangkai Spek Masuk ke Sisi Tudung (Temples)
+  // Tangkai Spek Masuk ke Sisi Tudung
   const templeL = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.014, 0.16), glassFrameMat);
-  templeL.position.set(-0.16, 0.04, 0.18);
+  templeL.position.set(-0.165, 0.04, 0.18);
   teacherHead.add(templeL);
 
   const templeR = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.014, 0.16), glassFrameMat);
-  templeR.position.set(0.16, 0.04, 0.18);
+  templeR.position.set(0.165, 0.04, 0.18);
   teacherHead.add(templeR);
 
   teacherGroup.add(teacherHead);
 
   // H. Tag Nama Terapung "Cikgu Asyikin (Guru BM)"
-  const teacherTag = createTextSprite('Cikgu Asyikin (Guru BM)', 'rgba(6, 78, 59, 0.94)', '#A7F3D0', 576, 160, 48);
+  const teacherTag = createTextSprite('Cikgu Asyikin (Guru BM)', 'rgba(136, 19, 55, 0.95)', '#FFE4E6', 576, 160, 48);
   teacherTag.scale.set(3.4, 1.4, 1);
   teacherTag.position.set(0, 2.75, 0);
   teacherGroup.add(teacherTag);
@@ -572,6 +624,41 @@ export function buildLobby(arg1, arg2, arg3) {
   bookStripe.position.set(-0.16, 1.28, 0.02);
   bookStripe.rotation.x = 0.12;
   rostrumGroup.add(bookStripe);
+
+  // Botol Air Comel Cikgu Asyikin (Cream Body dengan Tapak Terracotta Orange dari Foto)
+  const tumblerGroup = new THREE.Group();
+  tumblerGroup.position.set(0.30, 1.25, 0.06);
+
+  const tBase = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.055, 0.055, 0.05, 14),
+    new THREE.MeshLambertMaterial({ color: 0xEA580C }) // Tapak Oren Bata
+  );
+  tBase.position.y = 0.025;
+  tumblerGroup.add(tBase);
+
+  const tBody = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.052, 0.052, 0.18, 14),
+    new THREE.MeshLambertMaterial({ color: 0xFEF3C7 }) // Badan Krim
+  );
+  tBody.position.y = 0.14;
+  tumblerGroup.add(tBody);
+
+  const tCap = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.048, 0.048, 0.04, 12),
+    new THREE.MeshLambertMaterial({ color: 0xEA580C }) // Penutup Oren
+  );
+  tCap.position.y = 0.25;
+  tumblerGroup.add(tCap);
+
+  const tHandle = new THREE.Mesh(
+    new THREE.TorusGeometry(0.022, 0.005, 6, 12),
+    new THREE.MeshLambertMaterial({ color: 0x94A3B8 })
+  );
+  tHandle.position.set(0, 0.28, 0);
+  tHandle.rotation.x = Math.PI / 2;
+  tumblerGroup.add(tHandle);
+
+  rostrumGroup.add(tumblerGroup);
 
   roomGroup.add(rostrumGroup);
   roomColliders.push({ minX: 1.3, maxX: 2.7, minZ: -2.6, maxZ: -1.5 });

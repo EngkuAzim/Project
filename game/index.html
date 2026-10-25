@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Fredoka:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 
   <!-- External Stylesheet with Cache-Buster -->
-  <link rel="stylesheet" href="./style.css?v=4.4.3">
+  <link rel="stylesheet" href="./style.css?v=4.4.4">
 
   <!-- Favicon & Web App Icons -->
   <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
@@ -104,7 +104,10 @@
       </div>
 
       <div class="main-menu-footer">
-        <span>👩‍🏫 Guru Pembimbing: <strong>Cikgu Asyikin</strong></span>
+        <span style="display: inline-flex; align-items: center; gap: 6px;">
+          <img src="./images/cikgu-asyikin-avatar.jpg" alt="Cikgu Asyikin" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1.5px solid #F59E0B; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
+          Guru Pembimbing: <strong>Cikgu Asyikin</strong>
+        </span>
         <span>&bull;</span>
         <span>🎓 Sijil Pentaksiran Bilik Darjah (PBD)</span>
       </div>
@@ -481,13 +484,20 @@
   <div id="profile-modal" class="modal-overlay" onclick="handleOverlayClick(event, 'profile-modal')">
     <div class="modal-card" style="max-width: 440px;">
       <button class="modal-close-btn" onclick="closeModal('profile-modal')">&times;</button>
-      <div class="modal-hero-icon" style="background: linear-gradient(135deg, #4361EE, #3A0CA3);">🎓</div>
-      <h2>Profil Murid Bestari</h2>
-      <div class="trialogic-tag">✦ Maklumat Pentaksiran Bilik Darjah (PBD)</div>
       
-      <p style="font-size: 13px; color: #64748B; margin-bottom: 16px;">
-        Sila masukkan nama dan kelas anda untuk dipaparkan pada Sijil Pentaksiran Bilik Darjah.
-      </p>
+      <!-- Cikgu Asyikin Teacher Speech Bubble dengan Foto Sebenar -->
+      <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px; background: linear-gradient(135deg, #FFF1F2, #FFE4E6); border: 2px solid #FDA4AF; padding: 12px 14px; border-radius: 16px; box-shadow: 0 4px 12px rgba(136, 19, 55, 0.08);">
+        <img src="./images/cikgu-asyikin-avatar.jpg" alt="Cikgu Asyikin" style="width: 62px; height: 62px; border-radius: 50%; object-fit: cover; border: 2.5px solid #F59E0B; box-shadow: 0 4px 10px rgba(0,0,0,0.18); flex-shrink: 0;">
+        <div>
+          <div style="font-weight: 800; font-size: 15px; color: #881337; display: flex; align-items: center; gap: 6px;">
+            <span>Cikgu Asyikin</span>
+            <span style="font-size: 11px; background: #881337; color: #FFF; padding: 1px 7px; border-radius: 999px; font-weight: 600;">Guru BM</span>
+          </div>
+          <div style="font-size: 12.5px; color: #9F1239; line-height: 1.35; margin-top: 2px;">"Selamat datang! Sila masukkan nama & kelas kamu untuk didaftarkan pada Sijil Pentaksiran Bilik Darjah (PBD)."</div>
+        </div>
+      </div>
+
+      <div class="trialogic-tag">✦ Maklumat Pentaksiran Bilik Darjah (PBD)</div>
 
       <div class="form-group">
         <label class="form-label" for="input-student-name">Nama Murid:</label>
@@ -939,7 +949,7 @@
   </div>
 
   <!-- Main ES6 Module Game Script with Cache-Buster -->
-  <script type="module" src="./game.js?v=4.4.3"></script>
+  <script type="module" src="./game.js?v=4.4.4"></script>
 
   <!-- PWA Service Worker Registration & Install Prompt Handler -->
   <script>
