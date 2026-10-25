@@ -295,7 +295,13 @@ export function createTextSprite(text, bgColor = 'rgba(15, 23, 42, 0.94)', textC
     ctx.stroke();
 
     ctx.fillStyle = textColor;
-    ctx.font = `bold ${fontSize}px "Fredoka", "Plus Jakarta Sans", "Amiri", Arial, sans-serif`;
+    let currFontSize = fontSize;
+    ctx.font = `bold ${currFontSize}px "Fredoka", "Plus Jakarta Sans", "Amiri", Arial, sans-serif`;
+    const maxTextWidth = w - r * 1.4;
+    while (ctx.measureText(text).width > maxTextWidth && currFontSize > 18) {
+      currFontSize -= 2;
+      ctx.font = `bold ${currFontSize}px "Fredoka", "Plus Jakarta Sans", "Amiri", Arial, sans-serif`;
+    }
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, width / 2, height / 2);

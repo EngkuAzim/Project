@@ -90,36 +90,299 @@ export function buildLobby(arg1, arg2, arg3) {
   roomGroup.add(noticeboard);
   roomColliders.push({ minX: -10.5, maxX: -7.8, minZ: -3.2, maxZ: 1.2 });
 
-  // 5. NPC Cikgu Asyikin (Guru Bahasa Melayu)
+  // 5. NPC Cikgu Asyikin (Guru Bahasa Melayu) - Bertudung Bawal & Berkaca Mata
   const teacherGroup = new THREE.Group();
   teacherGroup.position.set(2.0, 0, -3.2);
 
-  const skirt = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.52, 0.95, 12), new THREE.MeshLambertMaterial({ color: 0x047857 }));
-  skirt.position.y = 0.65;
+  // A. Kasut Hitam Wanita (Black Court Shoes)
+  const shoeMat = new THREE.MeshLambertMaterial({ color: 0x111827 });
+  const shoeL = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.07, 0.22), shoeMat);
+  shoeL.position.set(-0.15, 0.035, 0.05);
+  teacherGroup.add(shoeL);
+  const shoeR = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.07, 0.22), shoeMat);
+  shoeR.position.set(0.15, 0.035, 0.05);
+  teacherGroup.add(shoeR);
+
+  // B. Kain / Skirt Labuh Baju Kurung (Emerald Green)
+  const skirt = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.32, 0.52, 0.95, 16),
+    new THREE.MeshLambertMaterial({ color: 0x047857 })
+  );
+  skirt.position.y = 0.52;
   teacherGroup.add(skirt);
 
-  const bajuKurung = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.68, 0.44), new THREE.MeshLambertMaterial({ color: 0x10B981 }));
-  bajuKurung.position.y = 1.35;
+  // Jalur Emas Hujung Kain
+  const skirtTrim = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.51, 0.525, 0.04, 16),
+    new THREE.MeshLambertMaterial({ color: 0xF59E0B })
+  );
+  skirtTrim.position.y = 0.06;
+  teacherGroup.add(skirtTrim);
+
+  // C. Baju Kurung Moden (Emerald Green Kurung Blouse)
+  const bajuKurung = new THREE.Mesh(
+    new THREE.BoxGeometry(0.70, 0.68, 0.44),
+    new THREE.MeshLambertMaterial({ color: 0x059669 })
+  );
+  bajuKurung.position.y = 1.30;
   teacherGroup.add(bajuKurung);
 
-  const tudung = new THREE.Mesh(new THREE.SphereGeometry(0.36, 14, 12), new THREE.MeshLambertMaterial({ color: 0xFEF08A }));
-  tudung.position.y = 1.95;
-  teacherGroup.add(tudung);
+  // Renda / Jalur Emas Hujung Baju
+  const bajuTrim = new THREE.Mesh(
+    new THREE.BoxGeometry(0.72, 0.035, 0.46),
+    new THREE.MeshLambertMaterial({ color: 0xF59E0B })
+  );
+  bajuTrim.position.y = 0.98;
+  teacherGroup.add(bajuTrim);
 
-  const face = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.28, 0.12), new THREE.MeshLambertMaterial({ color: 0xFDE68A }));
-  face.position.set(0, 1.9, 0.26);
-  teacherGroup.add(face);
+  // Tanda Nama Rasmi Guru (Name Badge "CIKGU ASYIKIN")
+  const badgePlate = new THREE.Mesh(
+    new THREE.BoxGeometry(0.16, 0.05, 0.02),
+    new THREE.MeshLambertMaterial({ color: 0x0F172A })
+  );
+  badgePlate.position.set(-0.18, 1.44, 0.23);
+  teacherGroup.add(badgePlate);
 
+  const badgeTextLine = new THREE.Mesh(
+    new THREE.BoxGeometry(0.12, 0.015, 0.025),
+    new THREE.MeshLambertMaterial({ color: 0xFFFFFF })
+  );
+  badgeTextLine.position.set(-0.18, 1.44, 0.23);
+  teacherGroup.add(badgeTextLine);
+
+  // D. Labuh Tudung Bahu & Dada (Hijab Drape / Shawl over Shoulders)
+  const tudungMat = new THREE.MeshLambertMaterial({ color: 0xFFFBEB }); // Soft Vanilla Cream
+  const tudungTrimMat = new THREE.MeshLambertMaterial({ color: 0xFDE68A }); // Warm Gold Accent
+
+  const tudungCowl = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.36, 0.58, 0.44, 16),
+    tudungMat
+  );
+  tudungCowl.position.y = 1.58;
+  teacherGroup.add(tudungCowl);
+
+  // Lipatan V-Shape di Dada
+  const frontDrape = new THREE.Mesh(
+    new THREE.BoxGeometry(0.30, 0.34, 0.06),
+    tudungTrimMat
+  );
+  frontDrape.position.set(0, 1.50, 0.23);
+  frontDrape.rotation.x = -0.1;
+  teacherGroup.add(frontDrape);
+
+  // Kerongsang Emas (Gold Brooch Pin)
+  const brooch = new THREE.Mesh(
+    new THREE.OctahedronGeometry(0.04, 0),
+    new THREE.MeshLambertMaterial({ color: 0xF59E0B })
+  );
+  brooch.position.set(0, 1.64, 0.26);
+  teacherGroup.add(brooch);
+
+  // E. Lengan Kanan Memegang Pen Merah Cikgu
+  const armR = new THREE.Group();
+  armR.position.set(0.40, 1.55, 0.05);
+
+  const sleeveR = new THREE.Mesh(
+    new THREE.BoxGeometry(0.16, 0.48, 0.16),
+    new THREE.MeshLambertMaterial({ color: 0x059669 })
+  );
+  sleeveR.position.set(0, -0.20, 0.08);
+  sleeveR.rotation.x = -0.32;
+  armR.add(sleeveR);
+
+  const handR = new THREE.Mesh(
+    new THREE.BoxGeometry(0.10, 0.12, 0.10),
+    new THREE.MeshLambertMaterial({ color: 0xF7CE9E })
+  );
+  handR.position.set(0, -0.42, 0.18);
+  armR.add(handR);
+
+  // Pen Merah Memeriksa Latihan
+  const penMerah = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.015, 0.015, 0.22, 6),
+    new THREE.MeshLambertMaterial({ color: 0xDC2626 })
+  );
+  penMerah.position.set(0.03, -0.38, 0.24);
+  penMerah.rotation.x = -0.4;
+  armR.add(penMerah);
+
+  teacherGroup.add(armR);
+
+  // F. Lengan Kiri Melambai Mesra (Waving Arm)
   const armL = new THREE.Group();
-  armL.position.set(-0.44, 1.55, 0);
-  const sleeveL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.6, 0.18), new THREE.MeshLambertMaterial({ color: 0x10B981 }));
-  sleeveL.position.y = -0.22;
+  armL.position.set(-0.42, 1.56, 0);
+
+  const sleeveL = new THREE.Mesh(
+    new THREE.BoxGeometry(0.16, 0.46, 0.16),
+    new THREE.MeshLambertMaterial({ color: 0x059669 })
+  );
+  sleeveL.position.y = -0.20;
   armL.add(sleeveL);
+
+  const cuffL = new THREE.Mesh(
+    new THREE.BoxGeometry(0.17, 0.03, 0.17),
+    new THREE.MeshLambertMaterial({ color: 0xF59E0B })
+  );
+  cuffL.position.y = -0.42;
+  armL.add(cuffL);
+
+  const handL = new THREE.Mesh(
+    new THREE.BoxGeometry(0.10, 0.12, 0.06),
+    new THREE.MeshLambertMaterial({ color: 0xF7CE9E })
+  );
+  handL.position.y = -0.48;
+  armL.add(handL);
+
   teacherGroup.add(armL);
 
-  const teacherTag = createTextSprite('Cikgu Asyikin (Guru BM)', 'rgba(6, 78, 59, 0.94)', '#A7F3D0', 512, 160, 52);
-  teacherTag.scale.set(3.0, 1.4, 1);
-  teacherTag.position.set(0, 2.7, 0);
+  // G. Kepala dengan Tudung Bawal & Spek (Teacher Head Group)
+  const teacherHead = new THREE.Group();
+  teacherHead.position.set(0, 1.95, 0);
+
+  // 1. Kubah Tudung Bulat (Hijab Crown)
+  const tudungCrown = new THREE.Mesh(
+    new THREE.SphereGeometry(0.38, 20, 16),
+    tudungMat
+  );
+  teacherHead.add(tudungCrown);
+
+  // 2. Awning Tudung Bawal Berbentuk Lipatan Kemas di Dahi
+  const awning = new THREE.Mesh(
+    new THREE.BoxGeometry(0.30, 0.05, 0.12),
+    tudungTrimMat
+  );
+  awning.position.set(0, 0.19, 0.23);
+  awning.rotation.x = 0.22;
+  teacherHead.add(awning);
+
+  // Lipatan tepi tudung membingkai pipi
+  const cheekL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.26, 0.14), tudungTrimMat);
+  cheekL.position.set(-0.19, -0.05, 0.20);
+  teacherHead.add(cheekL);
+
+  const cheekR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.26, 0.14), tudungTrimMat);
+  cheekR.position.set(0.19, -0.05, 0.20);
+  teacherHead.add(cheekR);
+
+  // Pelapik Dagu Tudung (Chin Cover)
+  const tudungChin = new THREE.Mesh(
+    new THREE.BoxGeometry(0.24, 0.08, 0.10),
+    tudungMat
+  );
+  tudungChin.position.set(0, -0.16, 0.24);
+  teacherHead.add(tudungChin);
+
+  // 3. Muka Lembut di Dalam Bukaan Tudung (Face Mesh)
+  const faceMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(0.30, 0.28, 0.14),
+    new THREE.MeshLambertMaterial({ color: 0xF7CE9E }) // Warm Natural Skin
+  );
+  faceMesh.position.set(0, 0.02, 0.21);
+  teacherHead.add(faceMesh);
+
+  // 4. Mata Murid Cikgu (Smiling Pupils with Twinkle)
+  const eyeMat = new THREE.MeshBasicMaterial({ color: 0x1E293B });
+  const sparkleMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+
+  const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.05, 0.02), eyeMat);
+  eyeL.position.set(-0.09, 0.04, 0.29);
+  teacherHead.add(eyeL);
+
+  const eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.05, 0.02), eyeMat);
+  eyeR.position.set(0.09, 0.04, 0.29);
+  teacherHead.add(eyeR);
+
+  const spL = new THREE.Mesh(new THREE.BoxGeometry(0.016, 0.016, 0.025), sparkleMat);
+  spL.position.set(-0.08, 0.055, 0.295);
+  teacherHead.add(spL);
+
+  const spR = new THREE.Mesh(new THREE.BoxGeometry(0.016, 0.016, 0.025), sparkleMat);
+  spR.position.set(0.10, 0.055, 0.295);
+  teacherHead.add(spR);
+
+  // Kening Bersahaja (Gentle Eyebrows)
+  const browMat = new THREE.MeshLambertMaterial({ color: 0x475569 });
+  const browL = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.018, 0.02), browMat);
+  browL.position.set(-0.09, 0.11, 0.29);
+  browL.rotation.z = 0.08;
+  teacherHead.add(browL);
+
+  const browR = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.018, 0.02), browMat);
+  browR.position.set(0.09, 0.11, 0.29);
+  browR.rotation.z = -0.08;
+  teacherHead.add(browR);
+
+  // Pipi Merah Jambu Lembut (Blush)
+  const blushMat = new THREE.MeshBasicMaterial({ color: 0xFB7185, side: THREE.DoubleSide });
+  const blushL = new THREE.Mesh(new THREE.PlaneGeometry(0.05, 0.028), blushMat);
+  blushL.position.set(-0.13, -0.03, 0.29);
+  teacherHead.add(blushL);
+
+  const blushR = new THREE.Mesh(new THREE.PlaneGeometry(0.05, 0.028), blushMat);
+  blushR.position.set(0.13, -0.03, 0.29);
+  teacherHead.add(blushR);
+
+  // Senyuman Mesra Guru (Warm Gentle Smile)
+  const smile = new THREE.Mesh(
+    new THREE.TorusGeometry(0.038, 0.010, 6, 12, Math.PI),
+    new THREE.MeshBasicMaterial({ color: 0xE11D48 })
+  );
+  smile.position.set(0, -0.065, 0.285);
+  smile.rotation.z = Math.PI;
+  teacherHead.add(smile);
+
+  // 5. CERMIN MATA / SPEK GURU (Smart Teacher Spectacles)
+  const glassFrameMat = new THREE.MeshStandardMaterial({
+    color: 0x1E293B, // Smart Midnight Dark Rim
+    metalness: 0.6,
+    roughness: 0.3
+  });
+
+  const lensMat = new THREE.MeshBasicMaterial({
+    color: 0xBAE6FD,
+    transparent: true,
+    opacity: 0.38,
+    side: THREE.DoubleSide
+  });
+
+  // Bingkai Kiri
+  const rimL = new THREE.Mesh(new THREE.TorusGeometry(0.062, 0.012, 8, 20), glassFrameMat);
+  rimL.position.set(-0.09, 0.04, 0.31);
+  teacherHead.add(rimL);
+
+  const lensL = new THREE.Mesh(new THREE.CircleGeometry(0.055, 16), lensMat);
+  lensL.position.set(-0.09, 0.04, 0.305);
+  teacherHead.add(lensL);
+
+  // Bingkai Kanan
+  const rimR = new THREE.Mesh(new THREE.TorusGeometry(0.062, 0.012, 8, 20), glassFrameMat);
+  rimR.position.set(0.09, 0.04, 0.31);
+  teacherHead.add(rimR);
+
+  const lensR = new THREE.Mesh(new THREE.CircleGeometry(0.055, 16), lensMat);
+  lensR.position.set(0.09, 0.04, 0.305);
+  teacherHead.add(lensR);
+
+  // Jambatan Cermin Mata di Hidung (Nose Bridge)
+  const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.014, 0.014), glassFrameMat);
+  bridge.position.set(0, 0.04, 0.31);
+  teacherHead.add(bridge);
+
+  // Tangkai Spek Masuk ke Sisi Tudung (Temples)
+  const templeL = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.012, 0.16), glassFrameMat);
+  templeL.position.set(-0.16, 0.04, 0.22);
+  teacherHead.add(templeL);
+
+  const templeR = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.012, 0.16), glassFrameMat);
+  templeR.position.set(0.16, 0.04, 0.22);
+  teacherHead.add(templeR);
+
+  teacherGroup.add(teacherHead);
+
+  // H. Tag Nama Terapung "Cikgu Asyikin (Guru BM)"
+  const teacherTag = createTextSprite('Cikgu Asyikin (Guru BM)', 'rgba(6, 78, 59, 0.94)', '#A7F3D0', 576, 160, 48);
+  teacherTag.scale.set(3.4, 1.4, 1);
+  teacherTag.position.set(0, 2.75, 0);
   teacherGroup.add(teacherTag);
 
   roomGroup.add(teacherGroup);
@@ -282,6 +545,23 @@ export function buildLobby(arg1, arg2, arg3) {
   micHead.position.set(0.18, 1.54, -0.12);
   rostrumGroup.add(micHead);
 
+  // Buku Teks Bahasa Melayu di Atas Rostrum
+  const textBook = new THREE.Mesh(
+    new THREE.BoxGeometry(0.38, 0.035, 0.28),
+    new THREE.MeshLambertMaterial({ color: 0x1E40AF })
+  );
+  textBook.position.set(-0.16, 1.28, 0.02);
+  textBook.rotation.x = 0.12;
+  rostrumGroup.add(textBook);
+
+  const bookStripe = new THREE.Mesh(
+    new THREE.BoxGeometry(0.39, 0.038, 0.05),
+    new THREE.MeshLambertMaterial({ color: 0xF59E0B })
+  );
+  bookStripe.position.set(-0.16, 1.28, 0.02);
+  bookStripe.rotation.x = 0.12;
+  rostrumGroup.add(bookStripe);
+
   roomGroup.add(rostrumGroup);
   roomColliders.push({ minX: 1.3, maxX: 2.7, minZ: -2.6, maxZ: -1.5 });
 
@@ -363,6 +643,6 @@ export function buildLobby(arg1, arg2, arg3) {
 
   return {
     teacherWavingArm: armL,
-    teacherHead: tudung
+    teacherHead
   };
 }

@@ -828,7 +828,7 @@ function animate() {
     const dTeacher = playerGroup.position.distanceTo(new THREE.Vector3(2.0, 0, -3.2));
     const dNotice = playerGroup.position.distanceTo(new THREE.Vector3(-9.2, 0, -1.0));
 
-    if (dTeacher <= 2.6) {
+    if (dTeacher <= 3.2) {
       foundTarget = 'npcTeacher';
       promptText = 'Tekan E untuk Bicara dengan Cikgu Asyikin';
     } else if (dNotice <= 3.4) {
