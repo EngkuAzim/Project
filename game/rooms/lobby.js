@@ -123,7 +123,243 @@ export function buildLobby(arg1, arg2, arg3) {
   teacherGroup.add(teacherTag);
 
   roomGroup.add(teacherGroup);
-  roomColliders.push({ minX: 1.0, maxX: 3.0, minZ: -4.2, maxZ: -2.2 });
+  // 6. Windows: 4 window frames on North and West walls
+  function buildWindow(width, height) {
+    const winGroup = new THREE.Group();
+    // Wooden Outer Frame
+    const frameMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(width + 0.2, height + 0.2, 0.12),
+      new THREE.MeshLambertMaterial({ color: 0x78350F })
+    );
+    winGroup.add(frameMesh);
+
+    // Light Blue Glass Pane
+    const glassMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(width, height),
+      new THREE.MeshBasicMaterial({ color: 0xBAE6FD, transparent: true, opacity: 0.85, side: THREE.DoubleSide })
+    );
+    glassMesh.position.z = 0.02;
+    winGroup.add(glassMesh);
+
+    // Wooden Louvers / Crossbars (Horizontal & Vertical)
+    const vertBar = new THREE.Mesh(
+      new THREE.BoxGeometry(0.08, height, 0.08),
+      new THREE.MeshLambertMaterial({ color: 0x92400E })
+    );
+    vertBar.position.z = 0.04;
+    winGroup.add(vertBar);
+
+    [-height * 0.25, height * 0.25].forEach((ly) => {
+      const hBar = new THREE.Mesh(
+        new THREE.BoxGeometry(width, 0.06, 0.08),
+        new THREE.MeshLambertMaterial({ color: 0x92400E })
+      );
+      hBar.position.set(0, ly, 0.04);
+      winGroup.add(hBar);
+    });
+
+    // Bottom Window Sill
+    const sill = new THREE.Mesh(
+      new THREE.BoxGeometry(width + 0.35, 0.1, 0.25),
+      new THREE.MeshLambertMaterial({ color: 0x592911 })
+    );
+    sill.position.set(0, -height / 2 - 0.05, 0.08);
+    winGroup.add(sill);
+
+    return winGroup;
+  }
+
+  // 2 Windows on North Wall (flanking the main banner)
+  const winNorthLeft = buildWindow(2.2, 2.0);
+  winNorthLeft.position.set(-10.5, 3.4, -10.7);
+  roomGroup.add(winNorthLeft);
+
+  const winNorthRight = buildWindow(2.2, 2.0);
+  winNorthRight.position.set(10.5, 3.4, -10.7);
+  roomGroup.add(winNorthRight);
+
+  // 2 Windows on West Wall
+  const winWestNorth = buildWindow(2.2, 2.0);
+  winWestNorth.rotation.y = Math.PI / 2;
+  winWestNorth.position.set(-12.7, 3.4, -4.5);
+  roomGroup.add(winWestNorth);
+
+  const winWestSouth = buildWindow(2.2, 2.0);
+  winWestSouth.rotation.y = Math.PI / 2;
+  winWestSouth.position.set(-12.7, 3.4, 4.5);
+  roomGroup.add(winWestSouth);
+
+  // 7. Indoor Potted Plants Helper & Placements
+  function createPottedPlant(px, pz) {
+    const plantGroup = new THREE.Group();
+    plantGroup.position.set(px, 0, pz);
+
+    // White Ceramic Pot
+    const potMat = new THREE.MeshLambertMaterial({ color: 0xF8FAFC });
+    const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.3, 0.75, 12), potMat);
+    pot.position.y = 0.375;
+    pot.castShadow = true;
+    plantGroup.add(pot);
+
+    // Top Soil
+    const soil = new THREE.Mesh(new THREE.CylinderGeometry(0.39, 0.39, 0.06, 12), new THREE.MeshLambertMaterial({ color: 0x451A03 }));
+    soil.position.y = 0.74;
+    plantGroup.add(soil);
+
+    // Lush Overlapping Green Spheres (Foliage)
+    const foliageMat1 = new THREE.MeshLambertMaterial({ color: 0x15803D });
+    const foliageMat2 = new THREE.MeshLambertMaterial({ color: 0x16A34A });
+    const foliageMat3 = new THREE.MeshLambertMaterial({ color: 0x22C55E });
+
+    const centerBush = new THREE.Mesh(new THREE.SphereGeometry(0.48, 8, 8), foliageMat1);
+    centerBush.position.y = 1.05;
+    plantGroup.add(centerBush);
+
+    const bushClusters = [
+      { x: 0.24, y: 1.15, z: 0.12, r: 0.32, mat: foliageMat2 },
+      { x: -0.22, y: 1.18, z: -0.14, r: 0.34, mat: foliageMat3 },
+      { x: 0.12, y: 1.25, z: -0.22, r: 0.30, mat: foliageMat1 },
+      { x: -0.15, y: 1.32, z: 0.18, r: 0.28, mat: foliageMat2 }
+    ];
+
+    bushClusters.forEach((c) => {
+      const b = new THREE.Mesh(new THREE.SphereGeometry(c.r, 8, 8), c.mat);
+      b.position.set(c.x, c.y, c.z);
+      plantGroup.add(b);
+    });
+
+    roomGroup.add(plantGroup);
+    roomColliders.push({ minX: px - 0.55, maxX: px + 0.55, minZ: pz - 0.55, maxZ: pz + 0.55 });
+  }
+
+  // Place 4 indoor plants (corners and near flagpole)
+  createPottedPlant(-10.2, -7.5); // Near flagpole
+  createPottedPlant(11.2, -9.5);  // North-East corner
+  createPottedPlant(-11.2, 8.5);  // South-West corner
+  createPottedPlant(11.2, 8.5);   // South-East corner
+
+  // 8. Teacher's Rostrum with Tiny Mic (Placed directly in front of Cikgu Asyikin)
+  const rostrumGroup = new THREE.Group();
+  rostrumGroup.position.set(2.0, 0, -2.1);
+
+  // Stacked brown wooden boxes
+  const rostrumBase = new THREE.Mesh(
+    new THREE.BoxGeometry(1.15, 0.14, 0.85),
+    new THREE.MeshLambertMaterial({ color: 0x78350F })
+  );
+  rostrumBase.position.y = 0.07;
+  rostrumGroup.add(rostrumBase);
+
+  const rostrumPillar = new THREE.Mesh(
+    new THREE.BoxGeometry(0.85, 1.05, 0.6),
+    new THREE.MeshLambertMaterial({ color: 0x92400E })
+  );
+  rostrumPillar.position.y = 0.65;
+  rostrumGroup.add(rostrumPillar);
+
+  // Slanted top reading desk
+  const rostrumTop = new THREE.Mesh(
+    new THREE.BoxGeometry(0.95, 0.08, 0.7),
+    new THREE.MeshLambertMaterial({ color: 0x78350F })
+  );
+  rostrumTop.position.set(0, 1.22, 0);
+  rostrumTop.rotation.x = 0.12;
+  rostrumGroup.add(rostrumTop);
+
+  // Tiny Black Microphone
+  const micStem = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.015, 0.015, 0.28, 8),
+    new THREE.MeshStandardMaterial({ color: 0x1E293B, metalness: 0.8 })
+  );
+  micStem.position.set(0.18, 1.4, -0.08);
+  micStem.rotation.x = -0.2;
+  rostrumGroup.add(micStem);
+
+  const micHead = new THREE.Mesh(
+    new THREE.SphereGeometry(0.045, 8, 8),
+    new THREE.MeshStandardMaterial({ color: 0x0F172A, roughness: 0.5 })
+  );
+  micHead.position.set(0.18, 1.54, -0.12);
+  rostrumGroup.add(micHead);
+
+  roomGroup.add(rostrumGroup);
+  roomColliders.push({ minX: 1.3, maxX: 2.7, minZ: -2.6, maxZ: -1.5 });
+
+  // 9. Wooden Benches on Left & Right Sides of Red Carpet
+  function createWoodenBench(bx, bz, rotY) {
+    const benchGroup = new THREE.Group();
+    benchGroup.position.set(bx, 0, bz);
+    benchGroup.rotation.y = rotY;
+
+    const benchWoodMat = new THREE.MeshLambertMaterial({ color: 0x78350F });
+    const legWoodMat = new THREE.MeshLambertMaterial({ color: 0x451A03 });
+
+    // Seat plank
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.12, 0.8), benchWoodMat);
+    seat.position.y = 0.48;
+    benchGroup.add(seat);
+
+    // Backrest plank
+    const backrest = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.5, 0.08), benchWoodMat);
+    backrest.position.set(0, 0.88, -0.36);
+    benchGroup.add(backrest);
+
+    // 4 Wooden legs
+    const legPositions = [
+      [-1.3, 0.24, -0.3],
+      [1.3, 0.24, -0.3],
+      [-1.3, 0.24, 0.3],
+      [1.3, 0.24, 0.3]
+    ];
+    legPositions.forEach(([lx, ly, lz]) => {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.48, 0.12), legWoodMat);
+      leg.position.set(lx, ly, lz);
+      benchGroup.add(leg);
+    });
+
+    roomGroup.add(benchGroup);
+  }
+
+  createWoodenBench(-4.5, 1.5, Math.PI / 2);  // Left bench facing red carpet
+  createWoodenBench(4.5, 1.5, -Math.PI / 2); // Right bench facing red carpet
+  roomColliders.push({ minX: -5.1, maxX: -3.9, minZ: 0.0, maxZ: 3.0 });
+  roomColliders.push({ minX: 3.9, maxX: 5.1, minZ: 0.0, maxZ: 3.0 });
+
+  // 10. Pendant Lamps: 4 warm-colored glowing spheres hanging from ceiling
+  const lampPositions = [
+    [-5.0, -3.5],
+    [5.0, -3.5],
+    [-5.0, 4.0],
+    [5.0, 4.0]
+  ];
+
+  lampPositions.forEach(([lx, lz]) => {
+    const lampGroup = new THREE.Group();
+    lampGroup.position.set(lx, 0, lz);
+
+    // Suspension cord from ceiling (y=5.5 down to y=4.2)
+    const cord = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.02, 0.02, 1.3, 8),
+      new THREE.MeshLambertMaterial({ color: 0x334155 })
+    );
+    cord.position.y = 4.85;
+    lampGroup.add(cord);
+
+    // Glowing Sphere
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(0.36, 16, 12),
+      new THREE.MeshBasicMaterial({ color: 0xFFDDAA })
+    );
+    sphere.position.y = 4.2;
+    lampGroup.add(sphere);
+
+    // Warm Ambient Point Light
+    const pLight = new THREE.PointLight(0xFFDDAA, 0.75, 8.0);
+    pLight.position.y = 4.2;
+    lampGroup.add(pLight);
+
+    roomGroup.add(lampGroup);
+  });
 
   return {
     teacherWavingArm: armL,

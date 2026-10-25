@@ -126,6 +126,7 @@ spawnR1Checkpoints(COLLECTIBLES_R1, roomGroups.room1);
 
 const r2Refs = buildRoom2(scene, roomGroups.room2, colliders.room2);
 const r2AssemblyStation = r2Refs.r2AssemblyStation;
+const r2CeilingFans = r2Refs.ceilingFans || [];
 // Sesi 1: Spawns ONLY the 4 items for Ulat Buku & Anak Emas on 4 display pedestals
 spawnR2PictureCards(COLLECTIBLES_R2_SESSION1, roomGroups.room2);
 
@@ -658,6 +659,13 @@ function animate() {
       }
     }
   });
+
+  // Smooth Procedural Rotation of Room 2 Ceiling Fans
+  if (gameState.currentRoom === 'room2' && r2CeilingFans.length > 0) {
+    r2CeilingFans.forEach(hub => {
+      hub.rotation.y += 0.04;
+    });
+  }
 
   // Player Movement (Roblox 3rd-Person Front View Axes & Mobile Virtual Joystick)
   const isMenuOpen = document.getElementById('main-menu') && !document.getElementById('main-menu').classList.contains('hidden');
